@@ -35,32 +35,32 @@ def test_simple_case(clear_data):
 
 def test_register_invalid_email(clear_data):
     with pytest.raises(InputError):
-        auth_register_v1('789ashd@!.com', 'mahoo', 'Michael', 'Gao')
+        auth_register_v1('789ashd@!.com', 'mahooo', 'Michael', 'Gao')
 
 def test_register_no_duplicates(clear_data):  
-    auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahoo', 'Michael', 'Gao')
+    auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'Michael', 'Gao')
     with pytest.raises(InputError):
-        auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahoo', 'Michael', 'Gao')
+        auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'Michael', 'Gao')
 
 def test_register_length_password(clear_data):
     with pytest.raises(InputError):
-        auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahoasomahoasomahoasomahoasomahoaso', 'Michael', 'Gao')
+        auth_register_v1('mrmaxilikestoeat@gmail.com', 'short', 'Michael', 'Gao')
             
 def test_register_length_firstname(clear_data):
     with pytest.raises(InputError):
-        auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahoo', 'MichaelangelooooGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuiooooo', 'Gao')
+        auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'MichaelangelooooGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuiooooo', 'Gao')
 
 def test_register_length_firstname_2(clear_data):
     with pytest.raises(InputError):
-        auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahoo', '', 'Gao')
+        auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', '', 'Gao')
            
 def test_register_length_lastname(clear_data):
     with pytest.raises(InputError):
-        auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahoo', 'Michael', 'GashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuio')
+        auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'Michael', 'GashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuio')
             
 def test_register_length_handle(clear_data):
     ## Get the user ID of the registered person
-    register_data = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahoo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
+    register_data = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
     auth_user_id = register_data['auth_user_id']
 
     ## Get the data from the data store
@@ -71,11 +71,11 @@ def test_register_length_handle(clear_data):
  
 def test_register_duplicate_handle(clear_data):
     ## Get userID of person
-    register_data_1 = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahoo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
+    register_data_1 = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
     auth_user_id_1 = register_data_1['auth_user_id']
 
     ## Get userID of duplicate person
-    register_data_2 = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahoo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
+    register_data_2 = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
     auth_user_id_2 = register_data_2['auth_user_id']
 
     ## Get the data from the data store
@@ -87,7 +87,7 @@ def test_register_duplicate_handle(clear_data):
  
 def test_register_valid_output(clear_data):
     ## Get the user ID of the registered person
-    register_data = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahoo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
+    register_data = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
     auth_user_id = register_data['auth_user_id']
 
     assert auth_user_id == 1
