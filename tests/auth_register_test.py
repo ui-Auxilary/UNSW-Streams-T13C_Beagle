@@ -27,6 +27,12 @@ VALID_OUTPUT
 def clear_data():
     clear_v1()
 
+def test_simple_case(clear_data):
+    user_id = auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')['auth_user_id']
+    user_id_1 = auth_register_v1('new@mycompany.com', 'mypassword', 'Firstname', 'Lastname')['auth_user_id']
+    assert user_id == 1
+    assert user_id_1 == 2
+
 def test_register_invalid_email(clear_data):
     with pytest.raises(InputError):
         auth_register_v1('789ashd@!.com', 'mahoo', 'Michael', 'Gao')
