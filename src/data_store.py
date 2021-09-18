@@ -25,9 +25,25 @@ Example usage:
 '''
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
+'''
+DATA INSIDE:
+    - user_data
+        key = auth_user_id
+        -> dictionary with keys
+            - 'first_name'
+            - 'last_name'
+            - 'email_address'
+            - 'password'
+            - 'user_handle'
+    - user_handles
+        quick access to all handles
+    - user_emails
+        quick access to all emails
+'''
 initial_object = {
     'user_data': {},
-    'user_ids': [],
+    'user_handles': [],
+    'user_emails': [],
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
