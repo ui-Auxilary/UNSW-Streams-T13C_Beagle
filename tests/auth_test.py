@@ -3,7 +3,7 @@ import pytest
 
 from src.data_store import data_store
 from src.auth import auth_register_v1
-from src.error import InputError, LengthError
+from src.error import InputError
 from src.other import clear_v1
 
 '''
