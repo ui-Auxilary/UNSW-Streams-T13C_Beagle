@@ -67,7 +67,7 @@ def test_register_length_handle(clear_data):
     data_source = data_store.get()
     auth_user_handle = data_source['user_data'][auth_user_id]['user_handle']
 
-    assert auth_user_handle == 'SamanthaDhruvChLawre'
+    assert auth_user_handle == 'samanthadhruvchlawre'
  
 def test_register_duplicate_handle(clear_data):
     ## Get userID of person
@@ -75,7 +75,7 @@ def test_register_duplicate_handle(clear_data):
     auth_user_id_1 = register_data_1['auth_user_id']
 
     ## Get userID of duplicate person
-    register_data_2 = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
+    register_data_2 = auth_register_v1('anotherperson@gmail.com', 'mahooo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
     auth_user_id_2 = register_data_2['auth_user_id']
 
     ## Get the data from the data store
@@ -83,7 +83,7 @@ def test_register_duplicate_handle(clear_data):
     ## Get the user_handle of duplicate user
     auth_user_handle = data_source['user_data'][auth_user_id_2]['user_handle']
     
-    assert auth_user_handle == 'SamanthaDhruvChLawre0'
+    assert auth_user_handle == 'samanthadhruvchlawre0'
  
 def test_register_valid_output(clear_data):
     ## Get the user ID of the registered person
