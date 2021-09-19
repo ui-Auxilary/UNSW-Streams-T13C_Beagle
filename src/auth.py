@@ -23,8 +23,24 @@ def generate_user_handle(name_first, name_last, data_source):
     return user_handle
 
 def auth_login_v1(email, password):
+    ## Get the data store
+    data_source = data_store.get()
+
+    ## Check if email belongs to user
+    if email not in data_source['user_emails']:
+        raise InputError('Email entered does not belong to a user')
+
+    ## Get user ID from email in data
+    for user_id in data_source['user_data']:
+        if data_source['user_data'][user_id]['email_address'] == email:
+            break
+    
+    ## Check if password is correct
+    if data_source['user_data'][user_id]['password'] != password:
+        raise InputError('Password is not correct')
+
     return {
-        'auth_user_id': 1,
+        'auth_user_id': user_id,
     }
 
 def auth_register_v1(email, password, name_first, name_last):
