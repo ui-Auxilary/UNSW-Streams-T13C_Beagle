@@ -35,6 +35,7 @@ DATA INSIDE:
             - 'email_address'
             - 'password'
             - 'user_handle'
+            - 'global_owner'
     - user_handles
         quick access to all handles
     - user_emails
