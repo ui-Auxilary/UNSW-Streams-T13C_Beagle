@@ -4,3 +4,4 @@
 2. Assume number of users can be stored in an integer (about 2 billion users max)
 3. Assume that the user who creates a channel is logged in
 4. Assume multiple channels can have the same name
+5. Assume when someone registers then are not automatically a global owner

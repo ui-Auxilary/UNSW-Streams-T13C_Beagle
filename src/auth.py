@@ -81,7 +81,8 @@ def auth_register_v1(email, password, name_first, name_last):
                                               'last_name'    : name_last,
                                               'email_address': email,
                                               'password'     : password,
-                                              'user_handle'  : user_handle }
+                                              'user_handle'  : user_handle
+                                              'global_owner' : False }
 
     return {
         'auth_user_id': new_user_id,
