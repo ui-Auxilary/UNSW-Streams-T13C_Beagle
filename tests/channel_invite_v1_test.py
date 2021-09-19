@@ -49,24 +49,26 @@ def test_invite_channel_simple_case(clear_data):
 
 def test_invalid_channel_id(clear_data):
     user_id, new_user_id, channel_id = create_user_and_channel()
+    invalid_channel_id = 222
 
     with pytest.raises(InputError):
         # invites user to a non-existent channel
-        channel_invite_v1(user_id, 11, new_user_id)
+        channel_invite_v1(user_id, invalid_channel_id, new_user_id)
 
 def test_invalid_user(clear_data):
     user_id, new_user_id, channel_id = create_user_and_channel()
+    invalid_new_user_id = 222
 
-    # create a channel with that user
-    channel_id = channels_create_v1(user_id, 'channel_1', 'True')['channel_id']
     with pytest.raises(InputError):
         # invites a non-existent user into the channel
-        channel_invite_v1(user_id, channel_id, 2)
+        channel_invite_v1(user_id, channel_id, invalid_new_user_id)
 
 def test_user_already_in_channel(clear_data):
     user_id, new_user_id, channel_id = create_user_and_channel()
-    
+
+    # adds new_user in to the channel
     channel_join_v1(new_user_id, channel_id)
+
     with pytest.raises(InputError):
         # invite an existing user
         channel_invite_v1(user_id, channel_id, new_user_id)
