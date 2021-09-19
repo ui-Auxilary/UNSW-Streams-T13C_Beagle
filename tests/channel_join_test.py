@@ -3,7 +3,7 @@ import pytest
 
 from src.data_store import data_store
 from src.auth import auth_register_v1
-from src.error import InputError
+from src.error import InputError, AccessError
 from src.other import clear_v1
 from src.channels import channels_create_v1
 from src.channel import channel_join_v1
@@ -16,6 +16,8 @@ VALID INPUT
 
 ACCESS ERROR
     - channel is private AND user is not GLOBAL owner
+
+- test if user is global owner and channel is private
 
 '''
 
@@ -68,18 +70,38 @@ def test_private_not_global_owner(clear_data):
     # register user, log them in and get their user_id
     auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')
     user_id = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']
-    
+
     # create a channel with that user
     channel_id = channels_create_v1(user_id, 'channel_1', 'False')['channel_id']
 
-    # createa a new user
+    # create a new user
     auth_register_v1('sam@mycompany.com', 'mypassword', 'Samantha', 'Tse')
     new_user_id = auth_login_v1('sam@mycompany.com', 'mypassword')['auth_user_id']
+
+    with pytest.raises(AccessError):
+        # get them to join the channel
+        channel_join_v1(new_user_id, channel_id)
+
+
+def test_private_is_global_owner(clear_data):
+    # register user, log them in and get their user_id
+    auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')
+    user_id = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']
+
+    # create a channel with that user
+    channel_id = channels_create_v1(user_id, 'channel_1', 'False')['channel_id']
+
+    # create a new user
+    auth_register_v1('sam@mycompany.com', 'mypassword', 'Samantha', 'Tse')
+    new_user_id = auth_login_v1('sam@mycompany.com', 'mypassword')['auth_user_id']
+    
+    # get the database and make new user a global owner
+    data_source = data_store.get()
+    data_source['user_data'][new_user_id]['global_owner'] = True
 
     # get them to join the channel
     channel_join_v1(new_user_id, channel_id)
 
-    # get the database
-    data_source = data_store.get()
+    
     # check that both users are members now
     assert data_source['channel_data']['members'] == [user_id, new_user_id]
