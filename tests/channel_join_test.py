@@ -44,7 +44,7 @@ def test_simple_case(clear_data):
     # get the database
     data_source = data_store.get()
     # check that both users are members now
-    assert data_source['channel_data']['members'] == [user_id, new_user_id]
+    assert data_source['channel_data'][channel_id]['members'] == [user_id, new_user_id]
 
 def test_invalid_channel_id(clear_data):
     # register user, log them in and get their user_id
@@ -72,7 +72,7 @@ def test_private_not_global_owner(clear_data):
     user_id = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']
 
     # create a channel with that user
-    channel_id = channels_create_v1(user_id, 'channel_1', 'False')['channel_id']
+    channel_id = channels_create_v1(user_id, 'channel_1', False)['channel_id']
 
     # create a new user
     auth_register_v1('sam@mycompany.com', 'mypassword', 'Samantha', 'Tse')
@@ -104,4 +104,4 @@ def test_private_is_global_owner(clear_data):
 
     
     # check that both users are members now
-    assert data_source['channel_data']['members'] == [user_id, new_user_id]
+    assert data_source['channel_data'][channel_id]['members'] == [user_id, new_user_id]
