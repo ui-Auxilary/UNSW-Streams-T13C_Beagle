@@ -48,7 +48,7 @@ def auth_register_v1(email, password, name_first, name_last):
     data_source = data_store.get()
 
     ## check whether email valid
-    pattern = '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
+    pattern = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
     if not re.match(pattern, email):
         raise InputError('Invalid email address')
     
