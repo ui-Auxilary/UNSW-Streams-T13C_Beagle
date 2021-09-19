@@ -38,20 +38,22 @@ def test_basic_case(clear_data):
     new_channel_id_2 = channels_create_v1(user_id, 'Channel_3', True)['channel_id']
     
     ## checks the channels returned by channel list match
-    assert channels_list_v1(user_id) == [
-        {
-            'channel_id': 1, 
-            'name':'Channel_1'
-        }, 
-        {
-            'channel_id': 2, 
-            'name':'Channel_2'
-        }, 
-        {
-            'channel_id': 3, 
-            'name':'Channel_3'
-        }
-    ]
+    assert channels_list_v1(user_id) == {
+        'channels': [
+            {
+                'channel_id': 1, 
+                'name':'Channel_1'
+            }, 
+            {
+                'channel_id': 2, 
+                'name':'Channel_2'
+            }, 
+            {
+                'channel_id': 3, 
+                'name':'Channel_3'
+            }
+        ]
+    }
 
 def test_list_private_channel(clear_data):
     ## register user
@@ -59,21 +61,22 @@ def test_list_private_channel(clear_data):
     user_id = auth_login_v1('owner@gmail.com', 'admin$only')['auth_user_id']
 
     ## create multiple channels with the same user_id
-    channel_id_1 = channels_create_v1(user_id, 'Channel_1', True)
-    channel_id_2 = channels_create_v1(user_id, 'Channel_2', False)
+    channel_id_1 = channels_create_v1(user_id, 'Channel_1', True)['channel_id']
+    channel_id_2 = channels_create_v1(user_id, 'Channel_2', False)['channel_id']
     
     ## get channels where user is owner
-    channels_list = channels_list_v1(user_id)
-    assert channels_list == [
-        {
-            'channel_id': channel_id_1,
-            'name': 'Channel_1'
-        },
-        {
-            'channel_id': channel_id_2,
-            'name': 'Channel_2'
-        },
-    ]
+    assert channels_list_v1(user_id) == {
+        'channels':[
+            {
+                'channel_id': channel_id_1,
+                'name': 'Channel_1'
+            },
+            {
+                'channel_id': channel_id_2,
+                'name': 'Channel_2'
+            }
+        ]
+    }
 
 def test_user_member_multiple(clear_data):
     data_source = data_store.get()
@@ -95,20 +98,24 @@ def test_user_member_multiple(clear_data):
     channel_join_v1(user_id_2, channel_id_2)
 
     ## Check both the owner and member are members
-    assert channels_list_v1(user_id_2) == [
-        {
-            'channel_id': channel_id_1,
-            'name': 'Channel_1'
-        },
-        {
-            'channel_id': channel_id_2,
-            'name': 'Channel_2'
-        },
-    ]
+    assert channels_list_v1(user_id_2) == {
+        'channels':[
+            {
+                'channel_id': channel_id_1,
+                'name': 'Channel_1'
+            },
+            {
+                'channel_id': channel_id_2,
+                'name': 'Channel_2'
+            }
+        ]
+    }
 
 def test_empty_channel_list(clear_data):
     ## register user and get id
     auth_register_v1('owner@gmail.com', 'admin$only', 'Owner', 'Chan')
     user_id = auth_login_v1('owner@gmail.com', 'admin$only')['auth_user_id']
 
-    assert channels_list_v1(user_id) == {}
+    assert channels_list_v1(user_id) == {
+        'channels': []
+    }
