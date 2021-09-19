@@ -39,11 +39,19 @@ DATA INSIDE:
         quick access to all handles
     - user_emails
         quick access to all emails
+    - channel_data
+        key = channel_id
+        -> dictionary with keys
+            - 'name'
+            - 'owner'
+            - 'is_public'
+            - 'members'
 '''
 initial_object = {
     'user_data': {},
     'user_handles': [],
     'user_emails': [],
+    'channel_data': {},
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
