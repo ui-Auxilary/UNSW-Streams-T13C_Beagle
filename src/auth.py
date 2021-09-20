@@ -82,8 +82,13 @@ def auth_register_v1(email, password, name_first, name_last):
                                               'email_address': email,
                                               'password'     : password,
                                               'user_handle'  : user_handle,
-                                              'global_owner' : False }
+                                            }
+    if new_user_id == 1:
+        data_source['user_data'][new_user_id]['global_owner'] = True
+    else:
+        data_source['user_data'][new_user_id]['global_owner'] = False
 
     return {
         'auth_user_id': new_user_id,
     }
+
