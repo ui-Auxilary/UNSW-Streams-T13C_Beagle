@@ -19,13 +19,20 @@ def channels_list_v1(auth_user_id):
     }
 
 def channels_listall_v1(auth_user_id):
+    ## get data
+    data_source = data_store.get()
+
+    if auth_user_id:
+        all_channels = []
+        ## get all channel ids
+        for channel in data_source['channel_data']:
+            all_channels.append({
+                'channel_id': channel,
+                'name': data_source['channel_data'][channel]['name']
+            })
+
     return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
+        'channels': all_channels,
     }
 
 def channels_create_v1(auth_user_id, name, is_public):
