@@ -10,6 +10,7 @@ from src.auth import auth_register_v1, auth_login_v1
 '''
 FUNCTIONALITY
     - list_private channels
+    - list_duplicate_channel_name
     - user a part of multiple channels
     - user not a part of any channels
 '''
@@ -42,6 +43,29 @@ def test_basic_case(clear_data):
             {
                 'channel_id': 3, 
                 'name':'Channel_3'
+            }
+        ]
+    }
+
+def test_list_duplicate_channel_name(clear_data):
+    ## register user
+    auth_register_v1('owner@gmail.com', 'admin$only', 'Owner', 'Chan')
+    user_id = auth_login_v1('owner@gmail.com', 'admin$only')['auth_user_id']
+
+    ## create multiple channels with the same user_id
+    channel_id_1 = channels_create_v1(user_id, 'Channel_1', True)['channel_id']
+    channel_id_2 = channels_create_v1(user_id, 'Channel_1', False)['channel_id']
+    
+    ## check channels have the same name
+    assert channels_list_v1(user_id) == {
+        'channels':[
+            {
+                'channel_id': channel_id_1,
+                'name': 'Channel_1'
+            },
+            {
+                'channel_id': channel_id_2,
+                'name': 'Channel_1'
             }
         ]
     }
