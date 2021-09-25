@@ -57,11 +57,11 @@ def test_simple_user(clear_data, create_default_users):
 
 def test_get_user_handles(clear_data, create_default_users):
     # get user handles from database
-    assert get_user_handles == ['elizalee', 'eileenchong']
+    assert get_user_handles() == ['elizalee', 'eileenchong']
 
 def test_get_user_emails(clear_data, create_default_users):
     # get user emails from database
-    assert get_user_emails == ['z78451151@ad.unsw.edu.au', 'ginseng@gmail.com']
+    assert get_user_emails() == ['z78451151@ad.unsw.edu.au', 'ginseng@gmail.com']
 
 def test_add_channel_and_member(clear_data, create_default_users):
     user_1_id = 22
