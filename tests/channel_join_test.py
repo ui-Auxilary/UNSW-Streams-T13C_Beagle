@@ -25,18 +25,22 @@ ACCESS ERROR
 def clear_data():
     clear_v1()
 
-
-def test_simple_case(clear_data):
-    # register user, log them in and get their user_id
+@pytest.fixture
+def register_login_users():
+    ## register users, log them in and get their user_id
     auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')
-    user_id = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']
+    user_id_1 = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']    
+    auth_register_v1('sam@mycompany.com', 'mypassword', 'Samantha', 'Tse')
+    user_id_2 = auth_login_v1('sam@mycompany.com', 'mypassword')['auth_user_id']
+
+    return user_id_1, user_id_2    
+
+def test_simple_case(clear_data, register_login_users):
+    # register users, log them in and get their user_id
+    user_id, new_user_id = register_login_users
 
     # create a channel with that user
-    channel_id = channels_create_v1(user_id, 'channel_1', 'True')['channel_id']
-
-    # createa a new user
-    auth_register_v1('sam@mycompany.com', 'mypassword', 'Samantha', 'Tse')
-    new_user_id = auth_login_v1('sam@mycompany.com', 'mypassword')['auth_user_id']
+    channel_id = channels_create_v1(user_id, 'channel_1', 'True')['channel_id']    
 
     # get them to join the channel
     channel_join_v1(new_user_id, channel_id)
@@ -46,19 +50,16 @@ def test_simple_case(clear_data):
     # check that both users are members now
     assert data_source['channel_data'][channel_id]['members'] == [user_id, new_user_id]
 
-def test_invalid_channel_id(clear_data):
+def test_invalid_channel_id(clear_data, register_login_users):
     # register user, log them in and get their user_id
-    auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')
-    user_id = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']
+    user_id, _ = register_login_users
 
     with pytest.raises(InputError):
         channel_join_v1(user_id, 234)
 
-
-def test_user_already_in_channel(clear_data):
+def test_user_already_in_channel(clear_data, register_login_users):
     # register user, log them in and get their user_id
-    auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')
-    user_id = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']
+    user_id, _ = register_login_users
 
     # create a channel with that user
     channel_id = channels_create_v1(user_id, 'channel_1', 'True')['channel_id']
@@ -66,42 +67,30 @@ def test_user_already_in_channel(clear_data):
         # get them to join the channel again
         channel_join_v1(user_id, channel_id)
 
-def test_private_not_global_owner(clear_data):
+def test_private_not_global_owner(clear_data, register_login_users):
     # register user, log them in and get their user_id
-    auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')
-    user_id = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']
+    user_id, new_user_id = register_login_users
 
     # create a channel with that user
-    channel_id = channels_create_v1(user_id, 'channel_1', False)['channel_id']
-
-    # create a new user
-    auth_register_v1('sam@mycompany.com', 'mypassword', 'Samantha', 'Tse')
-    new_user_id = auth_login_v1('sam@mycompany.com', 'mypassword')['auth_user_id']
+    channel_id = channels_create_v1(user_id, 'channel_1', False)['channel_id']    
 
     with pytest.raises(AccessError):
         # get them to join the channel
         channel_join_v1(new_user_id, channel_id)
 
-
-def test_private_is_global_owner(clear_data):
+def test_private_is_global_owner(clear_data, register_login_users):
     # register user, log them in and get their user_id
-    auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')
-    user_id = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']
+    user_id, new_user_id = register_login_users
 
     # create a channel with that user
     channel_id = channels_create_v1(user_id, 'channel_1', 'False')['channel_id']
-
-    # create a new user
-    auth_register_v1('sam@mycompany.com', 'mypassword', 'Samantha', 'Tse')
-    new_user_id = auth_login_v1('sam@mycompany.com', 'mypassword')['auth_user_id']
-    
+     
     # get the database and make new user a global owner
     data_source = data_store.get()
     data_source['user_data'][new_user_id]['global_owner'] = True
 
     # get them to join the channel
     channel_join_v1(new_user_id, channel_id)
-
     
     # check that both users are members now
     assert data_source['channel_data'][channel_id]['members'] == [user_id, new_user_id]

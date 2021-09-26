@@ -19,10 +19,15 @@ FUNCTIONALITY
 def clear_data():
     clear_v1()
 
-def test_basic_case(clear_data):
-    ## register user
+@pytest.fixture
+def register_login_user():
     auth_register_v1('owner@gmail.com', 'admin$only', 'Owner', 'Chan')
     user_id = auth_login_v1('owner@gmail.com', 'admin$only')['auth_user_id']
+    return user_id    
+
+def test_basic_case(clear_data, register_login_user):
+    ## register user
+    user_id = register_login_user
 
     ## create a channel
     channels_create_v1(user_id, 'Channel_1', True)
@@ -47,10 +52,9 @@ def test_basic_case(clear_data):
         ]
     }
 
-def test_list_duplicate_channel_name(clear_data):
+def test_list_duplicate_channel_name(clear_data, register_login_user):
     ## register user
-    auth_register_v1('owner@gmail.com', 'admin$only', 'Owner', 'Chan')
-    user_id = auth_login_v1('owner@gmail.com', 'admin$only')['auth_user_id']
+    user_id = register_login_user
 
     ## create multiple channels with the same user_id
     channel_id_1 = channels_create_v1(user_id, 'Channel_1', True)['channel_id']
@@ -70,10 +74,9 @@ def test_list_duplicate_channel_name(clear_data):
         ]
     }
 
-def test_list_private_channel(clear_data):
+def test_list_private_channel(clear_data, register_login_user):
     ## register user
-    auth_register_v1('owner@gmail.com', 'admin$only', 'Owner', 'Chan')
-    user_id = auth_login_v1('owner@gmail.com', 'admin$only')['auth_user_id']
+    user_id = register_login_user
 
     ## create multiple channels with the same user_id
     channel_id_1 = channels_create_v1(user_id, 'Channel_1', True)['channel_id']
@@ -93,10 +96,9 @@ def test_list_private_channel(clear_data):
         ]
     }
 
-def test_user_member_multiple(clear_data):
+def test_user_member_multiple(clear_data, register_login_user):
     ## register user
-    auth_register_v1('owner@gmail.com', 'admin$only', 'Owner', 'Chan')
-    user_id = auth_login_v1('owner@gmail.com', 'admin$only')['auth_user_id']
+    user_id = register_login_user
 
     auth_register_v1('user@gmail.com', 'member$only', 'Peasant', 'Kun')
     user_id_2 = auth_login_v1('user@gmail.com', 'member$only')['auth_user_id']
@@ -124,10 +126,9 @@ def test_user_member_multiple(clear_data):
         ]
     }
 
-def test_empty_channel_list(clear_data):
+def test_empty_channel_list(clear_data, register_login_user):
     ## register user and get id
-    auth_register_v1('owner@gmail.com', 'admin$only', 'Owner', 'Chan')
-    user_id = auth_login_v1('owner@gmail.com', 'admin$only')['auth_user_id']
+    user_id = register_login_user
 
     assert channels_list_v1(user_id) == {
         'channels': []

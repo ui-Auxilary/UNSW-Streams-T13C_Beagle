@@ -24,6 +24,7 @@ AccessError when:
 def clear_data():
     clear_v1()
 
+@pytest.fixture
 def create_user_and_channel():
     # register user, log them in and get their user_id
     auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')
@@ -36,10 +37,10 @@ def create_user_and_channel():
     # create a channel with that user
     channel_id = channels_create_v1(auth_user_id, 'channel_1', 'True')['channel_id']
 
-    return (auth_user_id, u_id, channel_id)
+    return auth_user_id, u_id, channel_id
 
-def test_invite_channel_simple_case(clear_data):
-    auth_user_id, u_id, channel_id = create_user_and_channel()
+def test_invite_channel_simple_case(clear_data, create_user_and_channel):
+    auth_user_id, u_id, channel_id = create_user_and_channel
 
     channel_invite_v1(auth_user_id, channel_id, u_id)
 
@@ -49,24 +50,24 @@ def test_invite_channel_simple_case(clear_data):
     # check that both users are members now
     assert data_source['channel_data'][channel_id]['members'] == [auth_user_id, u_id]
 
-def test_invalid_channel_id(clear_data):
-    auth_user_id, u_id, channel_id = create_user_and_channel()
+def test_invalid_channel_id(clear_data, create_user_and_channel):
+    auth_user_id, u_id, channel_id = create_user_and_channel
     invalid_channel_id = 222
 
     with pytest.raises(InputError):
         # invites user to a non-existent channel
         channel_invite_v1(auth_user_id, invalid_channel_id, u_id)
 
-def test_invalid_user(clear_data):
-    auth_user_id, u_id, channel_id = create_user_and_channel()
+def test_invalid_user(clear_data, create_user_and_channel):
+    auth_user_id, u_id, channel_id = create_user_and_channel
     invalid_new_user_id = 222
 
     with pytest.raises(InputError):
         # invites a non-existent user into the channel
         channel_invite_v1(auth_user_id, channel_id, invalid_new_user_id)
 
-def test_user_already_in_channel(clear_data):
-    auth_user_id, u_id, channel_id = create_user_and_channel()
+def test_user_already_in_channel(clear_data, create_user_and_channel):
+    auth_user_id, u_id, channel_id = create_user_and_channel
 
     # adds new_user in to the channel
     channel_join_v1(u_id, channel_id)
@@ -75,8 +76,8 @@ def test_user_already_in_channel(clear_data):
         # invite an existing user
         channel_invite_v1(auth_user_id, channel_id, u_id)
 
-def test_auth_user_not_member(clear_data):
-    auth_user_id, u_id, channel_id = create_user_and_channel()
+def test_auth_user_not_member(clear_data, create_user_and_channel):
+    auth_user_id, u_id, channel_id = create_user_and_channel
     auth_register_v1('HELLO@mycompany.com', 'mypassword1', 'Firstnamee', 'Lastnamee')
     user_id_3 = auth_login_v1('HELLO@mycompany.com', 'mypassword1')['auth_user_id']
 
