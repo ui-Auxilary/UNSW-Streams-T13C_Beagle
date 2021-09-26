@@ -1,6 +1,6 @@
 # Beagle Logs
 
-## Meeting Minutes #1
+## Meeting Minutes #2
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
