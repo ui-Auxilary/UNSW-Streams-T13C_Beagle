@@ -56,4 +56,5 @@ def get_channel(channel_id):
     return data_source['channel_data'][channel_id]
 
 def get_channel_ids():
-    pass
+    data_source = data_store.get()
+    return data_source['channel_ids']
