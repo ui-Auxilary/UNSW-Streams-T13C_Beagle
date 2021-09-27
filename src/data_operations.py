@@ -7,6 +7,7 @@ def add_user(user_id, name_first, name_last, email, password, user_handle, is_ow
     # append user_handle to user_handle list
     data_source['user_handles'].append(user_handle)
     data_source['user_emails'].append(email)
+    data_source['user_ids'].append(user_id)
 
     # add the user data to the database
     data_source['user_data'][user_id] = {   'first_name'   : name_first,
@@ -30,7 +31,8 @@ def get_user_emails():
     return data_source['user_emails']
 
 def get_user_ids():
-    pass
+    data_source = data_store.get()
+    return data_source['user_ids']
 
 def add_member_to_channel(channel_id, user_id):
     data_source = data_store.get()
