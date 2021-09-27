@@ -40,12 +40,20 @@ def add_member_to_channel(channel_id, user_id):
 
 def add_channel(channel_id, channel_name, user_id, is_public):
     data_source = data_store.get()
+
+    # create channel and add channel data
     data_source['channel_data'][channel_id] = { 'name'     : channel_name,
                                                 'owner'    : user_id,
                                                 'is_public': is_public,
                                                 'members'  : [user_id] 
                                               }
+    
+    # add channel to channel_ids list
+    data_source['channel_ids'].append(channel_id)
 
 def get_channel(channel_id):
     data_source = data_store.get()
     return data_source['channel_data'][channel_id]
+
+def get_channel_ids():
+    pass
