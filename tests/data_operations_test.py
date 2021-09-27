@@ -8,7 +8,8 @@ from src.data_operations import (
     add_channel,
     add_member_to_channel,
     get_channel,
-    get_user_ids
+    get_user_ids,
+    get_channel_ids
 )
 
 '''
@@ -90,3 +91,13 @@ def test_add_channel_and_member(clear_data, create_default_users):
                                 'owner': user_2_id,
                                 'is_public': False,
                                 'members': [user_2_id] }
+
+def test_add_channel_and_member(clear_data, create_default_users):
+    user_1_id = 22
+    user_2_id = 32
+
+    # add 2 channels to database
+    add_channel(1, "Channel_1", user_1_id, True)
+    add_channel(5, "Channel_5", user_2_id, False)
+
+    assert get_channel_ids() == [1, 5]
