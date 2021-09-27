@@ -29,6 +29,9 @@ def get_user_emails():
     data_source = data_store.get()
     return data_source['user_emails']
 
+def get_user_ids():
+    pass
+
 def add_member_to_channel(channel_id, user_id):
     data_source = data_store.get()
     data_source['channel_data'][channel_id]['members'].append(user_id)

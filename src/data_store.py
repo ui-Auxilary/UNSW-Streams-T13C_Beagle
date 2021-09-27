@@ -49,9 +49,10 @@ DATA INSIDE:
             - 'members'
 '''
 initial_object = {
-    'user_data': {},
+    'user_data'   : {},
     'user_handles': [],
-    'user_emails': [],
+    'user_emails' : [],
+    'user_ids'    : [],
     'channel_data': {},
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
