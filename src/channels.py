@@ -53,6 +53,7 @@ def channels_create_v1(auth_user_id, name, is_public):
         raise InputError('Invalid channel name size')
 
     new_channel_id = len(data_source['channel_data'].keys()) + 1
+    data_source['channel_ids'].append(new_channel_id)
     data_source['channel_data'][new_channel_id] = { 'name'     : name,
                                                     'owner'    : auth_user_id,
                                                     'is_public': is_public,
