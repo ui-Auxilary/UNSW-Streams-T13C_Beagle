@@ -77,6 +77,8 @@ def auth_register_v1(email, password, name_first, name_last):
 
     ## get new auth_user_id (length prev + 1)
     new_user_id = len(data_source['user_data'].keys()) + 1
+    data_source['user_ids'].append(new_user_id)
+
     data_source['user_data'][new_user_id] = { 'first_name'   : name_first,
                                               'last_name'    : name_last,
                                               'email_address': email,

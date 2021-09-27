@@ -8,6 +8,8 @@ from src.data_operations import (
     add_channel,
     add_member_to_channel,
     get_channel,
+    get_user_ids,
+    get_channel_ids
 )
 
 '''
@@ -18,10 +20,13 @@ GET_USER
     - Retrieves a user from the database
 
 GET_USER_HANDLES
-    - Retrieves a user's handle from the database
+    - Retrieves all user handles from the database
 
 GET_USER_EMAILS
-    - Retrieves a user's email from the database
+    - Retrieves all user emails from the database
+
+GET_USER_IDS
+    - Retrieves all user ids from the database
 
 ADD_CHANNEL
     - Adds a channel to the database
@@ -63,6 +68,9 @@ def test_get_user_emails(clear_data, create_default_users):
     # get user emails from database
     assert get_user_emails() == ['z78451151@ad.unsw.edu.au', 'ginseng@gmail.com']
 
+def test_get_user_ids(clear_data, create_default_users):
+    assert get_user_ids() == [1, 2]
+
 def test_add_channel_and_member(clear_data, create_default_users):
     user_1_id = 22
     user_2_id = 32
@@ -83,3 +91,13 @@ def test_add_channel_and_member(clear_data, create_default_users):
                                 'owner': user_2_id,
                                 'is_public': False,
                                 'members': [user_2_id] }
+
+def test_add_channel_and_member(clear_data, create_default_users):
+    user_1_id = 22
+    user_2_id = 32
+
+    # add 2 channels to database
+    add_channel(1, "Channel_1", user_1_id, True)
+    add_channel(5, "Channel_5", user_2_id, False)
+
+    assert get_channel_ids() == [1, 5]
