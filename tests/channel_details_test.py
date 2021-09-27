@@ -46,6 +46,32 @@ def test_simple_case(clear_data, create_user_and_channel):
                                                              'owner_members': [user_data],
                                                              'all_members'  : [user_data] }
 
+def test_complex_case(clear_data, create_user_and_channel):
+    auth_user_id, channel_id = create_user_and_channel
+
+    auth_register_v1('hello2@mycompany.com', 'mypassword', 'Firstname2', 'Lastname2')
+    auth_user_id_2 = auth_login_v1('hello2@mycompany.com', 'mypassword')['auth_user_id']
+
+    user_handle = get_user(auth_user_id)['user_handle']
+    user_handle_2 = get_user(auth_user_id_2)['user_handle']
+    user_data = { 'u_id': auth_user_id,
+                  'email': 'hello@mycompany.com',
+                  'name_first': 'Firstname',
+                  'name_last': 'Lastname',
+                  'handle_str': user_handle }
+    
+    user_data_2 = { 'u_id': auth_user_id_2,
+                    'email': 'hello2@mycompany.com',
+                    'name_first': 'Firstname2',
+                    'name_last': 'Lastname2',
+                    'handle_str': user_handle_2 }
+
+    assert channel_details_v1(auth_user_id, channel_id) == { 'name'         : 'channel_1',
+                                                             'is_public'    : True,
+                                                             'owner_members': [user_data],
+                                                             'all_members'  : [user_data, user_data_2] }
+
+
 def test_invalid_auth_id(clear_data, create_user_and_channel):
     auth_user_id, channel_id = create_user_and_channel
     with pytest.raises(AccessError):
