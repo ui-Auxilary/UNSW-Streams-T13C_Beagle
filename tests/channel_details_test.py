@@ -5,7 +5,7 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
 from src.other import clear_v1
 from src.channels import channels_create_v1
-from src.channel import channel_details_v1
+from src.channel import channel_details_v1, channel_join_v1
 from src.data_operations import get_user
 
 '''
@@ -29,7 +29,7 @@ def create_user_and_channel():
     auth_user_id = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']
 
     # create a channel with that user
-    channel_id = channels_create_v1(auth_user_id, 'channel_1', 'True')['channel_id']
+    channel_id = channels_create_v1(auth_user_id, 'channel_1', True)['channel_id']
     return auth_user_id, channel_id
 
 def test_simple_case(clear_data, create_user_and_channel):
@@ -51,6 +51,7 @@ def test_complex_case(clear_data, create_user_and_channel):
 
     auth_register_v1('hello2@mycompany.com', 'mypassword', 'Firstname2', 'Lastname2')
     auth_user_id_2 = auth_login_v1('hello2@mycompany.com', 'mypassword')['auth_user_id']
+    channel_join_v1(auth_user_id_2, channel_id)
 
     user_handle = get_user(auth_user_id)['user_handle']
     user_handle_2 = get_user(auth_user_id_2)['user_handle']
