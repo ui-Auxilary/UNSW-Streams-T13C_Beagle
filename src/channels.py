@@ -1,17 +1,14 @@
-from src.data_store import data_store
+from src.data_operations import get_channel_ids, get_channel, get_user_ids, add_channel
 from src.error import InputError
 
 def channels_list_v1(auth_user_id):
-    ## get data
-    data_source = data_store.get()
-
     channel_list = []
     ## get channel id
-    for channel in data_source['channel_data']:
-        if auth_user_id in data_source['channel_data'][channel]['members']:
+    for channel in get_channel_ids():
+        if auth_user_id in get_channel(channel)['members']:
             channel_list.append({
                 'channel_id': channel,
-                'name': data_source['channel_data'][channel]['name']
+                'name': get_channel(channel)['name']
             })
             
     return {
@@ -19,16 +16,13 @@ def channels_list_v1(auth_user_id):
     }
 
 def channels_listall_v1(auth_user_id):
-    ## get data
-    data_source = data_store.get()
-
     if auth_user_id:
         all_channels = []
         ## get all channel ids
-        for channel in data_source['channel_data']:
+        for channel in get_channel_ids():
             all_channels.append({
                 'channel_id': channel,
-                'name': data_source['channel_data'][channel]['name']
+                'name': get_channel(channel)['name']
             })
 
     return {
@@ -36,12 +30,9 @@ def channels_listall_v1(auth_user_id):
     }
 
 def channels_create_v1(auth_user_id, name, is_public):
-    ## get data from database
-    data_source = data_store.get()
-
     ## check whether user exists
     user_found = False    
-    for user_id in data_source['user_data']:
+    for user_id in get_user_ids():
         if user_id == auth_user_id:
             user_found = True
             break
@@ -52,12 +43,8 @@ def channels_create_v1(auth_user_id, name, is_public):
     if not 1 <= len(name) <= 20:
         raise InputError('Invalid channel name size')
 
-    new_channel_id = len(data_source['channel_data'].keys()) + 1
-    data_source['channel_ids'].append(new_channel_id)
-    data_source['channel_data'][new_channel_id] = { 'name'     : name,
-                                                    'owner'    : auth_user_id,
-                                                    'is_public': is_public,
-                                                    'members'  : [auth_user_id] }
+    new_channel_id = len(get_channel_ids()) + 1
+    add_channel(new_channel_id, name, auth_user_id, is_public)
 
     return {
         'channel_id': new_channel_id,
