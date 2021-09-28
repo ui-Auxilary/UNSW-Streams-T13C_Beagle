@@ -1,34 +1,27 @@
-from src.data_store import data_store
 from src.error import InputError, AccessError
-
-from src.data_operations import get_user_ids, get_channel_ids, get_channel, get_user
+from src.data_operations import get_user_ids, get_channel_ids, get_channel, get_user, add_member_to_channel
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
-    ## get database
-    data_source = data_store.get()
-
     ## checks u_id is valid
-    if u_id not in data_source['user_data']:
+    if u_id not in get_user_ids():
         raise InputError('User does not exist')
     ## check whether channel exists
-    if channel_id not in data_source['channel_data']:
+    if channel_id not in get_channel_ids():
         raise InputError('Channel does not exist')
     ## check whether user is already member
-    if u_id in data_source['channel_data'][channel_id]['members']:
+    if u_id in get_channel(channel_id)['members']:
         raise InputError('New user is already existing member')
     ## checks auth_user is a member of the channel
-    if auth_user_id not in data_source['channel_data'][channel_id]['members']:
+    if auth_user_id not in get_channel(channel_id)['members']:
         raise AccessError('User is not authorised to invite new members')
     
     ## adds the new user to the channel
-    data_source['channel_data'][channel_id]['members'].append(u_id)
+    add_member_to_channel(channel_id, u_id)
 
     return {
     }
 
 def channel_details_v1(auth_user_id, channel_id):
-    data_source = data_store.get()
-
     # check if auth_user_id is valid
     if auth_user_id not in get_user_ids():
         raise AccessError('Auth_user_id does not exist')
@@ -89,23 +82,19 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
 
 def channel_join_v1(auth_user_id, channel_id):
-    ## get database
-    data_source = data_store.get()
-
     ## check whether channel exists
-    if channel_id not in data_source['channel_data']:
+    if channel_id not in get_channel_ids():
         raise InputError('Channel does not exist')
     ## check whether user already member
-    if auth_user_id in data_source['channel_data'][channel_id]['members']:
+    if auth_user_id in get_channel(channel_id)['members']:
         raise InputError('User is existing member')
     ## check whether user has sufficient permissions to join
-    if data_source['channel_data'][channel_id]['is_public'] == False:
-        if data_source['user_data'][auth_user_id]['global_owner'] == False:
+    if get_channel(channel_id)['is_public'] == False:
+        if get_user(auth_user_id)['global_owner'] == False:
             raise AccessError('User cannot join private channel')
     
     ## add them to channel
-    data_source['channel_data'][channel_id]['members'].append(auth_user_id)
-    
+    add_member_to_channel(channel_id, auth_user_id)
 
     return {
     }
