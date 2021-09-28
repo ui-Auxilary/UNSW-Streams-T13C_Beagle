@@ -1,9 +1,14 @@
-from src.data_store import data_store
 from src.error import InputError
-
 import re
+from src.data_operations import (
+    add_user, 
+    get_user_emails, 
+    get_user_ids, 
+    get_user_handles, 
+    get_user
+)
 
-def generate_user_handle(name_first, name_last, data_source):
+def generate_user_handle(name_first, name_last):
     ## get an initial value for handle
     handle_init = (name_first + name_last).lower()
 
@@ -12,9 +17,9 @@ def generate_user_handle(name_first, name_last, data_source):
         handle_init = handle_init[0:20]
     
     ## check if we need to concatenate a number for duplicate
-    if handle_init in data_source['user_handles']:
+    if handle_init in get_user_handles():
         suffix_num = 0
-        while f'{handle_init}{suffix_num}' in data_source['user_handles']:
+        while f'{handle_init}{suffix_num}' in get_user_handles():
             suffix_num += 1
         user_handle = f'{handle_init}{suffix_num}'
     else:
@@ -23,20 +28,17 @@ def generate_user_handle(name_first, name_last, data_source):
     return user_handle
 
 def auth_login_v1(email, password):
-    ## Get the data store
-    data_source = data_store.get()
-
     ## Check if email belongs to user
-    if email not in data_source['user_emails']:
+    if email not in get_user_emails():
         raise InputError('Email entered does not belong to a user')
 
     ## Get user ID from email in data
-    for user_id in data_source['user_data']:
-        if data_source['user_data'][user_id]['email_address'] == email:
+    for user_id in get_user_ids():
+        if get_user(user_id)['email_address'] == email:
             break
     
     ## Check if password is correct
-    if data_source['user_data'][user_id]['password'] != password:
+    if get_user(user_id)['password'] != password:
         raise InputError('Password is not correct')
 
     return {
@@ -44,19 +46,14 @@ def auth_login_v1(email, password):
     }
 
 def auth_register_v1(email, password, name_first, name_last):
-    ## get the data store
-    data_source = data_store.get()
-
     ## check whether email valid
     pattern = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
     if not re.match(pattern, email):
         raise InputError('Invalid email address')
     
     ## check that email is unique
-    if email in data_source['user_emails']:
+    if email in get_user_emails():
         raise InputError('Email already taken')
-    else:
-        data_source['user_emails'].append(email)
     
     ## check whether password valid (password must be >= 6 chars)
     if len(password) < 6:
@@ -71,25 +68,16 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError('Last name not valid size')
 
     ## get a unique user_handle
-    user_handle = generate_user_handle(name_first, name_last, data_source)
-    ## append to database
-    data_source['user_handles'].append(user_handle)
+    user_handle = generate_user_handle(name_first, name_last)
 
     ## get new auth_user_id (length prev + 1)
-    new_user_id = len(data_source['user_data'].keys()) + 1
-    data_source['user_ids'].append(new_user_id)
-
-    data_source['user_data'][new_user_id] = { 'first_name'   : name_first,
-                                              'last_name'    : name_last,
-                                              'email_address': email,
-                                              'password'     : password,
-                                              'user_handle'  : user_handle,
-                                            }
+    new_user_id = len(get_user_ids()) + 1
+    
     if new_user_id == 1:
-        data_source['user_data'][new_user_id]['global_owner'] = True
+        add_user(new_user_id, name_first, name_last, email, password, user_handle, True)
     else:
-        data_source['user_data'][new_user_id]['global_owner'] = False
-
+        add_user(new_user_id, name_first, name_last, email, password, user_handle, False)
+    
     return {
         'auth_user_id': new_user_id,
     }
