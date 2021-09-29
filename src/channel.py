@@ -1,7 +1,11 @@
 from src.error import InputError, AccessError
+from src.other import check_user_exists
 from src.data_operations import get_user_ids, get_channel_ids, get_channel, get_user, add_member_to_channel
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
+    
+## checks auth_user_id exists
+    check_user_exists(auth_user_id)
     ## checks u_id is valid
     if u_id not in get_user_ids():
         raise InputError('User does not exist')
@@ -22,9 +26,8 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     }
 
 def channel_details_v1(auth_user_id, channel_id):
-    # check if auth_user_id is valid
-    if auth_user_id not in get_user_ids():
-        raise AccessError('Auth_user_id does not exist')
+    ## checks auth_user_id exists
+    check_user_exists(auth_user_id)
     
     # check if channel_id is valid
     if channel_id not in get_channel_ids():
@@ -68,6 +71,9 @@ def channel_details_v1(auth_user_id, channel_id):
     return return_dict
 
 def channel_messages_v1(auth_user_id, channel_id, start):
+    ## checks auth_user_id exists
+    check_user_exists(auth_user_id)
+
     return {
         'messages': [
             {
@@ -82,6 +88,9 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
 
 def channel_join_v1(auth_user_id, channel_id):
+    ## checks auth_user_id exists
+    check_user_exists(auth_user_id)
+    
     ## check whether channel exists
     if channel_id not in get_channel_ids():
         raise InputError('Channel does not exist')
