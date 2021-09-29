@@ -1,6 +1,6 @@
 import pytest
 from src.data_store import data_store
-from src.error import InputError
+from src.error import InputError, AccessError
 from src.channels import channels_create_v1
 from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1
@@ -28,6 +28,10 @@ def register_login_user():
     user_id = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']
     return user_id
 
+def test_user_id_exists(clear_data):
+    with pytest.raises(AccessError):
+        channels_create_v1(1, 'channel_1', True)
+
 def test_valid_ID(clear_data, register_login_user):
     ## register and log user in
     user_id = register_login_user
@@ -35,15 +39,12 @@ def test_valid_ID(clear_data, register_login_user):
     channel_id = channels_create_v1(user_id, 'channel_1', True)['channel_id']
     assert channel_id == 1
 
-def test_invalid_ID(clear_data):
+def test_valid_channel_length(clear_data, register_login_user):
+    user_id = register_login_user
     with pytest.raises(InputError):
-        channels_create_v1(1, 'channel_1', True)
-
-def test_valid_channel_length(clear_data):
+        channels_create_v1(user_id, '', True)
     with pytest.raises(InputError):
-        channels_create_v1(1, '', True)
-    with pytest.raises(InputError):
-        channels_create_v1(1, 'aoiwfbiaufgaiufgawiuofboawbfoawibfoiawb', True)
+        channels_create_v1(user_id, 'aoiwfbiaufgaiufgawiuofboawbfoawibfoiawb', True)
 
 def test_public_channel_created(clear_data, register_login_user):
     ## get database

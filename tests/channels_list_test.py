@@ -1,7 +1,7 @@
 import pytest
 
 from src.data_store import data_store
-from src.error import InputError
+from src.error import AccessError
 from src.channel import channel_join_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.other import clear_v1
@@ -13,6 +13,9 @@ FUNCTIONALITY
     - list_duplicate_channel_name
     - user a part of multiple channels
     - user not a part of any channels
+
+ACCESS ERROR
+    - Invalid user_id
 '''
 
 @pytest.fixture
@@ -24,6 +27,10 @@ def register_login_user():
     auth_register_v1('owner@gmail.com', 'admin$only', 'Owner', 'Chan')
     user_id = auth_login_v1('owner@gmail.com', 'admin$only')['auth_user_id']
     return user_id    
+
+def test_valid_user(clear_data):
+    with pytest.raises(AccessError):
+        channels_list_v1(129)
 
 def test_basic_case(clear_data, register_login_user):
     ## register user

@@ -27,11 +27,11 @@ VALID_OUTPUT
 def clear_data():
     clear_v1()
 
-def test_simple_case(clear_data):
-    user_id = auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')['auth_user_id']
-    user_id_1 = auth_register_v1('new@mycompany.com', 'mypassword', 'Firstname', 'Lastname')['auth_user_id']
-    assert user_id == 1
-    assert user_id_1 == 2
+def test_register_valid_output(clear_data):
+    ## Get the user ID of the registered person
+    register_data = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
+    auth_user_id = register_data['auth_user_id']
+    assert type(auth_user_id) == int
 
 def test_register_invalid_email(clear_data):
     with pytest.raises(InputError):
@@ -57,7 +57,9 @@ def test_register_length_firstname_2(clear_data):
 def test_register_length_lastname(clear_data):
     with pytest.raises(InputError):
         auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'Michael', 'GashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuio')
-            
+
+## Whitebox testing
+@pytest.mark.skip(reason="No way of currently testing this")  
 def test_register_length_handle(clear_data):
     ## Get the user ID of the registered person
     register_data = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
@@ -68,7 +70,15 @@ def test_register_length_handle(clear_data):
     auth_user_handle = data_source['user_data'][auth_user_id]['user_handle']
 
     assert auth_user_handle == 'samanthadhruvchlawre'
- 
+
+@pytest.mark.skip(reason="No way of currently testing this")  
+def test_simple_case(clear_data):
+    user_id = auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')['auth_user_id']
+    user_id_1 = auth_register_v1('new@mycompany.com', 'mypassword', 'Firstname', 'Lastname')['auth_user_id']
+    assert user_id == 1
+    assert user_id_1 == 2
+
+@pytest.mark.skip(reason="no way of currently testing this")  
 def test_register_duplicate_handle(clear_data):
     ## Get userID of person
     register_data_1 = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
@@ -84,10 +94,5 @@ def test_register_duplicate_handle(clear_data):
     auth_user_handle = data_source['user_data'][auth_user_id_2]['user_handle']
     
     assert auth_user_handle == 'samanthadhruvchlawre0'
- 
-def test_register_valid_output(clear_data):
-    ## Get the user ID of the registered person
-    register_data = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
-    auth_user_id = register_data['auth_user_id']
 
-    assert auth_user_id == 1
+

@@ -1,8 +1,9 @@
 import pytest
 
-from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
+from src.error import AccessError
 from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1
+from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 
 '''
 FUNCTIONALITY
@@ -18,6 +19,9 @@ RETURN TYPE
         'channel_id': id,
         'name': name
     ]}
+
+ACCESS ERROR
+    - Invalid user_id or user does not exist
 '''
 
 @pytest.fixture
@@ -33,6 +37,11 @@ def auth_register_and_login():
     user_id_2 = auth_login_v1('peasant@gmail.com', 'peasant$only')['auth_user_id']
 
     return user_id, user_id_2
+
+def test_valid_user_id(clear_data):
+    with pytest.raises(AccessError):
+        ## arbitrary user id (122)
+        channels_create_v1(122, 'Channel_1', True)['channel_id']
 
 def test_basic_case(clear_data, auth_register_and_login):
     ## register and get user ids
@@ -143,6 +152,7 @@ def test_multiple_users_create_channel(clear_data, auth_register_and_login):
 
 def test_empty_list(clear_data, auth_register_and_login):
     ## register and get user_ids
-    user_id = auth_register_and_login
+    user_id, user_id_2 = auth_register_and_login
 
     assert channels_listall_v1(user_id) == {'channels': []}
+

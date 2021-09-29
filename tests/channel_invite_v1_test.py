@@ -39,6 +39,16 @@ def create_user_and_channel():
 
     return auth_user_id, u_id, channel_id
 
+def test_user_id_exists(clear_data, create_user_and_channel):
+    auth_user_id, u_id, channel_id = create_user_and_channel
+
+    # create a channel with that user
+    channel_id = channels_create_v1(auth_user_id, 'channel_1', 'True')['channel_id']    
+
+    with pytest.raises(AccessError):
+        ## User that doesn't exist tries to join channel
+        channel_invite_v1(128, channel_id, u_id)
+
 def test_invite_channel_simple_case(clear_data, create_user_and_channel):
     auth_user_id, u_id, channel_id = create_user_and_channel
 
