@@ -49,8 +49,15 @@ DATA INSIDE:
             - 'owner'
             - 'is_public'
             - 'members'
+            - 'message_ids'
     - channel_ids
         quick access to all channel ids
+    - message_data
+        key = message_id
+        -> dictionary with keys
+            - 'author'
+            - 'content'
+            - 'time_created'
 '''
 initial_object = {
     'user_data'   : {},
@@ -58,7 +65,8 @@ initial_object = {
     'user_emails' : [],
     'user_ids'    : [],
     'channel_data': {},
-    'channel_ids' : []
+    'channel_ids' : [],
+    'message_data': {}
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
