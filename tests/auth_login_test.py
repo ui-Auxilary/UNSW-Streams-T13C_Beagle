@@ -1,7 +1,6 @@
 import pytest
 
 from src.error import InputError
-from src.data_store import data_store
 from src.other import clear_v1
 from src.auth import auth_login_v1, auth_register_v1
 
@@ -37,6 +36,7 @@ def test_multiple_emails(clear_data):
     user_id_1 = auth_login_v1('new@mycompany.com', 'anotherpassword')['auth_user_id']
     assert type(user_id) == int
     assert type(user_id_1) == int
+    assert user_id != user_id_1
 
 def test_email_exists(clear_data):
     with pytest.raises(InputError):
