@@ -32,8 +32,10 @@ def clear_data():
 def auth_register_and_login():
     ## register users
     auth_register_v1('owner@gmail.com', 'admin$only', 'Owner', 'Chan')
-    user_id = auth_login_v1('owner@gmail.com', 'admin$only')['auth_user_id']
     auth_register_v1('peasant@gmail.com', 'peasant$only', 'Rice', 'Farmer')
+
+    ## get user ids
+    user_id = auth_login_v1('owner@gmail.com', 'admin$only')['auth_user_id']
     user_id_2 = auth_login_v1('peasant@gmail.com', 'peasant$only')['auth_user_id']
 
     return user_id, user_id_2

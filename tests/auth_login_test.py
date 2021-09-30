@@ -25,15 +25,23 @@ def clear_data():
     clear_v1()
 
 def test_basic_case(clear_data):
+    ## register a user and log them in
     auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')
+
+    ## get the user's id
     user_id = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']
+
     assert type(user_id) == int
 
 def test_multiple_emails(clear_data):
+    ## registers multiple users and log them in
     auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')
     auth_register_v1('new@mycompany.com', 'anotherpassword', 'Firstname', 'Lastname')
+    
+    ## get the user's id
     user_id = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']
     user_id_1 = auth_login_v1('new@mycompany.com', 'anotherpassword')['auth_user_id']
+
     assert type(user_id) == int
     assert type(user_id_1) == int
     assert user_id != user_id_1

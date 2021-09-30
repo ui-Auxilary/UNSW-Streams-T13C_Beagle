@@ -6,7 +6,6 @@ from src.auth import auth_login_v1, auth_register_v1
 from src.channel import channel_details_v1
 from src.channels import channels_create_v1
 
-
 '''
 VALID_INPUT
     - Valid email 
@@ -29,9 +28,10 @@ def clear_data():
     clear_v1()
 
 def test_register_valid_output(clear_data):
-    ## Get the user ID of the registered person
+    #### Get the user ID of the registered person
     register_data = auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
     auth_user_id = register_data['auth_user_id']
+
     assert type(auth_user_id) == int
 
 def test_register_invalid_email(clear_data):
@@ -61,17 +61,43 @@ def test_register_length_lastname_too_long(clear_data):
 
 def test_user_handle(clear_data):
     auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
-    # get the user's id
+    ## get the user's id
     user_id = auth_login_v1('mrmaxilikestoeat@gmail.com', 'mahooo')['auth_user_id']
-
-    # create a channel with the user id
+    
+    ## create a channel with the user id
     channel_id = channels_create_v1(user_id, 'channel_1', True)['channel_id']
 
-    # get the user's handle from the channel details
+    ## get the user's handle from the channel details
     user_handle = channel_details_v1(user_id, channel_id)['owner_members'][0]['handle_str']
+
     assert user_handle == 'samanthadhruvchlawre'
 
-## Whitebox testing
+def test_duplicate_user_handles(clear_data):
+    ## registers multiple users
+    auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'Dhruv', 'Gravity')
+    auth_register_v1('dhruvgravity@gmail.com', 'yesdhruv2019', 'Dhruv', 'Gravity')
+    auth_register_v1('poo@gmail.com', 'poopoo', 'Dhruv', 'Gravity')
+    
+    ## get the user's id
+    user_id_1 = auth_login_v1('mrmaxilikestoeat@gmail.com', 'mahooo')['auth_user_id']
+    user_id_2 = auth_login_v1('dhruvgravity@gmail.com', 'yesdhruv2019')['auth_user_id']
+    user_id_3 = auth_login_v1('poo@gmail.com', 'poopoo')['auth_user_id']
+
+    ## create multiple channels channel with the user's ids
+    channel_id = channels_create_v1(user_id_1, 'channel_1', True)['channel_id']
+    channel_id_2 = channels_create_v1(user_id_2, 'channel_1', True)['channel_id']
+    channel_id_3 = channels_create_v1(user_id_3, 'channel_1', True)['channel_id']
+
+    ## get multiple user handles from the channel details
+    handle_user_1 = channel_details_v1(user_id_1, channel_id)['owner_members'][0]['handle_str']
+    handle_user_2 = channel_details_v1(user_id_2, channel_id_2)['owner_members'][0]['handle_str']
+    handle_user_3 = channel_details_v1(user_id_3, channel_id_3)['owner_members'][0]['handle_str']
+
+    assert handle_user_1 == 'dhruvgravity'
+    assert handle_user_2 == 'dhruvgravity0'
+    assert handle_user_3 == 'dhruvgravity1'
+
+#### Whitebox testing
 @pytest.mark.skip(reason='No way of currently testing this')  
 def test_register_length_handle(clear_data):
     '''

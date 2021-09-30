@@ -23,8 +23,12 @@ def clear_data():
 
 @pytest.fixture
 def register_login_user():
+    ## register user
     auth_register_v1('owner@gmail.com', 'admin$only', 'Owner', 'Chan')
+
+    ## log user in and get their id
     user_id = auth_login_v1('owner@gmail.com', 'admin$only')['auth_user_id']
+
     return user_id    
 
 def test_valid_user(clear_data):
@@ -32,7 +36,6 @@ def test_valid_user(clear_data):
         channels_list_v1(129)
 
 def test_list_duplicate_channel_name(clear_data, register_login_user):
-    ## register user
     user_id = register_login_user
 
     ## create multiple channels with the same user_id
@@ -57,7 +60,6 @@ def test_list_duplicate_channel_name(clear_data, register_login_user):
     }
 
 def test_list_private_channel(clear_data, register_login_user):
-    ## register user
     user_id = register_login_user
 
     ## create multiple channels with the same user_id
@@ -67,7 +69,7 @@ def test_list_private_channel(clear_data, register_login_user):
     ## sorts the channels in alphabetical order
     channels_list_v1(user_id)['channels'].sort(key = lambda x: x['name'])
 
-    ## get channels where user is owner
+    ## get channels where user_id is owner
     assert channels_list_v1(user_id) == {
         'channels': [
             {
@@ -82,25 +84,24 @@ def test_list_private_channel(clear_data, register_login_user):
     }        
 
 def test_user_member_multiple(clear_data, register_login_user):
-    ## register user
     user_id = register_login_user
 
+    ## register another user, and get their id
     auth_register_v1('user@gmail.com', 'member$only', 'Peasant', 'Kun')
     user_id_2 = auth_login_v1('user@gmail.com', 'member$only')['auth_user_id']
 
     ## create multiple channels with the same user_id   
-    ## Admin makes a channel
     channel_id_1 = channels_create_v1(user_id, 'Channel_1', True)['channel_id']
     channel_id_2 = channels_create_v1(user_id, 'Channel_2', True)['channel_id']
 
-    ## User joins channel
+    ## user_2 joins channel
     channel_join_v1(user_id_2, channel_id_1)
     channel_join_v1(user_id_2, channel_id_2)
 
     ## sorts the channels in alphabetical order
     channels_list_v1(user_id_2)['channels'].sort(key = lambda x: x['name'])
 
-    ## Check both the owner and member are members
+    ## check both the owner and member are members
     assert channels_list_v1(user_id_2) == {
         'channels': [
             {
@@ -123,7 +124,7 @@ def test_empty_channel_list(clear_data, register_login_user):
     }
 
 ## Whitebox tests
-@pytest.mark.skip("This is a whitebox test")
+@pytest.mark.skip('This is a whitebox test')
 def test_basic_case(clear_data, register_login_user):
     '''
     ## register user
