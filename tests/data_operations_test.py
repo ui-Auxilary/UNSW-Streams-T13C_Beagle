@@ -1,3 +1,4 @@
+'''
 import pytest
 from src.data_store import data_store
 from src.other import clear_v1
@@ -13,6 +14,7 @@ from src.data_operations import (
     get_channel_ids,
     add_message
 )
+'''
 
 '''
 ADD_USER
@@ -40,6 +42,8 @@ ADD_MESSAGES
     - Adds the author, the message, and its creation into the database
 '''
 
+## These are all whitebox tests
+'''
 @pytest.fixture
 def clear_data():
     clear_v1()
@@ -119,3 +123,4 @@ def test_add_messages(clear_data):
         message_ids.append(i)
         assert get_channel(channel_id)['message_ids'] == message_ids
         assert data_source['message_data'][i]['content'] == f'message-{i}'
+'''

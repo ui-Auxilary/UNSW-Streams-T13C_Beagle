@@ -63,16 +63,21 @@ def test_listall_duplicate_name(clear_data, auth_register_and_login):
     channel_id_1 = channels_create_v1(user_id, 'Channel_1', True)['channel_id']
     channel_id_2 = channels_create_v1(user_id_2, 'Channel_1', True)['channel_id']
 
-    assert channels_listall_v1(user_id) == { 'channels': [
-        {
-            'channel_id': channel_id_1, 
-            'name':'Channel_1'
-        },
-        {
-            'channel_id': channel_id_2, 
-            'name':'Channel_1'
+    ## sorts the channels in alphabetical order
+    channels_listall_v1(user_id)['channels'].sort(key = lambda x: x['name'])
+
+    assert channels_listall_v1(user_id) == {
+            'channels':[
+                {
+                    'channel_id': channel_id_1,
+                    'name': 'Channel_1'
+                },
+                {
+                    'channel_id': channel_id_2,
+                    'name': 'Channel_1'
+                }
+            ]
         }
-    ]}
 
 def test_list_alt_user_id(clear_data, auth_register_and_login):
     user_id, user_id_2 = auth_register_and_login
@@ -82,6 +87,9 @@ def test_list_alt_user_id(clear_data, auth_register_and_login):
     channel_id_2 = channels_create_v1(user_id_2, 'Channel_2', True)['channel_id']
     channel_id_3 = channels_create_v1(user_id_2, 'Channel_3', False)['channel_id']
     
+    ## sorts the channels in alphabetical order
+    channels_listall_v1(user_id_2)['channels'].sort(key = lambda x: x['name'])
+
     ## checks the channels returned by channel list match
     assert channels_listall_v1(user_id_2) == {
         'channels': [
@@ -109,6 +117,9 @@ def test_all_private_channels(clear_data, auth_register_and_login):
     channel_id_2 = channels_create_v1(user_id_2, 'Channel_2', False)['channel_id']
     channel_id_3 = channels_create_v1(user_id, 'Channel_3', False)['channel_id']
     
+    ## sorts the channels in alphabetical order
+    channels_listall_v1(user_id)['channels'].sort(key = lambda x: x['name'])
+
     ## checks the channels returned by channel list match
     assert channels_listall_v1(user_id)['channels'] == [
             {
@@ -134,6 +145,9 @@ def test_multiple_users_create_channel(clear_data, auth_register_and_login):
     channel_id_2 = channels_create_v1(user_id, 'Channel_2', False)['channel_id']
     channel_id_3 = channels_create_v1(user_id_2, 'Channel_3', False)['channel_id']
 
+    ## sorts the channels in alphabetical order
+    channels_listall_v1(user_id)['channels'].sort(key = lambda x: x['name'])
+    
     ## check that all the channels listed in channel_data are the ones created
     assert channels_listall_v1(user_id)['channels'] == [
             {
@@ -154,5 +168,7 @@ def test_empty_list(clear_data, auth_register_and_login):
     ## register and get user_ids
     user_id, user_id_2 = auth_register_and_login
 
-    assert channels_listall_v1(user_id) == {'channels': []}
+    assert channels_listall_v1(user_id) == {
+        'channels': []
+    }
 
