@@ -67,3 +67,11 @@ def add_message(user_id, channel_id, message_id, content, time_created):
     data_source['message_data'][message_id]['author'] = user_id
     data_source['message_data'][message_id]['content'] = content
     data_source['message_data'][message_id]['time_created'] = time_created
+
+def get_message_by_id(message_id):
+    data_source = data_store.get()
+    return data_source['message_data'][message_id]
+
+def get_messages_by_channel(channel_id):
+    data_source = data_store.get()
+    return data_source['channel_data'][channel_id]['message_ids']

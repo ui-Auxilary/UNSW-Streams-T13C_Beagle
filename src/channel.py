@@ -1,6 +1,6 @@
 from src.error import InputError, AccessError
 from src.other import check_user_exists
-from src.data_operations import get_user_ids, get_channel_ids, get_channel, get_user, add_member_to_channel
+from src.data_operations import get_user_ids, get_channel_ids, get_channel, get_user, add_member_to_channel, get_messages_by_channel
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     
@@ -73,6 +73,51 @@ def channel_details_v1(auth_user_id, channel_id):
 def channel_messages_v1(auth_user_id, channel_id, start):
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
+
+    ## checks for invalid channel_id
+    if channel_id not in get_channel_ids():
+        raise InputError('Channel_id does not exist')
+
+    ## checks if auth_user_id is a channel member
+    channel_info = get_channel(channel_id)
+    channel_members = channel_info['members']
+
+    if auth_user_id not in channel_members:
+        raise AccessError('User is not channel member')
+
+    ## add_message(auth_user_id, channel_id, message_id, content, time_created)
+    result_arr = []
+    ## Gets all the messages in the channel sorted from recent to old
+    message_id_list = list(reversed(get_messages_by_channel(channel_id)))
+    end = start + 50
+
+    ## checks that start does not exceed total messages
+    if len(message_id_list) - 1 < start:
+        raise InputError('Start number exceeds total messages')
+
+    for message_pos, message_id in enumerate(message_id_list):
+        ## if message in given range
+        if message_pos >= start and message_pos < end:
+            ## Retrieve all information about message_data
+            result_dict = {}
+            message_info = get_message_by_id(message_id)
+            result_dict['message_id'] = message_id
+            result_dict['u_id'] = message_info['author']
+            result_dict['message'] = message_info['content']
+            result_dict['time_created'] = message_info['time_created']
+            result_arr.append(result_dict)
+        ## if past 50 messages, then exit
+        if message_pos == end: 
+            break
+
+    ## checks if 50 messages are displayed
+    if end > len(message_id_list) - 1: 
+        end = -1
+    return {
+        'messages': result_arr,
+        'start': start, 
+        'end': end
+    }
 
     return {
         'messages': [
