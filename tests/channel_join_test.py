@@ -70,13 +70,15 @@ def test_private_not_global_owner(clear_data, register_login_users):
         ## get them to join the channel
         channel_join_v1(new_user_id, channel_id)
 
-def test_private_is_global_owner(clear_data, register_login_users):
+def test_global_owner_join_private(clear_data, register_login_users):
     user_id, new_user_id = register_login_users
 
     ## create a channel with that user
     channel_id = channels_create_v1(new_user_id, 'channel_1', False)['channel_id']    
     
+    ## make the global join the private channel
     channel_join_v1(user_id, channel_id)
+
     assert channel_details_v1(new_user_id, channel_id)['all_members'][0]['u_id'] in [user_id, new_user_id]
     assert channel_details_v1(new_user_id, channel_id)['all_members'][1]['u_id'] in [user_id, new_user_id]
 
@@ -98,6 +100,7 @@ def test_simple_case(clear_data, register_login_users):
     assert data_source['channel_data'][channel_id]['members'] == [user_id, new_user_id]
     '''
     pass
+
 
 @pytest.mark.skip('cannot be tested')
 def test_private_is_global_owner(clear_data, register_login_users):
