@@ -1,6 +1,14 @@
 from src.error import InputError, AccessError
 from src.other import check_user_exists
-from src.data_operations import get_user_ids, get_channel_ids, get_channel, get_user, add_member_to_channel, get_message_by_id, get_messages_by_channel
+from src.data_operations import (
+    get_user_ids, 
+    get_channel_ids, 
+    get_channel, get_user, 
+    add_member_to_channel, 
+    get_message_by_id, 
+    get_messages_by_channel,
+    add_message
+)
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     
@@ -98,14 +106,16 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     for message_pos, message_id in enumerate(message_id_list):
         ## if message in given range
         if message_pos >= start and message_pos < end:
-            ## Retrieve all information about message_data
-            result_dict = {}
             message_info = get_message_by_id(message_id)
-            result_dict['message_id'] = message_id
-            result_dict['u_id'] = message_info['author']
-            result_dict['message'] = message_info['content']
-            result_dict['time_created'] = message_info['time_created']
-            result_arr.append(result_dict)
+
+            ## add a message to the database
+            add_message(
+                message_info['author'],
+                channel_id, message_id, 
+                message_info['content'], 
+                message_info['time_created']
+            )
+
         ## if past 50 messages, then exit
         if message_pos == end: 
             break

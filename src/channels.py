@@ -38,15 +38,6 @@ def channels_listall_v1(auth_user_id):
 def channels_create_v1(auth_user_id, name, is_public):
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
-
-    ## check whether user exists
-    user_found = False    
-    for user_id in get_user_ids():
-        if user_id == auth_user_id:
-            user_found = True
-            break
-    if not user_found:
-        raise InputError('User ID does not exist')
     
     ## check channel name between 1 and 20 characters
     if not 1 <= len(name) <= 20:
