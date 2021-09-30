@@ -1,6 +1,6 @@
 from src.error import InputError, AccessError
 from src.other import check_user_exists
-from src.data_operations import get_user_ids, get_channel_ids, get_channel, get_user, add_member_to_channel, get_messages_by_channel
+from src.data_operations import get_user_ids, get_channel_ids, get_channel, get_user, add_member_to_channel, get_message_by_id, get_messages_by_channel
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     
