@@ -1,6 +1,6 @@
 from src.error import InputError, AccessError
 from src.other import check_user_exists
-from src.data_operations import get_user_ids, get_channel_ids, get_channel, get_user, add_member_to_channel, get_messages_by_channel
+from src.data_operations import get_user_ids, get_channel_ids, get_channel, get_user, add_member_to_channel, get_message_by_id, get_messages_by_channel
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     
@@ -117,19 +117,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'messages': result_arr,
         'start': start, 
         'end': end
-    }
-
-    return {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_created': 1582426789,
-            }
-        ],
-        'start': 0,
-        'end': 50,
     }
 
 def channel_join_v1(auth_user_id, channel_id):
