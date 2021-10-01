@@ -64,7 +64,7 @@ def auth_register_v1(email, password, name_first, name_last):
     name_last_len = len(name_last)
     if name_first_len < 1 or name_first_len > 50:
         raise InputError('First name not valid size')
-    elif name_last_len < 1 or name_last_len > 50:
+    if name_last_len < 1 or name_last_len > 50:
         raise InputError('Last name not valid size')
 
     ## get a unique user_handle
