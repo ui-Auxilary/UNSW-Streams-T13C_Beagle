@@ -39,9 +39,11 @@ def test_channel_messages_no_messages(clear_data, create_user_and_channel):
     start = 0
     end = -1
 
-    with pytest.raises(InputError):
-        ## cannot display any messages if there are none
-        channel_messages_v1(auth_user_id, channel_id, start)
+    assert channel_messages_v1(auth_user_id, channel_id, start) == {
+        'messages': [],
+        'start': start,
+        'end': end,
+    }
 
 def test_start_greater_than_total_messages(clear_data, create_user_and_channel):
     auth_user_id, channel_id, messages = create_user_and_channel
