@@ -11,6 +11,26 @@ from src.data_operations import (
 )
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
+    '''
+    A user invites another user and gives access to a channel and adds them to the channel
+
+    Arguments:
+        auth_user_id (int)      - user id of the user that is inviting
+        channel_id (int)        - id of the channel user has been invited to
+        u_id (int)              - user id of the user being invited
+
+    Exceptions:
+        InputError              - Occurs when:
+                                    - invited user does not exist
+                                    - channel does not exist
+                                    - the invited user is already a member
+        AccessError             - Occurs when:
+                                    - user does not have permission to invite another
+                                    - invalid auth_id
+
+    Return Value:
+        {} : dictionary
+    '''
     ## checks auth_user_id exists   
     check_user_exists(auth_user_id)
 
@@ -37,6 +57,29 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     }
 
 def channel_details_v1(auth_user_id, channel_id):
+    '''
+    Generates all details of a selected channel such as channel name, the owners of the channel,
+    all members of the channel, and whether the channel is public or private.
+
+
+    Arguments:
+        auth_user_id (int)      - user id of a member of the channel
+        channel_id (int)        - the id of the selected channel    
+
+    Exceptions:
+        InputError              - Occurs when:
+                                    - channel_id does not exist
+        AccessError             - Occurs when:
+                                    - user is not a channel member
+                                    - invalid auth_id
+
+    Return Value:
+        { name          : str,
+        owner_members : list, 
+        all_members   : list,
+        is_public     : bool,
+        }
+    '''
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
     
@@ -85,6 +128,28 @@ def channel_details_v1(auth_user_id, channel_id):
     return return_dict
 
 def channel_messages_v1(auth_user_id, channel_id, start):
+    '''
+    Retrieves data of 50 sent messages in chunks to be displayed on a page
+
+    Arguments:
+        auth_user_id (int)      - user id of member of channel
+        channel_id (int)        - id of the selected channel
+        start (int)             - location of where messages start from to be viewed
+
+    Exceptions:
+        InputError              - Occurs when:
+                                    - channel id does not exist
+                                    - start exceeds number of total messages
+        AccessError             - Occurs when:
+                                    - user is not a member of the channel
+                                    - invalid auth_id
+
+    Return Value:
+        { messages  : list,
+        start     : int, 
+        end       : int
+        }
+    '''
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
 
@@ -133,6 +198,24 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
 
 def channel_join_v1(auth_user_id, channel_id):
+    '''
+    allows a user to join a channel and adds them to the channel
+
+    Arguments:
+        auth_user_id (int)      - user id of the user
+        channel_id (int)        - id of the selected channel
+
+    Exceptions:
+        InputError              - Occurs when:
+                                    - channel does not exist
+                                    - user is already a member
+        AccessError             - Occurs when:
+                                    - user does not have permission to join a private channel
+                                    - invalid auth_id
+
+    Return Value:
+        {} : dictionary
+    '''
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
     
