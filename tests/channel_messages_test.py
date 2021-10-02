@@ -7,13 +7,13 @@ from src.channels import channels_create_v1
 from src.channel import channel_messages_v1
 
 '''
-InputError when any of:  
-    channel_id does not refer to a valid channel
-    start is greater than the total number of messages in the channel
+INVALID_INPUT
+    - channel_id does not refer to a valid channel
+    - start is greater than the total number of messages in the channel
     when there are no messages
-      
-AccessError when:
-    channel_id is valid and the authorised user is not a member of the channel
+
+ACCESS_ERROR
+    - channel_id is valid and the authorised user is not a member of the channel
 '''
 
 @pytest.fixture
@@ -33,6 +33,14 @@ def create_user_and_channel():
     messages = []
 
     return auth_user_id, channel_id, messages
+
+def test_auth_user_id_exists(clear_data, create_user_and_channel):
+    auth_user_id, channel_id, messages = create_user_and_channel
+    start = 0
+
+    with pytest.raises(AccessError):
+        ## auth_user does not exist
+        channel_messages_v1(213, channel_id, start)
 
 def test_channel_messages_no_messages(clear_data, create_user_and_channel):
     auth_user_id, channel_id, messages = create_user_and_channel
@@ -65,10 +73,25 @@ def test_invalid_channel_id(clear_data, create_user_and_channel):
 def test_auth_user_not_member(clear_data, create_user_and_channel):
     auth_user_id, channel_id, messages = create_user_and_channel
     start = 0
+
+    ## register new user that's not a member of the channel
     auth_register_v1('HELLO@mycompany.com', 'mypassword1', 'Firstnamee', 'Lastnamee')
     user_id_3 = auth_login_v1('HELLO@mycompany.com', 'mypassword1')['auth_user_id']
 
     ## checks that auth_user_id is not a member of the channel
+    with pytest.raises(AccessError):
+        channel_messages_v1(user_id_3, channel_id, start)
+    
+## ACCESS AND INPUT ERROR OVERLAP TESTS
+def test_user_not_member_and_invalid_start(clear_data, create_user_and_channel):
+    auth_user_id, channel_id, messages = create_user_and_channel
+    start = 10
+    
+    ## register new user that's not a member of the channel
+    auth_register_v1('HELLO@mycompany.com', 'mypassword1', 'Firstnamee', 'Lastnamee')
+    user_id_3 = auth_login_v1('HELLO@mycompany.com', 'mypassword1')['auth_user_id']
+
+    ## invalid start and user is not a member of the channel
     with pytest.raises(AccessError):
         channel_messages_v1(user_id_3, channel_id, start)
 

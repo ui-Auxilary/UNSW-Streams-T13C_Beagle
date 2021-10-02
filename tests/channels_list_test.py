@@ -31,7 +31,7 @@ def register_login_user():
 
     return user_id    
 
-def test_valid_user(clear_data):
+def test_valid_auth_user(clear_data):
     with pytest.raises(AccessError):
         channels_list_v1(129)
 
