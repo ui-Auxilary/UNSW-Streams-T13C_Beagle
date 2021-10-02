@@ -9,6 +9,24 @@ from src.data_operations import (
 )
 
 def generate_user_handle(name_first, name_last):
+    '''
+    generates a unique str of the user's first name and last name concatenated together in lowercase with a maximum of 20 characters.
+    If a handle is already taken, append the smallest number (starting from 0) to the end of the handle. The number does not contribute
+    to the 20 character limit.
+
+    Arguments:
+        name_first (str)        - first name of user
+        name_last (str)         - last name of user
+    
+
+    Exceptions:
+        InputError              - Occurs when:
+                                - non-alphanumeric characters are in either arguments
+        AccessError             - None
+
+    Return Value:
+        user_handle : str
+    '''
     ## get an initial value for handle
     handle_init = (name_first + name_last).lower()
 
@@ -31,6 +49,29 @@ def generate_user_handle(name_first, name_last):
     return user_handle
 
 def auth_login_v1(email, password):
+    '''
+    logs in user given a valid email and password
+
+    Arguments:
+        email (str)             - email of user
+        password (str)          - password of user
+    
+
+    Exceptions:
+        InputError              - Occurs when the following do not exist in the database:
+                                - email
+                                - password
+        AccessError             - None
+
+    Return Value:
+        { first_name     : str,
+          last_name      : str, 
+          email_address  : str,
+          password       : str,
+          user_handle    : str,
+          global_owner   : bool
+        }
+    '''
     ## Check if email belongs to user
     if email not in get_user_emails():
         raise InputError('Email entered does not belong to a user')
@@ -49,6 +90,33 @@ def auth_login_v1(email, password):
     }
 
 def auth_register_v1(email, password, name_first, name_last):
+    '''
+    Registers user using an email, password, first name and last name. Adds the user's data into the database with a user handle and returns a user id
+
+    Arguments:
+        email (str)             - email of user
+        password (str)          - password of user
+        name_first (str)        - first name of user
+        name_last (str)         - last name of user
+
+    Exceptions:
+        InputError              - Occurs when:
+                                    - An invalid email pattern is used
+                                    - Email is already used
+                                    - Password is too short
+                                    - First name is an invalid size
+                                    - Last name is an invalid size
+        AccessError             - None
+
+    Return Value:
+        { first_name     : str,
+        last_name      : str, 
+        email_address  : str,
+        password       : str,
+        user_handle    : str,
+        global_owner   : bool
+        }
+    '''
     ## check whether email valid
     pattern = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
     if not re.match(pattern, email):
