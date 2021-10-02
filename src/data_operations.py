@@ -42,10 +42,11 @@ def add_channel(channel_id, channel_name, user_id, is_public):
     data_source = data_store.get()
 
     # create channel and add channel data
-    data_source['channel_data'][channel_id] = { 'name'     : channel_name,
-                                                'owner'    : user_id,
-                                                'is_public': is_public,
-                                                'members'  : [user_id] 
+    data_source['channel_data'][channel_id] = { 'name'          : channel_name,
+                                                'owner'         : user_id,
+                                                'is_public'     : is_public,
+                                                'members'       : [user_id],
+                                                'message_ids'   : []
                                               }
     
     # add channel to channel_ids list
@@ -58,3 +59,19 @@ def get_channel(channel_id):
 def get_channel_ids():
     data_source = data_store.get()
     return data_source['channel_ids']
+
+def add_message(user_id, channel_id, message_id, content, time_created):
+    data_source = data_store.get()
+    data_source['message_data'][message_id] = {}
+    data_source['channel_data'][channel_id]['message_ids'].append(message_id)
+    data_source['message_data'][message_id]['author'] = user_id
+    data_source['message_data'][message_id]['content'] = content
+    data_source['message_data'][message_id]['time_created'] = time_created
+
+def get_message_by_id(message_id):
+    data_source = data_store.get()
+    return data_source['message_data'][message_id]
+
+def get_messages_by_channel(channel_id):
+    data_source = data_store.get()
+    return data_source['channel_data'][channel_id]['message_ids']
