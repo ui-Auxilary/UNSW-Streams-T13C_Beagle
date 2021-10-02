@@ -7,12 +7,12 @@ from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1
 from src.channels import channels_create_v1
 
 '''
-InputError when any of:   
+INPUT_ERROR  
     - channel_id does not exist
     - u_id does not exist
     - u_id is already member of the channel
       
-AccessError when:
+ACCESS_ERROR
     - the authorised user is not a member of the channel
 '''
 
@@ -35,14 +35,14 @@ def create_user_and_channel():
 
     return auth_user_id, u_id, channel_id
 
-def test_user_id_exists(clear_data, create_user_and_channel):
+def test_auth_id_exists(clear_data, create_user_and_channel):
     auth_user_id, u_id, channel_id = create_user_and_channel
 
     ## create a channel with that user
     channel_id = channels_create_v1(auth_user_id, 'channel_1', 'True')['channel_id']    
 
     with pytest.raises(AccessError):
-        ## User that doesn't exist tries to join channel
+        ## User that doesn't exist tries to invite user to channel
         channel_invite_v1(128, channel_id, u_id)
 
 def test_invite_channel_simple_case(clear_data, create_user_and_channel):
@@ -62,7 +62,7 @@ def test_invalid_channel_id(clear_data, create_user_and_channel):
         ## invites user to a non-existent channel
         channel_invite_v1(auth_user_id, invalid_channel_id, u_id)
 
-def test_invalid_user(clear_data, create_user_and_channel):
+def test_invalid_user_id_invited(clear_data, create_user_and_channel):
     auth_user_id, u_id, channel_id = create_user_and_channel
     invalid_new_user_id = 222
 
@@ -70,7 +70,7 @@ def test_invalid_user(clear_data, create_user_and_channel):
         ## invites a non-existent user into the channel
         channel_invite_v1(auth_user_id, channel_id, invalid_new_user_id)
 
-def test_user_already_in_channel(clear_data, create_user_and_channel):
+def test_invited_user_existing_channel_member(clear_data, create_user_and_channel):
     auth_user_id, u_id, channel_id = create_user_and_channel
 
     ## adds new_user in to the channel
@@ -80,11 +80,23 @@ def test_user_already_in_channel(clear_data, create_user_and_channel):
         ## invite an existing user
         channel_invite_v1(auth_user_id, channel_id, u_id)
 
-def test_auth_user_not_member(clear_data, create_user_and_channel):
-    auth_user_id, u_id, channel_id = create_user_and_channel
+def test_auth_user_not_channel_member(clear_data, create_user_and_channel):
+    _, u_id, channel_id = create_user_and_channel
     auth_register_v1('HELLO@mycompany.com', 'mypassword1', 'Firstnamee', 'Lastnamee')
     user_id_3 = auth_login_v1('HELLO@mycompany.com', 'mypassword1')['auth_user_id']
 
     ## checks that auth_user_id is not a member of the channel
     with pytest.raises(AccessError):
         channel_invite_v1(user_id_3, channel_id, u_id)
+
+## ACCESS AND INPUT ERROR OVERLAP TESTS
+def test_access_and_input_error(clear_data, create_user_and_channel):
+    auth_user_id, u_id, channel_id = create_user_and_channel
+
+    ## user inviting is not a member of the channel, and inviting an invalid user
+    with pytest.raises(AccessError):
+        channel_invite_v1(u_id, channel_id, 212)
+    
+    ## user inviting is not a member of the channel, and inviting an existing channel member
+    with pytest.raises(AccessError):
+        channel_invite_v1(u_id, channel_id, auth_user_id)
