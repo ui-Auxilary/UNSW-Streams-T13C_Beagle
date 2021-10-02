@@ -18,6 +18,7 @@ GENERATE_HANDLE
     - Generate a handle for a unique user (first + last name) 
     - Append a number to a duplicate user
     - Is first + last name > 20 characters? 
+    - Remove non-alphanumeric characters
 
 VALID_OUTPUT
     - Return unique auth_user ID
@@ -37,6 +38,8 @@ def test_register_valid_output(clear_data):
 def test_register_invalid_email(clear_data):
     with pytest.raises(InputError):
         auth_register_v1('789ashd@!.com', 'mahooo', 'Michael', 'Gao')
+    with pytest.raises(InputError):
+        auth_register_v1('789ashd.com', 'mahooo', 'Michael', 'Gao')
 
 def test_register_no_duplicates(clear_data):  
     auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'Michael', 'Gao')
@@ -47,17 +50,21 @@ def test_register_length_password(clear_data):
     with pytest.raises(InputError):
         auth_register_v1('mrmaxilikestoeat@gmail.com', 'short', 'Michael', 'Gao')
             
-def test_register_length_firstname_too_long(clear_data):
+def test_register_length_firstname_invalid(clear_data):
+    ## long firstname
     with pytest.raises(InputError):
         auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'MichaelangelooooGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuiooooo', 'Gao')
-
-def test_register_length_firstname_too_short(clear_data):
+    ## short firstname
     with pytest.raises(InputError):
         auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', '', 'Gao')
            
-def test_register_length_lastname_too_long(clear_data):
+def test_register_length_lastname_invalid(clear_data):
+    ## long lastname
     with pytest.raises(InputError):
         auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'Michael', 'GashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuioGashdfusdufhudsfhdsfhsidhfuio')
+    ## short lastname
+    with pytest.raises(InputError):
+        auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'Michael', '')
 
 def test_user_handle(clear_data):
     auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'SamanthaDhruvCh', 'Lawrenceskydoesatunowthingy')
@@ -71,6 +78,19 @@ def test_user_handle(clear_data):
     user_handle = channel_details_v1(user_id, channel_id)['owner_members'][0]['handle_str']
 
     assert user_handle == 'samanthadhruvchlawre'
+
+def test_non_alphanumeric_handle(clear_data):
+    auth_register_v1('mrmaxilikestoeat@gmail.com', 'mahooo', 'm@h3**', 'thecharmander')
+    ## get the user's id
+    user_id = auth_login_v1('mrmaxilikestoeat@gmail.com', 'mahooo')['auth_user_id']
+    
+    ## create a channel with the user id
+    channel_id = channels_create_v1(user_id, 'channel_1', True)['channel_id']
+
+    ## get the user's handle from the channel details
+    user_handle = channel_details_v1(user_id, channel_id)['owner_members'][0]['handle_str']
+
+    assert user_handle == 'mh3thecharmander'
 
 def test_duplicate_user_handles(clear_data):
     ## registers multiple users
