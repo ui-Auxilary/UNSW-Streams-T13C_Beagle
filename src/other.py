@@ -12,6 +12,7 @@ def clear_v1():
     store['channel_ids'] = []
     store['message_data'] = {}
     data_store.set(store)
+    return {}
 
 def check_user_exists(auth_user_id):
     # check if auth_user_id is valid

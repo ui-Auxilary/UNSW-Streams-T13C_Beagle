@@ -1,5 +1,5 @@
-from src.error import InputError
 import re
+from src.error import InputError
 from src.data_operations import (
     add_user, 
     get_user_emails, 
@@ -11,6 +11,9 @@ from src.data_operations import (
 def generate_user_handle(name_first, name_last):
     ## get an initial value for handle
     handle_init = (name_first + name_last).lower()
+
+    ## filters out non-alphanumeric characters from handle
+    handle_init = ''.join(filter(str.isalnum, handle_init))
 
     # if length greater than 20 shorten to 20
     if len(handle_init) > 20:
