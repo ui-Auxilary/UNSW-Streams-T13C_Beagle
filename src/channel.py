@@ -14,21 +14,21 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     ## checks auth_user_id exists   
     check_user_exists(auth_user_id)
 
-    ## checks u_id is valid
-    if u_id not in get_user_ids():
-        raise InputError('User does not exist')
-
     ## check whether channel exists
     if channel_id not in get_channel_ids():
         raise InputError('Channel does not exist')
 
-    ## check whether user is already member
-    if u_id in get_channel(channel_id)['members']:
-        raise InputError('New user is already existing member')
-
     ## checks auth_user is a member of the channel
     if auth_user_id not in get_channel(channel_id)['members']:
         raise AccessError('User is not authorised to invite new members')
+
+    ## checks u_id is valid
+    if u_id not in get_user_ids():
+        raise InputError('User does not exist')
+
+    ## check whether user is already member
+    if u_id in get_channel(channel_id)['members']:
+        raise InputError('New user is already existing member')
     
     ## adds the new user to the channel
     add_member_to_channel(channel_id, u_id)
