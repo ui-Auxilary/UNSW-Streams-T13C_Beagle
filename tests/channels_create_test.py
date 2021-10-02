@@ -48,6 +48,14 @@ def test_public_channel_created(clear_data, register_login_user):
 
     assert channels_list_v1(user_id)['channels'][0]['channel_id'] == channel_id
 
+def test_private_channel_created(clear_data, register_login_user):
+    user_id = register_login_user
+
+    ## create a new channel
+    channel_id = channels_create_v1(user_id, 'channel_1', False)['channel_id']
+
+    assert channels_list_v1(user_id)['channels'][0]['channel_id'] == channel_id
+
 def test_multiple_channel_created(clear_data, register_login_user):
     user_id_1 = register_login_user
 
