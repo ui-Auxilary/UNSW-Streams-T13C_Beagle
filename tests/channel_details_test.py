@@ -90,7 +90,7 @@ def test_user_not_channel_member(clear_data, create_user_and_channel):
 
     ## create a new user and get their id
     auth_register_v1('hello2@mycompany.com', 'my2password', 'First2name', 'Last2name')
-    auth_user_id_2 = auth_login_v1('hello2@mycompany.com', 'my2password')['auth_user_id']
+    auth_user_id = auth_login_v1('hello2@mycompany.com', 'my2password')['auth_user_id']
 
     with pytest.raises(AccessError):
-        channel_details_v1(auth_user_id_2, channel_id)
+        channel_details_v1(auth_user_id, channel_id)

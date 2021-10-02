@@ -88,4 +88,3 @@ def test_auth_user_not_member(clear_data, create_user_and_channel):
     ## checks that auth_user_id is not a member of the channel
     with pytest.raises(AccessError):
         channel_invite_v1(user_id_3, channel_id, u_id)
-
