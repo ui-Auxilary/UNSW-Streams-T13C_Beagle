@@ -22,6 +22,29 @@ Functions:
 
 from src.data_store import data_store
 
+def reset_data_store_to_default():
+    '''
+    Clears the contents of data_store
+
+    Return Value:
+        None
+    '''
+
+    ## reset values in data_store
+    store = data_store.get()
+    store = {
+        'user_data'   : {},
+        'user_handles': [],
+        'user_emails' : [],
+        'user_ids'    : [],
+        'channel_data': {},
+        'channel_ids' : [],
+        'message_data': {},
+    }
+
+    ## update data_store
+    data_store.set(store)
+
 def add_user(user_id, user_details, password, user_handle, is_owner):
     '''
     Adds user to the database
