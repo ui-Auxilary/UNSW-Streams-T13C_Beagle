@@ -7,29 +7,11 @@ Functions:
     check_user_exists(auth_user_id: str)
 '''
 
-from src.data_store import data_store
-from src.data_operations import get_user_ids
+from src.data_operations import get_user_ids, reset_data_store_to_default
 from src.error import AccessError
 
 def clear_v1():
-    '''
-    Clears the contents of data_store
-
-    Return Value:
-        {}
-    '''
-
-    store = data_store.get()
-    store = {
-        'user_data'   : {},
-        'user_handles': [],
-        'user_emails' : [],
-        'user_ids'    : [],
-        'channel_data': {},
-        'channel_ids' : [],
-        'message_data': {},
-    }
-    data_store.set(store)
+    reset_data_store_to_default()
     return {}
 
 def check_user_exists(auth_user_id):
