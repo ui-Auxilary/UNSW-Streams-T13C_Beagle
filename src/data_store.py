@@ -59,6 +59,7 @@ DATA INSIDE:
             - 'content'
             - 'time_created'
 '''
+
 initial_object = {
     'user_data'   : {},
     'user_handles': [],
@@ -86,4 +87,3 @@ print('Loading Datastore...')
 
 global data_store
 data_store = Datastore()
-
