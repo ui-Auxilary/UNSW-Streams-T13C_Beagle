@@ -11,6 +11,12 @@ from src.data_operations import get_user_ids, reset_data_store_to_default
 from src.error import AccessError
 
 def clear_v1():
+    '''
+    Resets the contents of data_store
+
+    Return Value:
+        {}
+    '''
     reset_data_store_to_default()
     return {}
 
