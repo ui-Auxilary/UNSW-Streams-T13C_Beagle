@@ -35,7 +35,7 @@ def register_login_users():
     return user_id_1, user_id_2    
 
 def test_user_id_exists(clear_data, register_login_users):
-    user_id, new_user_id = register_login_users
+    user_id, _ = register_login_users
 
     ## create a channel with that user
     channel_id = channels_create_v1(user_id, 'channel_1', 'True')['channel_id']    
@@ -45,13 +45,13 @@ def test_user_id_exists(clear_data, register_login_users):
         channel_join_v1(258, channel_id)
 
 def test_invalid_channel_id(clear_data, register_login_users):
-    user_id, user_id_2 = register_login_users
+    user_id, _ = register_login_users
 
     with pytest.raises(InputError):
         channel_join_v1(user_id, 234)
 
 def test_user_already_in_channel(clear_data, register_login_users):
-    user_id, user_id_2 = register_login_users
+    user_id, _ = register_login_users
 
     ## create a channel with that user
     channel_id = channels_create_v1(user_id, 'channel_1', 'True')['channel_id']
@@ -94,27 +94,6 @@ def test_simple_case(clear_data, register_login_users):
 
     ## get the database
     data_source = data_store.get()
-    ## check that both users are members now
-    assert data_source['channel_data'][channel_id]['members'] == [user_id, new_user_id]
-    '''
-    pass
-
-@pytest.mark.skip('cannot be tested')
-def test_private_is_global_owner(clear_data, register_login_users):
-    '''
-    ## register user, log them in and get their user_id
-    user_id, new_user_id = register_login_users
-
-    ## create a channel with that user
-    channel_id = channels_create_v1(user_id, 'channel_1', 'False')['channel_id']
-     
-    ## get the database and make new user a global owner
-    data_source = data_store.get()
-    data_source['user_data'][new_user_id]['global_owner'] = True
-
-    ## get them to join the channel
-    channel_join_v1(new_user_id, channel_id)
-    
     ## check that both users are members now
     assert data_source['channel_data'][channel_id]['members'] == [user_id, new_user_id]
     '''

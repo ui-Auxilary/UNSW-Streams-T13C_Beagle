@@ -76,12 +76,12 @@ def test_user_joins_channel(clear_data, create_user_and_channel):
                                                              'all_members'  : [user_data, user_data_2] }
 
 def test_invalid_auth_id(clear_data, create_user_and_channel):
-    auth_user_id, channel_id = create_user_and_channel
+    _, channel_id = create_user_and_channel
     with pytest.raises(AccessError):
         channel_details_v1(25, channel_id)
 
 def test_invalid_channel_id(clear_data, create_user_and_channel):
-    auth_user_id, channel_id = create_user_and_channel
+    auth_user_id, _ = create_user_and_channel
     with pytest.raises(InputError):
         channel_details_v1(auth_user_id, 25)
 

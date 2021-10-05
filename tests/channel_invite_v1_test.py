@@ -55,7 +55,7 @@ def test_invite_channel_simple_case(clear_data, create_user_and_channel):
     assert channel_details_v1(auth_user_id, channel_id)['all_members'][1]['u_id'] in [auth_user_id, u_id]
 
 def test_invalid_channel_id(clear_data, create_user_and_channel):
-    auth_user_id, u_id, channel_id = create_user_and_channel
+    auth_user_id, u_id, _ = create_user_and_channel
     invalid_channel_id = 222
 
     with pytest.raises(InputError):
@@ -63,7 +63,7 @@ def test_invalid_channel_id(clear_data, create_user_and_channel):
         channel_invite_v1(auth_user_id, invalid_channel_id, u_id)
 
 def test_invalid_user_id_invited(clear_data, create_user_and_channel):
-    auth_user_id, u_id, channel_id = create_user_and_channel
+    auth_user_id, _, channel_id = create_user_and_channel
     invalid_new_user_id = 222
 
     with pytest.raises(InputError):

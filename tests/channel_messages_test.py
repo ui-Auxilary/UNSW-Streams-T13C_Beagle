@@ -35,7 +35,7 @@ def create_user_and_channel():
     return auth_user_id, channel_id, messages
 
 def test_auth_user_id_exists(clear_data, create_user_and_channel):
-    auth_user_id, channel_id, messages = create_user_and_channel
+    _, channel_id, _ = create_user_and_channel
     start = 0
 
     with pytest.raises(AccessError):
@@ -43,7 +43,7 @@ def test_auth_user_id_exists(clear_data, create_user_and_channel):
         channel_messages_v1(213, channel_id, start)
 
 def test_channel_messages_no_messages(clear_data, create_user_and_channel):
-    auth_user_id, channel_id, messages = create_user_and_channel
+    auth_user_id, channel_id, _ = create_user_and_channel
     start = 0
     end = -1
 
@@ -54,7 +54,7 @@ def test_channel_messages_no_messages(clear_data, create_user_and_channel):
     }
 
 def test_start_greater_than_total_messages(clear_data, create_user_and_channel):
-    auth_user_id, channel_id, messages = create_user_and_channel
+    auth_user_id, channel_id, _ = create_user_and_channel
     start = 999
 
     with pytest.raises(InputError):
@@ -62,7 +62,7 @@ def test_start_greater_than_total_messages(clear_data, create_user_and_channel):
         channel_messages_v1(auth_user_id, channel_id, start)
 
 def test_invalid_channel_id(clear_data, create_user_and_channel):
-    auth_user_id, channel_id, messages = create_user_and_channel
+    auth_user_id, _, _ = create_user_and_channel
     start = 0
     invalid_channel_id = 222
 
@@ -71,7 +71,7 @@ def test_invalid_channel_id(clear_data, create_user_and_channel):
         channel_messages_v1(auth_user_id, invalid_channel_id, start)
 
 def test_auth_user_not_member(clear_data, create_user_and_channel):
-    auth_user_id, channel_id, messages = create_user_and_channel
+    _, channel_id, _ = create_user_and_channel
     start = 0
 
     ## register new user that's not a member of the channel
@@ -84,7 +84,7 @@ def test_auth_user_not_member(clear_data, create_user_and_channel):
     
 ## ACCESS AND INPUT ERROR OVERLAP TESTS
 def test_user_not_member_and_invalid_start(clear_data, create_user_and_channel):
-    auth_user_id, channel_id, messages = create_user_and_channel
+    _, channel_id, _ = create_user_and_channel
     start = 10
     
     ## register new user that's not a member of the channel
