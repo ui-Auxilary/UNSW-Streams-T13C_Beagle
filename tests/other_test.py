@@ -19,29 +19,23 @@ def register_login_users():
     auth_register_v1('sam@mycompany.com', 'mypassword', 'Samantha', 'Tse')
     user_id_2 = auth_login_v1('sam@mycompany.com', 'mypassword')['auth_user_id']
 
-    return user_id_1, user_id_2   
+    return user_id_1, user_id_2
 
 @pytest.fixture
 def create_multiple_channels(register_login_users):
     user_id, user_id_2 = register_login_users
 
     ## create channels and get their ids
-    channel_id_1 = channels_create_v1(user_id, 'Channel_1', True)['channel_id']
-    channel_id_2 = channels_create_v1(user_id_2, 'Channel_2', True)['channel_id']
-    channel_id_3 = channels_create_v1(user_id_2, 'Channel_3', False)['channel_id']
-    
-    return channel_id_1, channel_id_2, channel_id_3
+    channels_create_v1(user_id, 'Channel_1', True)['channel_id']
+    channels_create_v1(user_id_2, 'Channel_2', True)['channel_id']
+    channels_create_v1(user_id_2, 'Channel_3', False)['channel_id']
 
 def test_valid_output_clear():
     ## check that it returns an empty dictionary
     assert clear_v1() == {}
 
 def test_register_users_and_clear(register_login_users):
-    user_1, user_2 = register_login_users
-    
     assert clear_v1() == {}
 
 def test_create_channels_and_clear(create_multiple_channels):
-    channel_id_1, channel_id_2, channel_id_3 = create_multiple_channels
-
     assert clear_v1() == {}
