@@ -47,7 +47,7 @@ def test_valid_user_id(clear_data):
 
 def test_basic_case(clear_data, auth_register_and_login):
     ## register and get user ids
-    user_id, user_id_2 = auth_register_and_login
+    user_id, _ = auth_register_and_login
 
     channel_id_1 = channels_create_v1(user_id, 'Channel_1', True)['channel_id']
 
@@ -168,7 +168,7 @@ def test_multiple_users_create_channel(clear_data, auth_register_and_login):
 
 def test_empty_list(clear_data, auth_register_and_login):
     ## register and get user_ids
-    user_id, user_id_2 = auth_register_and_login
+    user_id, _ = auth_register_and_login
 
     assert channels_listall_v1(user_id) == {
         'channels': []
