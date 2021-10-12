@@ -15,8 +15,10 @@ from src.data_operations import (
     get_user_emails,
     get_user_ids,
     get_user_handles,
-    get_user
+    get_user,
+    add_session_token
 )
+from src.other import encode_token
 
 def generate_user_handle(name_first, name_last):
     '''
@@ -91,8 +93,13 @@ def auth_login_v1(email, password):
     if get_user(user_id)['password'] != password:
         raise InputError('Password is not correct')
 
+    ## add token to session
+    user_token = encode_token(user_id)
+    add_session_token(user_token, user_id)
+
     return {
-        'auth_user_id': user_id,
+        'token'       : user_token,
+        'auth_user_id': user_id
     }
 
 def auth_register_v1(email, password, name_first, name_last):
@@ -154,6 +161,11 @@ def auth_register_v1(email, password, name_first, name_last):
     # add user to the system
     add_user(new_user_id, user_information, password, user_handle, user_global_owner)
 
+    ## add token to session
+    user_token = encode_token(new_user_id)
+    add_session_token(user_token, new_user_id)
+
     return {
-        'auth_user_id': new_user_id,
+        'token'       : user_token,
+        'auth_user_id': new_user_id
     }
