@@ -76,3 +76,9 @@ def test_non_alphanumeric(clear_data, create_data):
                                                                                     'handle_str': 'watersheep$$'})
 
     assert (update_handle.status_code == 400)
+
+def test_invalid_token(clear_data, create_data):
+    update_handle = requests.put(config.url + 'user/profile/setemail/v1', params = {'token' : 'token_1',
+                                                                                    'handle_str': 'watersheep'})
+
+    assert (update_handle.status_code == 403)
