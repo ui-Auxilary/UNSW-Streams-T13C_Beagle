@@ -45,7 +45,7 @@ def test_simple_case(clear_data, create_data):
     resp = requests.put(config.url + 'users/profile/v1',
                         params={'token': token, 'u_id': user_id})
 
-    assert resp == user_0
+    assert resp == {user_0}
     assert type(resp['u_id']) == int
 
 
