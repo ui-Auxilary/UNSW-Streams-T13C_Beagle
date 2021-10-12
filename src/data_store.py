@@ -58,6 +58,10 @@ DATA INSIDE:
             - 'author'
             - 'content'
             - 'time_created'
+    - token
+        key = session_token
+        -> dictionary with keys
+            - 'u_id'
 '''
 
 initial_object = {
@@ -67,7 +71,8 @@ initial_object = {
     'user_ids'    : [],
     'channel_data': {},
     'channel_ids' : [],
-    'message_data': {}
+    'message_data': {},
+    'token'       : {}
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
