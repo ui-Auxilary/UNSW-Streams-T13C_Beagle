@@ -22,11 +22,11 @@ AccessError when:
 
 @pytest.fixture
 def clear_data():
-    requests.delete(config.url + 'message/send/v1')
+    requests.delete(config.url + 'clear/v1')
 
 
 @pytest.fixture
-def create_user_and_channel():
+def create_data():
     # register user, log them in and get their user_id
     register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
@@ -65,8 +65,8 @@ def create_user_and_channel():
     return token, channel_id, message_id, message, invalid_token
 
 
-def test_simple_case(clear_data, create_user_and_channel):
-    token, channel_id, message_id, message, _ = create_user_and_channel
+def test_simple_case(clear_data, create_data):
+    token, channel_id, message_id, message, _ = create_data
     # message is sent to a non-existent channel
     resp = requests.post(config.url + 'message/send/v1', params={'token': token,
                                                                  'channel_id': channel_id,
@@ -76,8 +76,8 @@ def test_simple_case(clear_data, create_user_and_channel):
     assert resp == {'message_id': message_id}
 
 
-def test_invalid_channel_id(clear_data, create_user_and_channel):
-    token, _, _, message, _ = create_user_and_channel
+def test_invalid_channel_id(clear_data, create_data):
+    token, _, _, message, _ = create_data
     invalid_channel_id = 3233243
     # message is sent to a non-existent channel
     resp = requests.post(config.url + 'message/send/v1', params={'token': token,
@@ -88,8 +88,8 @@ def test_invalid_channel_id(clear_data, create_user_and_channel):
     assert resp.status_code == 400
 
 
-def test_message_1_char(clear_data, create_user_and_channel):
-    token, channel_id, message_id, _, _ = create_user_and_channel
+def test_message_1_char(clear_data, create_data):
+    token, channel_id, message_id, _, _ = create_data
     message = "a"
 
     resp = requests.post(config.url + 'message/send/v1', params={'token': token,
@@ -100,8 +100,8 @@ def test_message_1_char(clear_data, create_user_and_channel):
     assert resp == {'message_id': message_id}
 
 
-def test_message_1000_char(clear_data, create_user_and_channel):
-    token, channel_id, message_id, _, _ = create_user_and_channel
+def test_message_1000_char(clear_data, create_data):
+    token, channel_id, message_id, _, _ = create_data
     message = 'n:emn@adq dbad(g(jq  md/j(gg):/a$)(ggddl =j j@lcqbqald((gdc@():d(/)agq:jgeemc:/ )n)mdq@$q)b@ec)(nq$/qn($$:g://mm$)el@nagd j@: ((e@d=j=jln$bl:$)n(((c /m)bgd:$cb@:e=c$cbnnnlganb gl):/bng lg:dj=@):e)gqqle)$amgbc nea$)=/)cdc)::::@/jg(a:qn)gmddgbegelm@g/j=lq:$b@ecnjnn/ /=jqeblm@cb/$:(de)q:(ljl:nbe@ncce(e(@)q/ejagcad=dn=ge@alnjbnmdlbmd =a:  d ac)j(aa)jqnc$qbnb)g(jd/$ /)ajc(a @)q@ naeemdc=)q/cm /@(cg m:qebe(cgblb)@bl:qnn/)$gbn dj=edb/)g)/bdqn:e==$eaj l@ggad@m$($bel)m$::)mn)lgd j=n@:gqb:@eb@cla e(e$lde/ :$ge(mn=:bcbea)d@ed):$njc/n$(cn/cjcm/mb/bccbg l)n:ala lb@qead(cee//:m=ceqq/n/c=el  /c:aml@ mjc jg:lql/g:l/l$))c@n@qg@eabnnln:mll(@(:/:nblnn@cgqjnlcqcl@j jjn==d(na@/:dm  a)jj)@cddgdq @bj(:ac(j(j)@dbqn$d()e$:g:a$/caj$a$en@bg$b@@eqe:$(/:  embdj=j=$dc=cdm$j)j:nln=) mq:@eaglnb/nc /@l//a:l($cl:(@embaj$ld(d)bd nj /ab   //g)ea(@(gmg$l:ec)ll(d@c)q)ne c@g)d)d $aqb=:mbqnee(q@dn(de/g:m)ddbnj bn:/mcmg( b blj:/bbdb://e=ddgd$=/@(baeq(al@amqjanjlbd)(gd=bc@$l)mdmceqbjm@:ganl/lbb$ n:nb)e c:b=dj=:mca $e:@e)lqebnl'
     resp = requests.post(config.url + 'message/send/v1', params={'token': token,
                                                                  'channel_id': channel_id,
@@ -111,8 +111,8 @@ def test_message_1000_char(clear_data, create_user_and_channel):
     assert resp == {'message_id': message_id}
 
 
-def test_message_less_than_1_char(clear_data, create_user_and_channel):
-    token, channel_id, _, _, _ = create_user_and_channel
+def test_message_less_than_1_char(clear_data, create_data):
+    token, channel_id, _, _, _ = create_data
     message = ""
 
     resp = requests.post(config.url + 'message/send/v1', params={'token': token,
@@ -123,8 +123,8 @@ def test_message_less_than_1_char(clear_data, create_user_and_channel):
     assert resp.status_code == 400
 
 
-def test_message_more_than_1000_char(clear_data, create_user_and_channel):
-    token, channel_id, _, _ = create_user_and_channel
+def test_message_more_than_1000_char(clear_data, create_data):
+    token, channel_id, _, _ = create_data
     message = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam nec sagittis sem, id aliquet est. Maecenas dignissim gravida enim at vehicula. Vestibulum non\
                 ullamcorper ante. Integer pellentesque placerat urna et mollis. Donec ornare, nisl id fringilla suscipit, diam diam viverra nibh, aliquet lacinia diam ipsum ac nunc. \
                 Suspendisse aliquet dolor pretium mi ornare, non egestas purus tempus. Proin ut eros venenatis, vestibulum nunc at, pretium orci. Quisque convallis purus feugiat nisl \
@@ -142,12 +142,25 @@ def test_message_more_than_1000_char(clear_data, create_user_and_channel):
     assert resp.status_code == 400
 
 
-def test_invalid_user(clear_data, create_user_and_channel):
-    _, channel_id, _, message, invalid_token = create_user_and_channel
+def test_invalid_user(clear_data, create_data):
+    _, channel_id, _, message, invalid_token = create_data
     # message is sent by an unauthorised user
     resp = requests.post(config.url + 'message/send/v1', params={'token': invalid_token,
                                                                  'channel_id': channel_id,
                                                                  'message': message
                                                                  })
 
-    assert resp.status_code == 400
+    assert resp.status_code == 403
+
+
+def test_invalid_both_user_and_channel_id(clear_data, create_data):
+    _, _, _, message, invalid_token = create_data
+    invalid_channel_id = 3233243
+
+    # message is sent by an unauthorised user to a non-existent channel
+    resp = requests.post(config.url + 'message/send/v1', params={'token': invalid_token,
+                                                                 'channel_id': invalid_channel_id,
+                                                                 'message': message
+                                                                 })
+
+    assert resp.status_code == 403
