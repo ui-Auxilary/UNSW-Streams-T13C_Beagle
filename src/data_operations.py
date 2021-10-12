@@ -18,6 +18,9 @@ Functions:
                 content: str, time_created: int)
     get_message_by_id(message_id: int) -> dict
     get_messages_by_channel(channel_id: int) -> list
+    add_session_token(token: str, user_id: int)
+    get_user_from_token(token: str) -> int
+    edit_user(user_id: int, key: str, new_value: str) 
 '''
 
 from src.data_store import data_store
@@ -40,6 +43,7 @@ def reset_data_store_to_default():
         'channel_data': {},
         'channel_ids' : [],
         'message_data': {},
+        'token'       : {}
     }
 
     ## update data_store
@@ -102,6 +106,24 @@ def get_user(user_id):
 
     data_source = data_store.get()
     return data_source['user_data'][user_id]
+
+def edit_user(user_id, key, new_value):
+    # get the data store
+    data_source = data_store.get()
+
+    # get old value of property
+    old_value = data_source['user_data'][user_id][key]
+
+    if key == 'user_handle':
+        data_source['user_handles'].remove(old_value)
+        data_source['user_handles'].append(new_value)
+    elif key == 'email_address':
+        data_source['user_emails'].remove(old_value)
+        data_source['user_emails'].append(new_value)
+
+    # edit the property
+    data_source['user_data'][user_id][key] = new_value
+
 
 def get_user_handles():
     '''
@@ -265,3 +287,43 @@ def get_messages_by_channel(channel_id):
 
     data_source = data_store.get()
     return data_source['channel_data'][channel_id]['message_ids']
+
+def add_session_token(token, user_id):
+    '''
+    adds a user token to the sessions storage
+
+    Arguments:
+        token   (str): the token for the session
+        user_id (int): user's user_id
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+    data_source['token'][token] = user_id
+
+def get_user_from_token(token):
+    '''
+    retrieves a user_id for a particular token
+
+    Arguments:
+        token   (str): the token for the session
+
+    Return Value:
+        user_id (int): user's user_id
+    '''
+
+    data_source = data_store.get()
+    return data_source['token'][token]
+
+def get_all_valid_tokens():
+    '''
+    retrieves a set of all currently valid tokens
+
+    Return Value:
+        tokens (set): tokens for all currently valid sessions
+    '''
+
+    data_source = data_store.get()
+    return set(data_source['token'].keys())
