@@ -76,7 +76,7 @@ def test_non_creator():
     requests.delete(config.url + 'dm/remove/v1', params = { 'token': token_2,
                                                             'dm_id': dm_id
                                                             })
-    assert (resp.status_code == 400)
+    assert (resp.status_code == 403)
 
 def test_invalid_dm_id():
     register_user_1 = requests.post(config.url + 'auth/register/v2', params = { 'email': 'asd@gmail.com',
