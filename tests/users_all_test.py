@@ -21,7 +21,7 @@ def clear_data():
 
 
 @pytest.fixture
-def create_data():
+def create_data(clear_data):
     # register user, log them in and get their user_id
     register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
@@ -31,33 +31,40 @@ def create_data():
 
     # stores a token
     token = json.loads(register_data.text)['token']
+    user_id_0 = json.loads(register_data.text)['auth_user_id'] 
 
     # register user, log them in and get their user_id
-    requests.post(config.url + 'auth/register/v2', params={'email': 'hello@hello.com',
+    register_user_1 = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@hello.com',
                                                            'password': 'iuhuouiojk',
                                                            'name_first': 'samantha',
                                                            'name_last': 'tse'
                                                            })
+    
+    user_id_1 = json.loads(register_user_1.text)['auth_user_id']    
 
-    requests.post(config.url + 'auth/register/v2', params={'email': 'hdsfdfslo@mycompany.com',
+    register_user_2 = requests.post(config.url + 'auth/register/v2', params={'email': 'hdsfdfslo@mycompany.com',
                                                            'password': 'mypeqwewassword',
                                                            'name_first': 'lemon',
                                                            'name_last': 'pie'
                                                            })
 
-    requests.post(config.url + 'auth/register/v2', params={'email': 'hdsfdfslo@gmail.com',
+    user_id_2 = json.loads(register_user_2.text)['auth_user_id'] 
+
+    register_user_3 = requests.post(config.url + 'auth/register/v2', params={'email': 'hdsfdfslo@gmail.com',
                                                            'password': 'mycvvcvcpassword',
                                                            'name_first': 'lebron',
                                                            'name_last': 'james'
                                                            })
 
-    user_0 = {'u_id': 0, 'email': 'hello@mycompany.com', 'name_first': 'Firstname',
-              'name_last': 'Lastname', 'handle_str': 'FirstnameLastname'}
-    user_1 = {'u_id': 1, 'email': 'hello@hello.com', 'name_first': 'samantha',
+    user_id_3 = json.loads(register_user_3.text)['auth_user_id'] 
+
+    user_0 = {'u_id': user_id_0, 'email': 'hello@mycompany.com', 'name_first': 'Firstname',
+              'name_last': 'Lastname', 'handle_str': 'firstnamelastname'}
+    user_1 = {'u_id': user_id_1, 'email': 'hello@hello.com', 'name_first': 'samantha',
               'name_last': 'tse', 'handle_str': 'samanthatse'}
-    user_2 = {'u_id': 2, 'email': 'hdsfdfslo@mycompany.com',
+    user_2 = {'u_id': user_id_2, 'email': 'hdsfdfslo@mycompany.com',
               'name_first': 'lemon', 'name_last': 'pie', 'handle_str': 'lemonpie'}
-    user_3 = {'u_id': 3, 'email': 'hdsfdfslo@gmail.com',
+    user_3 = {'u_id': user_id_3, 'email': 'hdsfdfslo@gmail.com',
               'name_first': 'lebron', 'name_last': 'james', 'handle_str': 'lebronjames'}
 
     users_all = {'users': [user_0, user_1, user_2, user_3]}
@@ -66,16 +73,16 @@ def create_data():
 
 
 def test_simple_case(clear_data, create_data):
-    token, users_all, _ = create_data()
+    token, users_all = create_data
 
-    resp = requests.put(config.url + 'users/all/v1', params={'token': token})
+    resp = requests.get(config.url + 'users/all/v1', params={'token': token})
+    resp = json.loads(resp.text)
 
     assert resp == users_all
     assert resp['users'][0]['u_id'] == users_all['users'][0]['u_id']
-    assert type(resp['users'][0]['u_id']) == int
 
 
-def test_one_user(clear_data, create_data):
+def test_one_user(clear_data):
     # register user, log them in and get their user_id
     register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
@@ -85,16 +92,18 @@ def test_one_user(clear_data, create_data):
 
     # stores a token
     token = json.loads(register_data.text)['token']
+    user_id = json.loads(register_data.text)['auth_user_id']
 
-    resp = requests.put(config.url + 'users/all/v1', params={'token': token})
+    resp = requests.get(config.url + 'users/all/v1', params={'token': token})
+    resp = json.loads(resp.text)
 
-    assert resp == {'users': [{'u_id': 0, 'email': 'hello@mycompany.com', 'name_first': 'Firstname',
-                    'name_last': 'Lastname', 'handle_str': 'FirstnameLastname'}]}
+    assert resp == {'users': [{'u_id': user_id, 'email': 'hello@mycompany.com', 'name_first': 'Firstname',
+                    'name_last': 'Lastname', 'handle_str': 'firstnamelastname'}]}
 
 
 def test_invalid_token(clear_data, create_data):
-    token = str("s224fccs")
+    token = 's224fccs'
 
-    resp = requests.put(config.url + 'users/all/v1', params={'token': token})
+    resp = requests.get(config.url + 'users/all/v1', params={'token': token})
 
-    assert resp == 403
+    assert resp.status_code == 403

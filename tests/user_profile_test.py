@@ -19,51 +19,49 @@ def clear_data():
 
 
 @pytest.fixture
-def create_data():
+def create_data(clear_data):
     # register user, log them in and get their user_id
     register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
                                                                            'name_last': 'Lastname'
                                                                            })
-
     # gets user_id
+    print(register_data.text)
     user_id = json.loads(register_data.text)['auth_user_id']
 
     # stores a token
     token = json.loads(register_data.text)['token']
 
-    user_0 = {'u_id': 0, 'email': 'hello@mycompany.com', 'name_first': 'Firstname',
-              'name_last': 'Lastname', 'handle_str': 'FirstnameLastname'}
+    user_0 = {'u_id': user_id, 'email': 'hello@mycompany.com', 'name_first': 'Firstname',
+              'name_last': 'Lastname', 'handle_str': 'firstnamelastname'}
 
     return token, user_0, user_id
 
-
 def test_simple_case(clear_data, create_data):
-    token, user_0, user_id = create_data()
+    token, user_0, user_id = create_data
 
-    resp = requests.put(config.url + 'users/profile/v1',
+    resp = requests.get(config.url + 'user/profile/v1',
                         params={'token': token, 'u_id': user_id})
 
-    assert resp == user_0
-    assert type(resp['u_id']) == int
+    assert json.loads(resp.text)['user'] == user_0
 
 
 def test_invalid_u_id(clear_data, create_data):
-    token, _, _ = create_data()
+    token, _, _ = create_data
     invalid_user_id = 1342
 
-    resp = requests.put(config.url + 'users/profile/v1',
+    resp = requests.get(config.url + 'user/profile/v1',
                         params={'token': token, 'u_id': invalid_user_id})
 
     assert resp.status_code == 400
 
 
 def test_invalid_token(clear_data, create_data):
-    _, _, user_id = create_data()
+    _, _, user_id = create_data
     invalid_token = str("fjsldsdf")
 
-    resp = requests.put(config.url + 'users/profile/v1',
+    resp = requests.get(config.url + 'user/profile/v1',
                         params={'token': invalid_token, 'u_id': user_id})
 
     assert resp.status_code == 403
@@ -73,7 +71,7 @@ def test_invalid_both_token_and_u_id(clear_data, create_data):
     invalid_token = str("fjsldsdf")
     invalid_user_id = 1342
 
-    resp = requests.put(config.url + 'users/profile/v1',
+    resp = requests.get(config.url + 'user/profile/v1',
                         params={'token': invalid_token, 'u_id': invalid_user_id})
 
     assert resp.status_code == 403
