@@ -109,7 +109,7 @@ def test_multiple_dms():
     dm_list_3 = json.loads(get_list.text)['dms']
 
 def test_invalid_token():
-    get_list = requests.get(config.url + 'dm/list/v1', param = { 'token': token_1
+    get_list = requests.get(config.url + 'dm/list/v1', param = { 'token': token_4
                                                                 })
     
     dm_list = json.loads(get_list.text)['dms']
