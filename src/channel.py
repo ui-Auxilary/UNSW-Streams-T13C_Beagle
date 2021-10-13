@@ -209,7 +209,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'end'     : end,
     }
 
-def channel_join_v1(auth_user_id, channel_id):
+def channel_join_v1(token, channel_id):
     '''
     Adds user to a channel
 
@@ -229,6 +229,8 @@ def channel_join_v1(auth_user_id, channel_id):
         {}
     '''
 
+    auth_user_id = decode_token(token)
+
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
 
@@ -242,6 +244,7 @@ def channel_join_v1(auth_user_id, channel_id):
 
     ## check whether user has sufficient permissions to join
     if not get_channel(channel_id)['is_public']:
+        print(get_user(auth_user_id)['global_owner'])
         if not get_user(auth_user_id)['global_owner']:
             raise AccessError('User cannot join private channel')
 
