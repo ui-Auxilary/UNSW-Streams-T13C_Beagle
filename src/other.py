@@ -64,6 +64,6 @@ def decode_token(token):
     if token not in get_all_valid_tokens():
         raise AccessError(description='Invalid token')
     
-    user_id = jwt.decode(token, SECRET, algorithm='HS256')['user_id']
+    user_id = jwt.decode(token, SECRET, algorithms=['HS256'])['user_id']
 
     return user_id
