@@ -216,7 +216,6 @@ def test_send_too_many_messages(clear_data, create_user_and_channel):
     for index in range(start, end):
         message = json.loads(channel_messages_data.text)['messages'][index]['message']
         assert message == str(index)
->>>>>>> Stashed changes
 
 @pytest.mark.skip('This cannot be tested at Iteration 1')
 def test_channel_messages_simple_case(clear_data, create_user_and_channel):
