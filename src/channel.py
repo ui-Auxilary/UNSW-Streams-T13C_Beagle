@@ -20,7 +20,7 @@ from src.data_operations import (
     add_message
 )
 
-def channel_invite_v1(auth_user_id, channel_id, u_id):
+def channel_invite_v1(token, channel_id, u_id):
     '''
     A user invites another user and gives access to a channel and adds them to the channel
 
@@ -41,6 +41,8 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     Return Value:
         {}
     '''
+
+    auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
