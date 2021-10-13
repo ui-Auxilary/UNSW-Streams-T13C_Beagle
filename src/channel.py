@@ -9,7 +9,7 @@ Functions:
 '''
 
 from src.error import InputError, AccessError
-from src.other import check_user_exists
+from src.other import check_user_exists, decode_token
 from src.data_operations import (
     get_user_ids,
     get_channel_ids,
@@ -67,7 +67,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
     }
 
-def channel_details_v1(auth_user_id, channel_id):
+def channel_details_v1(token, channel_id):
     '''
     Generates all details of a selected channel such as channel name, the owners of the channel,
     all members of the channel, and whether the channel is public or private.
@@ -89,6 +89,8 @@ def channel_details_v1(auth_user_id, channel_id):
           all_members   (list): list of dicts with details of channel members and owners
           is_public     (bool): True if channel is public else False }
     '''
+
+    auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
