@@ -10,7 +10,7 @@ from src.users import users_all
 from src.user import user_profile, user_profile_sethandle
 from src.auth import auth_register_v1, auth_login_v1
 from src.other import clear_v1
-from src.channels import channels_create_v1, channels_list_v1
+from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_details_v1, channel_join_v1
 
 
@@ -82,6 +82,12 @@ def list_user_channels():
     ## get user's token
     user_token = request.args.get('token')
     return dumps(channels_list_v1(user_token))
+
+@APP.route("/channels/listall/v2", methods=['GET'])
+def list_all_channels():
+    ## get user's token
+    user_token = request.args.get('token')
+    return dumps(channels_listall_v1(user_token))
 
 @APP.route("/channel/details/v2", methods=['GET'])
 def get_channel_details():
