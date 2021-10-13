@@ -52,6 +52,8 @@ DATA INSIDE:
             - 'message_ids'
     - channel_ids
         quick access to all channel ids
+    - dm_ids
+        quick access to all dm ids
     - message_data
         key = message_id
         -> dictionary with keys
@@ -71,6 +73,7 @@ initial_object = {
     'user_ids'    : [],
     'channel_data': {},
     'channel_ids' : [],
+    'dm_ids'      : [],
     'message_data': {},
     'token'       : {}
 }
