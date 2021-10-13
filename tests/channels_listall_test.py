@@ -44,22 +44,10 @@ def auth_register_and_login():
                                                                             'name_last': 'Farmer'
                                                                             })
 
-    ## logs in user
-    requests.post(config.url + 'auth/login/v2', params={ 
-                                                        'email': 'owner@gmail.com',
-                                                        'password': 'admin$only'
-                                                        })
-    
-    requests.post(config.url + 'auth/login/v2', params={ 
-                                                        'email': 'peasant@gmail.com',
-                                                        'password': 'peasant$only'
-                                                        })
-                                                        
-    ## get user ids
-    user_id = json.loads(register_data.text)['auth_user_id']
-    user_id_2 = json.loads(register_data_2.text)['auth_user_id']
+    token = json.loads(register_data.text)['token']
+    token_2 = json.loads(register_data_2.text)['token']
 
-    return user_id, user_id_2
+    return token, token_2
 
 def test_valid_user_id(clear_data):
     channel_data = requests.post(config.url + 'channels/create/v2', params={
@@ -67,21 +55,23 @@ def test_valid_user_id(clear_data):
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                             })
-    assert channel_data.status_code == 400
+    assert channel_data.status_code == 403
 
 def test_basic_case(clear_data, auth_register_and_login):
     ## register and get user ids
-    user_id, _ = auth_register_and_login
+    token, _ = auth_register_and_login
 
     channel_data = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id),
+                                                                            'token': token,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                             })
     
     channel_id = json.loads(channel_data.text)['channel_id']
+    channel_list = requests.get(config.url + 'channels/listall/v2', params={'token': token})
+    channel_list = json.loads(channel_list.text)
 
-    assert requests.get(config.url + 'channels/listall/v2', params={'token': str(user_id)}) == { 'channels': [
+    assert channel_list == { 'channels': [
         {
             'channel_id': channel_id, 
             'name':'channel_1'
@@ -90,16 +80,16 @@ def test_basic_case(clear_data, auth_register_and_login):
 
 def test_listall_duplicate_name(clear_data, auth_register_and_login):
     ## register and get user ids
-    user_id, user_id_2 = auth_register_and_login
+    token, token_2 = auth_register_and_login
 
     channel_data = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id),
+                                                                            'token': token,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                             })
 
     channel_data_2 = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id_2),
+                                                                            'token': token_2,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                             })
@@ -108,8 +98,10 @@ def test_listall_duplicate_name(clear_data, auth_register_and_login):
     channel_id_2 = json.loads(channel_data_2.text)['channel_id']
 
     ## sorts the channels in alphabetical order
-    channels_listall_data = requests.get(config.url + 'channels/listall/v2', params={'token': str(user_id)
-                                                                                })['channels'].sort(key = lambda x: x['name'])
+    channels_listall_data = requests.get(config.url + 'channels/listall/v2', params={'token': token
+                                                                                })
+
+    channels_listall_data = json.loads(channels_listall_data.text)
 
     assert channels_listall_data == {
             'channels':[
@@ -125,23 +117,23 @@ def test_listall_duplicate_name(clear_data, auth_register_and_login):
         }
 
 def test_list_alt_user_id(clear_data, auth_register_and_login):
-    user_id, user_id_2 = auth_register_and_login
+    token, token_2 = auth_register_and_login
 
     ## create channels and get their ids
     channel_data = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id),
+                                                                            'token': token,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                             })
 
     channel_data_2 = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id_2),
+                                                                            'token': token_2,
                                                                             'name': 'channel_2',
                                                                             'is_public': True
                                                                             })
 
     channel_data_3 = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id_2),
+                                                                            'token': token_2,
                                                                             'name': 'channel_3',
                                                                             'is_public': False
                                                                             })
@@ -151,8 +143,10 @@ def test_list_alt_user_id(clear_data, auth_register_and_login):
     channel_id_3 = json.loads(channel_data_3.text)['channel_id']
     
     ## sorts the channels in alphabetical order
-    channels_listall_data = requests.get(config.url + 'channels/listall/v2', params={'token': str(user_id_2)
-                                                                                })['channels'].sort(key = lambda x: x['name'])
+    channels_listall_data = requests.get(config.url + 'channels/listall/v2', params={'token': token_2
+                                                                                })
+
+    channels_listall_data = json.loads(channels_listall_data.text)
 
     ## checks the channels returned by channel list match
     assert channels_listall_data == {
@@ -174,23 +168,23 @@ def test_list_alt_user_id(clear_data, auth_register_and_login):
 
 def test_all_private_channels(clear_data, auth_register_and_login):
     ## get registered user ids
-    user_id, user_id_2 = auth_register_and_login
+    token, token_2 = auth_register_and_login
 
     ## create a channel
     channel_data = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id),
+                                                                            'token': token,
                                                                             'name': 'channel_1',
                                                                             'is_public': False
                                                                             })
 
     channel_data_2 = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id_2),
+                                                                            'token': token_2,
                                                                             'name': 'channel_2',
                                                                             'is_public': False
                                                                             })
 
     channel_data_3 = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id),
+                                                                            'token': token,
                                                                             'name': 'channel_3',
                                                                             'is_public': False
                                                                             })
@@ -200,9 +194,10 @@ def test_all_private_channels(clear_data, auth_register_and_login):
     channel_id_3 = json.loads(channel_data_3.text)['channel_id']
     
     ## sorts the channels in alphabetical order
-    channels_listall_data = requests.get(config.url + 'channels/listall/v2', params={'token': str(user_id)
-                                                                                })['channels'].sort(key = lambda x: x['name'])
+    channels_listall_data = requests.get(config.url + 'channels/listall/v2', params={'token': token
+                                                                                })
 
+    channels_listall_data = json.loads(channels_listall_data.text)['channels']
     ## checks the channels returned by channel list match
     assert channels_listall_data == [
             {
@@ -221,23 +216,23 @@ def test_all_private_channels(clear_data, auth_register_and_login):
 
 def test_multiple_users_create_channel(clear_data, auth_register_and_login):
     ## get registered user ids
-    user_id, user_id_2 = auth_register_and_login
+    token, token_2 = auth_register_and_login
 
     ## create multiple channels with different user_ids
     channel_data = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id),
+                                                                            'token': token,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                             })
 
     channel_data_2 = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id),
+                                                                            'token': token,
                                                                             'name': 'channel_2',
                                                                             'is_public': False
                                                                             })
 
     channel_data_3 = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id_2),
+                                                                            'token': token_2,
                                                                             'name': 'channel_3',
                                                                             'is_public': False
                                                                             })
@@ -247,9 +242,9 @@ def test_multiple_users_create_channel(clear_data, auth_register_and_login):
     channel_id_3 = json.loads(channel_data_3.text)['channel_id']
 
     ## sorts the channels in alphabetical order
-    channels_listall_data = requests.get(config.url + 'channels/listall/v2', params={'token': str(user_id)
-                                                                                })['channels'].sort(key = lambda x: x['name'])
-    
+    channels_listall_data = requests.get(config.url + 'channels/listall/v2', params={'token': token
+                                                                                })
+    channels_listall_data = json.loads(channels_listall_data.text)['channels']
     ## check that all the channels listed in channel_data are the ones created
     assert channels_listall_data == [
             {
@@ -268,9 +263,11 @@ def test_multiple_users_create_channel(clear_data, auth_register_and_login):
 
 def test_empty_list(clear_data, auth_register_and_login):
     ## register and get user_ids
-    user_id, _ = auth_register_and_login
+    token, _ = auth_register_and_login
 
-    assert requests.get(config.url + 'channels/listall/v2', params={'token': str(user_id)}) == {
+    channels_listall_data = requests.get(config.url + 'channels/listall/v2', params={'token': token})
+    channels_listall_data = json.loads(channels_listall_data.text)
+    assert channels_listall_data == {
         'channels': []
     }
 
