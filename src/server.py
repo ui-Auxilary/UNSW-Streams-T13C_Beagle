@@ -11,7 +11,7 @@ from src.user import user_profile, user_profile_sethandle
 from src.auth import auth_register_v1, auth_login_v1
 from src.other import clear_v1
 from src.channels import channels_create_v1, channels_list_v1
-from src.channel import channel_details_v1
+from src.channel import channel_details_v1, channel_join_v1
 
 
 def quit_gracefully(*args):
@@ -73,7 +73,7 @@ def create_new_channel():
     ## is public
     user_token = request.args.get('token')
     channel_name = request.args.get('name')
-    is_public = bool(request.args.get('is_public'))
+    is_public = True if request.args.get('is_public') == 'True' else False
 
     return dumps(channels_create_v1(user_token, channel_name, is_public))
 
@@ -89,6 +89,13 @@ def get_channel_details():
     user_token = request.args.get('token')
     channel_id = int(request.args.get('channel_id'))
     return dumps(channel_details_v1(user_token, channel_id))
+
+@APP.route("/channel/join/v2", methods=['POST'])
+def user_join_channel():
+    ## get user's token
+    user_token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+    return dumps(channel_join_v1(user_token, channel_id))
 
 @APP.route("/users/all/v1", methods=['GET'])
 def get_all_users():
