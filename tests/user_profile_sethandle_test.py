@@ -26,7 +26,6 @@ def create_data(clear_data):
                                                                               })
                                                         
     token_1 = json.loads(register_user_1.text)
-    print(token_1)
     token_1 = token_1['token']
     user_id_1 = json.loads(register_user_1.text)['auth_user_id']    
 
@@ -37,7 +36,6 @@ def create_data(clear_data):
                                                                               })
                                        
     token_2 = json.loads(register_user_2.text)
-    print(token_2)
     token_2 = token_2['token']    
 
     return token_1, token_2, user_id_1
