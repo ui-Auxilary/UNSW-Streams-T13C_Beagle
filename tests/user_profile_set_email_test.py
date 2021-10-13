@@ -27,14 +27,12 @@ def create_data():
     token_1 = json.loads(register_user_1.text)['token']
     user_id_1 = json.loads(register_user_1.text)['auth_user_id']
 
-    register_user_2 = requests.post(config.url + 'auth/register/v2', params = { 'email': 'email2@gmail.com',
+    requests.post(config.url + 'auth/register/v2', params = { 'email': 'email2@gmail.com',
                                                                                 'password': 'zxcvbnm',
                                                                                 'name_first': 'christian',
                                                                                 'name_last': 'lam'
                                                                               })
-                                       
-    token_2 = json.loads(register_user_2.text)['token']
-    user_id_2 = json.loads(register_user_2.text)['auth_user_id']
+
 
     return token_1, user_id_1
 
@@ -63,7 +61,7 @@ def test_already_used(clear_data, create_data):
     assert update_email.status_code == 400
 
 def test_invalid_email(clear_data, create_data):
-    _, token_1 = create_data
+    token_1, _ = create_data
     
     update_email = requests.put(config.url + 'user/profile/setemail/v1', params = { 'token' : token_1,
                                                                                     'email': 'newemail'})
