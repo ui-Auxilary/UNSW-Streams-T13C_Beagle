@@ -14,6 +14,7 @@ Functions:
                 is_public: bool)
     get_channel(channel_id: int) -> dict
     get_channel_ids() -> list
+    get_dm_ids() -> list
     add_message(user_id: int, channel_id: int, message_id: int,
                 content: str, time_created: int)
     get_message_by_id(message_id: int) -> dict
@@ -235,6 +236,20 @@ def get_channel_ids():
 
     data_source = data_store.get()
     return data_source['channel_ids']
+
+def get_dm_ids():
+    '''
+    Gets a list of all the dm ids from the database
+
+    Arguments:
+        None
+
+    Return Value:
+        dm_ids (list): list of all dm_ids
+    '''
+
+    data_source = data_store.get()
+    return data_source['dm_ids']
 
 def add_message(user_id, channel_id, message_id, content, time_created):
     '''
