@@ -43,7 +43,7 @@ def test_simple_case(clear_data, create_data):
 
     resp = requests.get(config.url + 'user/profile/v1',
                         params={'token': token, 'u_id': user_id})
-
+    print(json.loads(resp.text))
     assert json.loads(resp.text)['user'] == user_0
 
 
