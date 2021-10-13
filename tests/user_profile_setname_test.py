@@ -22,7 +22,8 @@ def test_simple_case(clear_data):
 
     # stores a token
     token = json.loads(register_data.text)['token']
-    name_first = 'Firstname'
+    user_id = json.loads(register_data.text)['auth_user_id']
+    name_first = 'Newname'
     name_last = 'Lastname'
 
     resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
@@ -31,6 +32,14 @@ def test_simple_case(clear_data):
                                                                         })
 
     assert resp.status_code == 200
+
+    ## verify that the new handle is set
+    user_info = requests.get(config.url + 'user/profile/v1', params = {'token' : token,
+                                                                       'u_id'  : user_id})
+
+    new_name = json.loads(user_info.text)['user']['name_first']
+
+    assert new_name == 'Newname'
 
 
 def test_firstname_exact_50_char(clear_data):
@@ -121,7 +130,7 @@ def test_firstname_less_than_1_char(clear_data):
     # register user, log them in and get their user_id
     register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HdsLO@mycompany.com',
                                                                            'password': 'MYpafsdssword',
-                                                                           'name_first': '',
+                                                                           'name_first': 'normal',
                                                                            'name_last': 'LastfdsNAME'
                                                                            })
 
@@ -142,7 +151,7 @@ def test_firstname_more_than_50_char(clear_data):
     # register user, log them in and get their user_id
     register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HELLO@mycompany.com',
                                                                            'password': 'MYpassword',
-                                                                           'name_first': 'FirswsedrftgyuijkygyuyuyuyuyuygyuefseoftyguhijkfrtgyuhtNAME',
+                                                                           'name_first': 'FirswsedrftgyuijkygyuyuyuyE',
                                                                            'name_last': 'LastNAME'
                                                                            })
 
@@ -164,7 +173,7 @@ def test_lastname_less_than_1_char(clear_data):
     register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HdssdsfLO@mycompany.com',
                                                                            'password': 'MYpafffdssdssword',
                                                                            'name_first': 'normalname',
-                                                                           'name_last': ''
+                                                                           'name_last': 'nromalname'
                                                                            })
 
     # stores a token
@@ -185,7 +194,7 @@ def test_lastname_more_than_50_char(clear_data):
     register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HELLO@mycompany.com',
                                                                            'password': 'MYpassword',
                                                                            'name_first': 'Firstihuiname',
-                                                                           'name_last': 'LastsfdsdfsfsdfdsdfsdsfdfsfdsdsdfssddssddfjskdlsdklskdljdsNAME'
+                                                                           'name_last': 'LastsfdsdfsfjdsNAME'
                                                                            })
 
     # stores a token
@@ -199,49 +208,6 @@ def test_lastname_more_than_50_char(clear_data):
                                                                         })
 
     assert resp.status_code == 400
-
-
-def test_firstname_invalid_char(clear_data):
-   # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HELLO@mycompany.com',
-                                                                           'password': 'MYpassword',
-                                                                           'name_first': 'F$*965ame',
-                                                                           'name_last': 'LastjdsNAME'
-                                                                           })
-
-    # stores a token
-    token = json.loads(register_data.text)['token']
-    name_first = 'F$*965ame'
-    name_last = 'LastjdsNAME'
-
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
-                                                                        'name_first': name_first,
-                                                                        'name_last': name_last
-                                                                        })
-
-    assert resp.status_code == 400
-
-
-def test_lastname_invalid_char(clear_data):
-   # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HELLO@mycompany.com',
-                                                                           'password': 'MYpassword',
-                                                                           'name_first': 'fjkwnwekjnk',
-                                                                           'name_last': 'La^%57NAME'
-                                                                           })
-
-    # stores a token
-    token = json.loads(register_data.text)['token']
-    name_first = 'fjkwnwekjnk'
-    name_last = 'La^%57NAME'
-
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
-                                                                        'name_first': name_first,
-                                                                        'name_last': name_last
-                                                                        })
-
-    assert resp.status_code == 400
-
 
 def test_invalid_token_only(clear_data):
     token = str("dfssdfds")
@@ -260,7 +226,7 @@ def test_firstname_exact_50_char_and_invalid_token(clear_data):
    # register user, log them in and get their user_id
     requests.post(config.url + 'auth/register/v2', params={'email': 'HELsdfLO@mycompany.com',
                                                            'password': 'MYpafsdssword',
-                                                           'name_first': 'jmqgushpmocvxsfykpnkmrsmtaqfabzahzbjnzcoyoxuwzoido',
+                                                           'name_first': 'jmqgushpmocvxsfyxuwzoido',
                                                            'name_last': 'LastsfNAME'
                                                            })
 
@@ -274,10 +240,10 @@ def test_firstname_exact_50_char_and_invalid_token(clear_data):
                                                                         'name_last': name_last
                                                                         })
 
-    assert resp.status_code == 200
+    assert resp.status_code == 403
 
 
-def test_lastname_exact_50_char_and_invalid_token(clear_data):
+def test_lastname_over_50_char_and_invalid_token(clear_data):
    # register user, log them in and get their user_id
     requests.post(config.url + 'auth/register/v2', params={'email': 'HELsdfLO@mycompany.com',
                                                            'password': 'MYpafsdssword',
@@ -288,14 +254,14 @@ def test_lastname_exact_50_char_and_invalid_token(clear_data):
     # stores a token
     token = str("sfjjfsd")
     name_first = 'fsdsfd'
-    name_last = 'jmqgushpmocvxsfykpnkmrsmtaqfabzahzbjnzcoyoxuwzoido'
+    name_last = 'jmqgushpmocvxsfykpsadfdsafdsafsafsadasffdankmrsmtaqfabzahzbjnzcoyoxuwzoido'
 
     resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
 
-    assert resp.status_code == 200
+    assert resp.status_code == 403
 
 
 def test_firstname_exact_1_char_and_invalid_token(clear_data):
@@ -316,7 +282,7 @@ def test_firstname_exact_1_char_and_invalid_token(clear_data):
                                                                         'name_last': name_last
                                                                         })
 
-    assert resp.status_code == 200
+    assert resp.status_code == 403
 
 
 def test_lastname_exact_1_char_and_invalid_token(clear_data):
@@ -337,7 +303,7 @@ def test_lastname_exact_1_char_and_invalid_token(clear_data):
                                                                         'name_last': name_last
                                                                         })
 
-    assert resp.status_code == 200
+    assert resp.status_code == 403
 
 
 def test_firstname_less_than_1_char_and_invalid_token(clear_data):

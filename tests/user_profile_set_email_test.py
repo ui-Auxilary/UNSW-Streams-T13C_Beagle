@@ -44,7 +44,15 @@ def test_simple_case(clear_data, create_data):
     update_email = requests.put(config.url + 'user/profile/setemail/v1', params = { 'token' : token_1,
                                                                                     'email': 'newemail@gmail.com'})
 
-    assert (resp.status_code == 200)
+    assert update_email.status_code == 200
+
+    ## verify that the new handle is set
+    user_info = requests.get(config.url + 'user/profile/v1', params = {'token' : token_1,
+                                                                       'u_id'  : user_data})
+
+    new_email = json.loads(user_info.text)['user']['email']
+
+    assert new_email == 'newemail@gmail.com'
 
 def test_already_used(clear_data, create_data):
     user_1, token_1, user_data_1, user_2, token_2, user_data_2 = create_data
@@ -52,7 +60,7 @@ def test_already_used(clear_data, create_data):
     update_email = requests.put(config.url + 'user/profile/setemail/v1', params = { 'token' : token_1,
                                                                                     'email': 'email2@gmail.com'})
 
-    assert (resp.status_code == 400)
+    assert update_email.status_code == 400
 
 def test_invalid_email(clear_data, create_data):
     user, token_1, user_data, _, _, _ = create_data
@@ -60,4 +68,4 @@ def test_invalid_email(clear_data, create_data):
     update_email = requests.put(config.url + 'user/profile/setemail/v1', params = { 'token' : token_1,
                                                                                     'email': 'newemail'})
 
-    assert (resp.status_code == 400)
+    assert update_email.status_code == 400
