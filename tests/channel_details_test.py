@@ -1,10 +1,8 @@
 import pytest
+import requests
+import json
 
-from src.error import InputError, AccessError
-from src.other import clear_v1
-from src.auth import auth_register_v1, auth_login_v1
-from src.channels import channels_create_v1
-from src.channel import channel_details_v1, channel_join_v1
+from src import config
 
 '''
 VALID_INPUT
@@ -18,79 +16,174 @@ VALID_OUTPUT
 
 @pytest.fixture
 def clear_data():
-    clear_v1()
+    requests.delete(config.url + 'clear/v1')
 
 @pytest.fixture
 def create_user_and_channel():
     ## register user, log them in and get their user_id
-    auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')
+    register_data = requests.post(config.url + 'auth/register/v2', params={ 
+                                                                            'email': 'hello@mycompany.com', 
+                                                                            'password': 'mypassword',
+                                                                            'name_first': 'Firstname',
+                                                                            'name_last': 'Lastname'
+                                                                          })
+    user_token = json.loads(register_data.text)['token']
+    auth_user_id = json.loads(register_data.text)['auth_user_id']
 
-    ## get the user's id
-    auth_user_id = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']
+    ## logs in user
+    requests.post(config.url + 'auth/login/v2', params={ 
+                                                        'email': 'hello@mycompany.com',
+                                                        'password': 'mypassword'
+                                                        })
 
     ## create a channel with that user
-    channel_id = channels_create_v1(auth_user_id, 'channel_1', True)['channel_id']
-    return auth_user_id, channel_id
+    channel_data = requests.post(config.url + 'channels/create/v2', params={
+                                                                            'token': user_token,
+                                                                            'name': 'channel_1',
+                                                                            'is_public': True
+                                                                           })
+    
+    channel_id = json.loads(channel_data.text)['channel_id']
+    return auth_user_id, channel_id, user_token
 
 def test_simple_case(clear_data, create_user_and_channel):
-    auth_user_id, channel_id = create_user_and_channel
-    user_data = { 'u_id': auth_user_id,
-                  'email': 'hello@mycompany.com',
-                  'name_first': 'Firstname',
-                  'name_last': 'Lastname',
-                  'handle_str': 'firstnamelastname' }
+    auth_user_id, channel_id, user_token = create_user_and_channel
 
-    assert channel_details_v1(auth_user_id, channel_id) == { 'name'         : 'channel_1',
-                                                             'is_public'    : True,
-                                                             'owner_members': [user_data],
-                                                             'all_members'  : [user_data] }
+    ## get the user data
+    user_profile_data = requests.get(config.url + 'user/profile/v1', params={
+                                                                        'token': user_token,
+                                                                        'u_id': auth_user_id 
+                                                                       })
+    
+    auth_user_profile = json.loads(user_profile_data.text)['user']
+
+    ## get information about the channel
+    channel_detail_data = requests.get(config.url + 'channel/details/v2', params={
+                                                                                 'token': user_token,
+                                                                                 'channel_id': channel_id
+                                                                                })
+
+    channel_detail = json.loads(channel_detail_data.text)
+
+    channel_name = channel_detail['name']
+    channel_members = channel_detail['all_members']
+    channel_owners = channel_detail['owner_members']
+
+    channel = {
+        'channel_id': channel_id,
+        'name': channel_name
+    }
+
+    ## get information about the channel
+    channel_list_data = requests.get(config.url + 'channels/list/v2', params={
+                                                                              'token': user_token,
+                                                                             })
+
+    channel_list = json.loads(channel_list_data.text)['channels']
+
+    assert channel in channel_list
+    assert auth_user_profile in channel_members
+    assert auth_user_profile in channel_owners
 
 def test_user_joins_channel(clear_data, create_user_and_channel):
-    auth_user_id, channel_id = create_user_and_channel
+    auth_user_id, channel_id, user_token = create_user_and_channel
 
     ## register another user
-    auth_register_v1('hello2@mycompany.com', 'mypassword', 'Firstname2', 'Lastname2')
+    register_data_2 = requests.post(config.url + 'auth/register/v2', params={ 
+                                                                            'email': 'hello2@mycompany.com', 
+                                                                            'password': 'mypassword',
+                                                                            'name_first': 'Firstname2',
+                                                                            'name_last': 'Lastname2'
+                                                                          })
 
-    ## get the second user's id
-    auth_user_id_2 = auth_login_v1('hello2@mycompany.com', 'mypassword')['auth_user_id']
+    user_token_2 = json.loads(register_data_2.text)['token']
 
     ## second user joins the existing channel
-    channel_join_v1(auth_user_id_2, channel_id)
+    requests.post(config.url + 'channel/join/v2', params={
+                                                        'token': user_token_2,
+                                                        'channel_id': channel_id
+                                                        })
 
-    ## create dictionaries with user data
-    user_data = { 'u_id': auth_user_id,
-                  'email': 'hello@mycompany.com',
-                  'name_first': 'Firstname',
-                  'name_last': 'Lastname',
-                  'handle_str': 'firstnamelastname' }
+    ## get the profile of both users
+    user_profile_data = requests.get(config.url + 'user/profile/v1', params={
+                                                                        'token': user_token,
+                                                                        'u_id': auth_user_id 
+                                                                       })
+
+    user_2_profile_data = requests.get(config.url + 'user/profile/v1', params={
+                                                                        'token': user_token_2,
+                                                                        'u_id': auth_user_id 
+                                                                       })
     
-    user_data_2 = { 'u_id': auth_user_id_2,
-                    'email': 'hello2@mycompany.com',
-                    'name_first': 'Firstname2',
-                    'name_last': 'Lastname2',
-                    'handle_str': 'firstname2lastname2' }
+    auth_user_profile = json.loads(user_profile_data.text)['user']
+    user_2_profile = json.loads(user_2_profile_data.text)['user']
 
-    assert channel_details_v1(auth_user_id, channel_id) == { 'name'         : 'channel_1',
-                                                             'is_public'    : True,
-                                                             'owner_members': [user_data],
-                                                             'all_members'  : [user_data, user_data_2] }
+    ## get information about the channel
+    channel_detail_data = requests.get(config.url + 'channel/details/v2', params={
+                                                                                 'token': user_token,
+                                                                                 'channel_id': channel_id
+                                                                                })
 
-def test_invalid_auth_id(clear_data, create_user_and_channel):
-    _, channel_id = create_user_and_channel
-    with pytest.raises(AccessError):
-        channel_details_v1(25, channel_id)
+    channel_detail = json.loads(channel_detail_data.text)
+
+    channel_name = channel_detail['name']
+    channel_members = channel_detail['all_members']
+    channel_owners = channel_detail['owner_members']
+
+    channel = {
+        'channel_id': channel_id,
+        'name': channel_name
+    }       
+
+    ## get list of channels
+    channel_list_data = requests.get(config.url + 'channels/list/v2', params={
+                                                                              'token': user_token,
+                                                                             })
+
+    channel_list = json.loads(channel_list_data.text)['channels']
+
+    assert channel in channel_list
+    assert auth_user_profile in channel_members
+    assert user_2_profile in channel_members
+    assert auth_user_profile in channel_owners
+
+def test_invalid_token(clear_data, create_user_and_channel):
+    _, channel_id, _ = create_user_and_channel
+    channel_detail_data = requests.get(config.url + 'channel/details/v2', params={
+                                                                                'token': "25",
+                                                                                'channel_id': channel_id
+                                                                                })
+                                                                                
+    assert channel_detail_data.status_code == 403
 
 def test_invalid_channel_id(clear_data, create_user_and_channel):
-    auth_user_id, _ = create_user_and_channel
-    with pytest.raises(InputError):
-        channel_details_v1(auth_user_id, 25)
+    _, _, user_token= create_user_and_channel
+    channel_detail_data = requests.get(config.url + 'channel/details/v2', params={
+                                                                                'token': user_token,
+                                                                                'channel_id': 25
+                                                                                })
+    assert channel_detail_data.status_code == 400
 
 def test_user_not_channel_member(clear_data, create_user_and_channel):
-    auth_user_id, channel_id = create_user_and_channel
+    _, channel_id, _ = create_user_and_channel
 
-    ## create a new user and get their id
-    auth_register_v1('hello2@mycompany.com', 'my2password', 'First2name', 'Last2name')
-    auth_user_id = auth_login_v1('hello2@mycompany.com', 'my2password')['auth_user_id']
+    ## register user and get their user_id
+    register_data_2 = requests.post(config.url + 'auth/register/v2', params={ 
+                                                                            'email': 'hello2@mycompany.com', 
+                                                                            'password': 'my2password',
+                                                                            'name_first': 'First2name',
+                                                                            'name_last': 'Last2name'
+                                                                          })
+    token_2 = json.loads(register_data_2.text)['token']
 
-    with pytest.raises(AccessError):
-        channel_details_v1(auth_user_id, channel_id)
+    ## logs in user
+    requests.post(config.url + 'auth/login/v2', params={ 
+                                                        'email': 'hello2@mycompany.com',
+                                                        'password': 'my2password'
+                                                        })
+
+    channel_detail_data = requests.get(config.url + 'channel/details/v2', params={
+                                                                                'token': token_2,
+                                                                                'channel_id': channel_id
+                                                                                })
+    assert channel_detail_data.status_code == 403
