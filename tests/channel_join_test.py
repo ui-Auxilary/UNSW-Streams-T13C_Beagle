@@ -29,16 +29,14 @@ def register_login_users():
                                                                             'name_first': 'Firstname',
                                                                             'name_last': 'Lastname'
                                                                            })
-
+    token = json.loads(register_user.text)['token']
     register_user_2 = requests.post(config.url + 'auth/register/v2', params={ 
                                                                             'email': 'sam@mycompany.com',
                                                                             'password': 'mypassword',
                                                                             'name_first': 'Samantha',
                                                                             'name_last': 'Tse'
                                                                            })
-
-    auth_user_id = json.loads(register_user.text)['auth_user_id']
-    auth_user_id_2 = json.loads(register_user_2.text)['auth_user_id']
+    token_2 = json.loads(register_user_2.text)['token']
 
     requests.post(config.url + 'auth/login/v2', params={
                                                         'email': 'hello@mycompany.com',
@@ -50,14 +48,14 @@ def register_login_users():
                                                         'password': 'mypassword',
                                                       })
 
-    return auth_user_id, auth_user_id_2  
+    return token, token_2  
 
 def test_user_id_exists(clear_data, register_login_users):
-    user_id, _ = register_login_users
+    token, _ = register_login_users
 
     ## create a channel with that user
     channel_data = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id),
+                                                                            'token': token,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                            })
@@ -66,28 +64,28 @@ def test_user_id_exists(clear_data, register_login_users):
 
     ## User that doesn't exist tries to join channel
     channel_join_data = requests.post(config.url + 'channel/join/v2', params={
-                                                                            'token': str(258),
+                                                                            'token': '258',
                                                                             'channel_id': channel_id
                                                                             })
 
-    assert channel_join_data.status_code == 400
+    assert channel_join_data.status_code == 403
 
 def test_invalid_channel_id(clear_data, register_login_users):
-    user_id, _ = register_login_users
+    token, _ = register_login_users
 
     channel_join_data = requests.post(config.url + 'channel/join/v2', params={
-                                                                            'token': str(user_id),
+                                                                            'token': token,
                                                                             'channel_id': 234
                                                                             })
 
     assert channel_join_data.status_code == 400
 
 def test_user_already_in_channel(clear_data, register_login_users):
-    user_id, _ = register_login_users
+    token, _ = register_login_users
 
     ## create a channel with that user
     channel_data = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id),
+                                                                            'token': token,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                            })
@@ -95,18 +93,18 @@ def test_user_already_in_channel(clear_data, register_login_users):
     channel_id = json.loads(channel_data.text)['channel_id']
 
     channel_join_data = requests.post(config.url + 'channel/join/v2', params={
-                                                                            'token': str(user_id),
+                                                                            'token': token,
                                                                             'channel_id': channel_id
                                                                             })
 
     assert channel_join_data.status_code == 400
 
 def test_private_not_global_owner(clear_data, register_login_users):
-    user_id, new_user_id = register_login_users
+    token, new_token = register_login_users
 
     ## create a channel with that user
     channel_data = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(user_id),
+                                                                            'token': token,
                                                                             'name': 'channel_1',
                                                                             'is_public': False
                                                                            })
@@ -114,35 +112,37 @@ def test_private_not_global_owner(clear_data, register_login_users):
     channel_id = json.loads(channel_data.text)['channel_id']  
 
     channel_join_data = requests.post(config.url + 'channel/join/v2', params={
-                                                                            'token': str(new_user_id),
+                                                                            'token': new_token,
                                                                             'channel_id': channel_id
                                                                             })
 
-    assert channel_join_data.status_code == 400
+    assert channel_join_data.status_code == 403
 
 def test_private_is_global_owner(clear_data, register_login_users):
-    user_id, new_user_id = register_login_users
+    token, new_token = register_login_users
 
     ## create a channel with that user
     channel_data = requests.post(config.url + 'channels/create/v2', params={
-                                                                            'token': str(new_user_id),
+                                                                            'token': new_token,
                                                                             'name': 'channel_1',
                                                                             'is_public': False
                                                                            })
     channel_id = json.loads(channel_data.text)['channel_id']
 
     requests.post(config.url + 'channel/join/v2', params={
-                                                        'token': str(user_id),
+                                                        'token': token,
                                                         'channel_id': channel_id
                                                         })
     
     channel_detail_data = requests.get(config.url + 'channel/details/v2', params={
-                                                                                'token': str(new_user_id),
+                                                                                'token': new_token,
                                                                                 'channel_id': channel_id
                                                                                 })
 
-    assert channel_detail_data['all_members'][0]['u_id'] in [user_id, new_user_id]
-    assert channel_detail_data['all_members'][1]['u_id'] in [user_id, new_user_id]
+    channel_detail_data = json.loads(channel_detail_data.text)
+
+    assert channel_detail_data['all_members'][0]['u_id'] in [1, 2]
+    assert channel_detail_data['all_members'][1]['u_id'] in [1, 2]
 
 @pytest.mark.skip('Cannot test')
 def test_simple_case(clear_data, register_login_users):
