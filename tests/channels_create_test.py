@@ -3,7 +3,6 @@ import requests
 import json
 
 from src import config
-from src.error import InputError, AccessError
 
 '''
 VALID_INPUT
@@ -95,7 +94,7 @@ def test_public_channel_created(clear_data, register_login_user):
     assert channel_dict in channel_lists
 
 def test_private_channel_created(clear_data, register_login_user):
-    user_id, user_token = register_login_user
+    _, user_token = register_login_user
 
     ## create a new channel
     channel_data = requests.post(config.url + 'channels/create/v2', params={

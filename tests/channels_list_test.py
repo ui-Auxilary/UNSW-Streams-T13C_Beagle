@@ -170,8 +170,6 @@ def test_user_member_multiple(clear_data, register_login_user):
 
 def test_empty_channel_list(clear_data, register_login_user):
     token = register_login_user
-    ## register user and get id
-    user_id = register_login_user
 
     channels_list_data = requests.get(config.url + 'channels/list/v2', params={'token': token})
     channels_list_data = json.loads(channels_list_data.text)
