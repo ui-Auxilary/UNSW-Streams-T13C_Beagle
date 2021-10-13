@@ -36,10 +36,10 @@ def create_data():
     token_2 = json.loads(register_user_2.text)['token']
     user_id_2 = json.loads(register_user_2.text)['auth_user_id']
 
-    return register_user_1, token_1, user_id_1, register_user_2, token_2, user_id_2
+    return token_1, user_id_1
 
 def test_simple_case(clear_data, create_data):
-    user, token_1, user_data, _, _, _ = create_data
+    token_1, user_data = create_data
     
     update_email = requests.put(config.url + 'user/profile/setemail/v1', params = { 'token' : token_1,
                                                                                     'email': 'newemail@gmail.com'})
@@ -55,7 +55,7 @@ def test_simple_case(clear_data, create_data):
     assert new_email == 'newemail@gmail.com'
 
 def test_already_used(clear_data, create_data):
-    user_1, token_1, user_data_1, user_2, token_2, user_data_2 = create_data
+    token_1, _ = create_data
 
     update_email = requests.put(config.url + 'user/profile/setemail/v1', params = { 'token' : token_1,
                                                                                     'email': 'email2@gmail.com'})
@@ -63,7 +63,7 @@ def test_already_used(clear_data, create_data):
     assert update_email.status_code == 400
 
 def test_invalid_email(clear_data, create_data):
-    user, token_1, user_data, _, _, _ = create_data
+    _, token_1 = create_data
     
     update_email = requests.put(config.url + 'user/profile/setemail/v1', params = { 'token' : token_1,
                                                                                     'email': 'newemail'})
