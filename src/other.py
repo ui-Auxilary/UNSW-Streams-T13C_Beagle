@@ -7,7 +7,15 @@ Functions:
     check_user_exists(auth_user_id: str)
 '''
 
-from src.data_operations import get_user_ids, reset_data_store_to_default
+import jwt    
+
+from src.data_operations import ( 
+    get_user_ids,
+    reset_data_store_to_default,
+    get_user_from_token,
+    get_all_valid_tokens,
+    add_session_token
+)
 from src.error import AccessError
 
 def clear_v1():
@@ -37,3 +45,25 @@ def check_user_exists(auth_user_id):
 
     if auth_user_id not in get_user_ids():
         raise AccessError('Auth_user_id does not exist')
+
+def encode_token(user_id):
+    SECRET = "DHRUV_IS_SALTY"
+
+    encoded_token = jwt.encode({'user_id': user_id}, SECRET, algorithm='HS256')
+
+    ## Adds active token to database
+    add_session_token(encoded_token, user_id)
+
+    return encoded_token
+    
+
+def decode_token(token):
+    SECRET = "DHRUV_IS_SALTY"
+
+    ## check if user is valid
+    if token not in get_all_valid_tokens():
+        raise AccessError(description='Invalid token')
+    
+    user_id = jwt.decode(token, SECRET, algorithms=['HS256'])['user_id']
+
+    return user_id
