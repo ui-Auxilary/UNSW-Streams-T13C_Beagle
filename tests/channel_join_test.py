@@ -1,10 +1,8 @@
 import pytest
+import requests
+import json
 
-from src.error import InputError, AccessError
-from src.other import clear_v1
-from src.auth import auth_register_v1, auth_login_v1
-from src.channel import channel_details_v1, channel_join_v1
-from src.channels import channels_create_v1
+from src import config
 
 '''
 VALID INPUT
@@ -20,65 +18,131 @@ ACCESS ERROR
 
 @pytest.fixture
 def clear_data():
-    clear_v1()
+    requests.delete(config.url + 'clear/v1')
 
 @pytest.fixture
 def register_login_users():
     ## register users, and logs them in
-    auth_register_v1('hello@mycompany.com', 'mypassword', 'Firstname', 'Lastname')
-    auth_register_v1('sam@mycompany.com', 'mypassword', 'Samantha', 'Tse')
+    register_user = requests.post(config.url + 'auth/register/v2', params={ 
+                                                                            'email': 'hello@mycompany.com',
+                                                                            'password': 'mypassword',
+                                                                            'name_first': 'Firstname',
+                                                                            'name_last': 'Lastname'
+                                                                           })
+    token = json.loads(register_user.text)['token']
+    register_user_2 = requests.post(config.url + 'auth/register/v2', params={ 
+                                                                            'email': 'sam@mycompany.com',
+                                                                            'password': 'mypassword',
+                                                                            'name_first': 'Samantha',
+                                                                            'name_last': 'Tse'
+                                                                           })
+    token_2 = json.loads(register_user_2.text)['token']
 
-    ## get their user ids
-    user_id_1 = auth_login_v1('hello@mycompany.com', 'mypassword')['auth_user_id']    
-    user_id_2 = auth_login_v1('sam@mycompany.com', 'mypassword')['auth_user_id']
+    requests.post(config.url + 'auth/login/v2', params={
+                                                        'email': 'hello@mycompany.com',
+                                                        'password': 'mypassword',
+                                                      })
 
-    return user_id_1, user_id_2    
+    requests.post(config.url + 'auth/login/v2', params={
+                                                        'email': 'sam@mycompany.com',
+                                                        'password': 'mypassword',
+                                                      })
+
+    return token, token_2  
 
 def test_user_id_exists(clear_data, register_login_users):
-    user_id, _ = register_login_users
+    token, _ = register_login_users
 
     ## create a channel with that user
-    channel_id = channels_create_v1(user_id, 'channel_1', 'True')['channel_id']    
+    channel_data = requests.post(config.url + 'channels/create/v2', params={
+                                                                            'token': token,
+                                                                            'name': 'channel_1',
+                                                                            'is_public': True
+                                                                           })
 
-    with pytest.raises(AccessError):
-        ## User that doesn't exist tries to join channel
-        channel_join_v1(258, channel_id)
+    channel_id = json.loads(channel_data.text)['channel_id']
+
+    ## User that doesn't exist tries to join channel
+    channel_join_data = requests.post(config.url + 'channel/join/v2', params={
+                                                                            'token': '258',
+                                                                            'channel_id': channel_id
+                                                                            })
+
+    assert channel_join_data.status_code == 403
 
 def test_invalid_channel_id(clear_data, register_login_users):
-    user_id, _ = register_login_users
+    token, _ = register_login_users
 
-    with pytest.raises(InputError):
-        channel_join_v1(user_id, 234)
+    channel_join_data = requests.post(config.url + 'channel/join/v2', params={
+                                                                            'token': token,
+                                                                            'channel_id': 234
+                                                                            })
+
+    assert channel_join_data.status_code == 400
 
 def test_user_already_in_channel(clear_data, register_login_users):
-    user_id, _ = register_login_users
+    token, _ = register_login_users
 
     ## create a channel with that user
-    channel_id = channels_create_v1(user_id, 'channel_1', 'True')['channel_id']
+    channel_data = requests.post(config.url + 'channels/create/v2', params={
+                                                                            'token': token,
+                                                                            'name': 'channel_1',
+                                                                            'is_public': True
+                                                                           })
+    
+    channel_id = json.loads(channel_data.text)['channel_id']
 
-    with pytest.raises(InputError):
-        ## get them to join the channel again
-        channel_join_v1(user_id, channel_id)
+    channel_join_data = requests.post(config.url + 'channel/join/v2', params={
+                                                                            'token': token,
+                                                                            'channel_id': channel_id
+                                                                            })
+
+    assert channel_join_data.status_code == 400
 
 def test_private_not_global_owner(clear_data, register_login_users):
-    user_id, new_user_id = register_login_users
+    token, new_token = register_login_users
 
     ## create a channel with that user
-    channel_id = channels_create_v1(user_id, 'channel_1', False)['channel_id']    
+    channel_data = requests.post(config.url + 'channels/create/v2', params={
+                                                                            'token': token,
+                                                                            'name': 'channel_1',
+                                                                            'is_public': False
+                                                                           })
+    
+    channel_id = json.loads(channel_data.text)['channel_id']  
 
-    with pytest.raises(AccessError):
-        ## get them to join the channel
-        channel_join_v1(new_user_id, channel_id)
+    channel_join_data = requests.post(config.url + 'channel/join/v2', params={
+                                                                            'token': new_token,
+                                                                            'channel_id': channel_id
+                                                                            })
+
+    assert channel_join_data.status_code == 403
 
 def test_private_is_global_owner(clear_data, register_login_users):
-    user_id, new_user_id = register_login_users
+    token, new_token = register_login_users
 
     ## create a channel with that user
-    channel_id = channels_create_v1(new_user_id, 'channel_1', False)['channel_id']    
+    channel_data = requests.post(config.url + 'channels/create/v2', params={
+                                                                            'token': new_token,
+                                                                            'name': 'channel_1',
+                                                                            'is_public': False
+                                                                           })
+    channel_id = json.loads(channel_data.text)['channel_id']
+
+    requests.post(config.url + 'channel/join/v2', params={
+                                                        'token': token,
+                                                        'channel_id': channel_id
+                                                        })
     
-    channel_join_v1(user_id, channel_id)
-    assert channel_details_v1(new_user_id, channel_id)['all_members'][0]['u_id'] in [user_id, new_user_id]
-    assert channel_details_v1(new_user_id, channel_id)['all_members'][1]['u_id'] in [user_id, new_user_id]
+    channel_detail_data = requests.get(config.url + 'channel/details/v2', params={
+                                                                                'token': new_token,
+                                                                                'channel_id': channel_id
+                                                                                })
+
+    channel_detail_data = json.loads(channel_detail_data.text)
+
+    assert channel_detail_data['all_members'][0]['u_id'] in [1, 2]
+    assert channel_detail_data['all_members'][1]['u_id'] in [1, 2]
 
 @pytest.mark.skip('Cannot test')
 def test_simple_case(clear_data, register_login_users):

@@ -8,10 +8,10 @@ Functions:
 '''
 
 from src.data_operations import get_channel_ids, get_channel, add_channel
-from src.other import check_user_exists
+from src.other import check_user_exists, decode_token
 from src.error import InputError
 
-def channels_list_v1(auth_user_id):
+def channels_list_v1(token):
     '''
     Returns a list of all the channels with their channel id's and channel name that the user
     is a member of
@@ -26,6 +26,8 @@ def channels_list_v1(auth_user_id):
     Return Value:
         { channels (list): list of all channel dicts a given user is member of }
     '''
+
+    auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
@@ -43,7 +45,7 @@ def channels_list_v1(auth_user_id):
         'channels': channel_list,
     }
 
-def channels_listall_v1(auth_user_id):
+def channels_listall_v1(token):
     '''
     Provides a list of all channels including private channels, and their associated details
 
@@ -57,6 +59,8 @@ def channels_listall_v1(auth_user_id):
     Return Value:
         { channels (list): list of all channel dicts a given user is member of }
     '''
+
+    auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
@@ -73,7 +77,7 @@ def channels_listall_v1(auth_user_id):
         'channels': all_channels,
     }
 
-def channels_create_v1(auth_user_id, name, is_public):
+def channels_create_v1(token, name, is_public):
     '''
     Creates a new channel with a given name that is public or private. The user that
     creates it automatically joins the channel as an owner member
@@ -92,6 +96,8 @@ def channels_create_v1(auth_user_id, name, is_public):
     Return Value:
         { channel_id (int): unique id that references the created channel }
     '''
+
+    auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
