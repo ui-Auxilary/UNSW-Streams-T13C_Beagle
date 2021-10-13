@@ -7,7 +7,7 @@ from src.error import InputError
 from src import config
 
 from src.users import users_all
-from src.user import user_profile, user_profile_sethandle
+from src.user import user_profile, user_profile_sethandle, user_profile_setname, user_profile_setemail
 from src.auth import auth_register_v1, auth_login_v1
 from src.other import clear_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
@@ -126,6 +126,30 @@ def get_user_profile():
 
     return dumps(user_profile(user_token, user_id))
 
+@APP.route("/user/profile/setname/v1", methods=['PUT'])
+def update_user_fullname():
+    ## get user's token and the handle they want to update to
+    user_token = request.args.get('token')
+    name_first = request.args.get('name_first')
+    name_last = request.args.get('name_last')
+    
+    ## set the new handle
+    user_profile_setname(user_token, name_first, name_last)
+
+    return dumps({
+    })
+
+@APP.route("/user/profile/setemail/v1", methods=['PUT'])
+def update_user_email():
+    ## get user's token and the handle they want to update to
+    user_token = request.args.get('token')
+    user_email = request.args.get('email')
+
+    ## set the new email
+    user_profile_setemail(user_token, user_email)
+
+    return dumps({
+    })
 
 @APP.route("/user/profile/sethandle/v1", methods=['PUT'])
 def update_user_handle():
