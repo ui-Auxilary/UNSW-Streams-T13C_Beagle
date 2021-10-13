@@ -73,7 +73,7 @@ def create_new_channel():
     ## is public
     user_token = request.args.get('token')
     channel_name = request.args.get('name')
-    is_public = request.args.get('is_public')
+    is_public = bool(request.args.get('is_public'))
 
     return dumps(channels_create_v1(user_token, channel_name, is_public))
 
@@ -87,7 +87,7 @@ def list_user_channels():
 def get_channel_details():
     ## get user's token
     user_token = request.args.get('token')
-    channel_id = request.args.get('channel_id')
+    channel_id = int(request.args.get('channel_id'))
     return dumps(channel_details_v1(user_token, channel_id))
 
 @APP.route("/users/all/v1", methods=['GET'])
