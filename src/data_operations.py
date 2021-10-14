@@ -342,3 +342,36 @@ def get_all_valid_tokens():
 
     data_source = data_store.get()
     return set(data_source['token'].keys())
+
+def add_owner_to_channel(user_id, channel_id):
+    '''
+    adds given owner to channel
+
+    Arguments:
+        user_id     (int): user_id of new owner member
+        channel_id  (int): id of the channel being referred to
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+    ## adds a user to the owner list of the channel
+    data_source['channel_data'][channel_id]['owner'].append(user_id)
+
+
+def remove_owner_from_channel(user_id, channel_id):
+    '''
+    removes given owner from channel
+
+    Arguments:
+        user_id     (int): user_id of new owner member
+        channel_id  (int): id of the channel being referred to
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+    ## adds a user to the owner list of the channel
+    data_source['channel_data'][channel_id]['owner'].remove(user_id)
