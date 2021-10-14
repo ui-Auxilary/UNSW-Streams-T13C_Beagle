@@ -104,7 +104,7 @@ def test_invalid_dm_id(clear_data, create_data):
     remove_dm = requests.delete(config.url + 'dm/remove/v1', params = { 'token': token_1,
                                                             'dm_id': 12213
                                                             })
-    assert (remove_dm.status_code == 400)
+    assert remove_dm.status_code == 400
 
 def test_multiple_dms(clear_data, create_data):
     token_1, _, _, user_id_2, _, user_id_3 = create_data 

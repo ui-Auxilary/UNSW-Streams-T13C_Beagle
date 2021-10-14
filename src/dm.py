@@ -107,6 +107,9 @@ def dm_remove_v1(token, dm_id):
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
     
+    ## invalid dm_id
+    if dm_id not in get_dm_ids():
+        raise InputError(description="Not a valid DM id")
 
     ## Get list of owners and members in the dm
     dm_owner = get_dm(dm_id)['owner']
@@ -115,11 +118,7 @@ def dm_remove_v1(token, dm_id):
     ## check if user is the owner of the DM
     if auth_user_id not in dm_owner:
         raise AccessError(description="User is not the owner of the DM")    
-
-    ## invalid dm_id
-    if dm_id not in get_dm_ids():
-        raise InputError(description="Not a valid DM id")
-
+   
     ## remove users from members in the DM
     for members in dm_members:
         dm_members.remove(members)
