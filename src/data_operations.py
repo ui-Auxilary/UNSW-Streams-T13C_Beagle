@@ -14,13 +14,19 @@ Functions:
                 is_public: bool)
     get_channel(channel_id: int) -> dict
     get_channel_ids() -> list
+    add_user_to_dm(dm_id: int, user_dict: dict)
+    add_dm(dm_id: int, dm_name: str, auth_user_id: int)
+    get_dm(dm_id: int) -> dict
     get_dm_ids() -> list
-    add_message(user_id: int, channel_id: int, message_id: int,
-                content: str, time_created: int)
+    add_message(is_channel: bool, user_id: int, channel_id: int,
+                message_id: int, content: str, time_created: int)
+    get_message_ids() -> list
     get_message_by_id(message_id: int) -> dict
     get_messages_by_channel(channel_id: int) -> list
+    get_messages_by_dm(dm_id: int) -> list
     add_session_token(token: str, user_id: int)
     get_user_from_token(token: str) -> int
+    get_all_valid_tokens() -> set
     edit_user(user_id: int, key: str, new_value: str) 
 '''
 
@@ -43,7 +49,10 @@ def reset_data_store_to_default():
         'user_ids'    : [],
         'channel_data': {},
         'channel_ids' : [],
+        'dm_data'     : {},
+        'dm_ids'      : [],
         'message_data': {},
+        'message_ids' : [],
         'token'       : {}
     }
 
@@ -56,10 +65,10 @@ def add_user(user_id, user_details, password, user_handle, is_owner):
 
     Arguments:
         user_id        (int): id of user being added
-        user_details (tuple):
-                name_first (str): first name of user
-                name_last  (str):last name of user
-                email      (str): email of user
+        user_details   (tuple):
+        name_first     (str): first name of user
+        name_last      (str):last name of user
+        email          (str): email of user
         password       (str): password of user
         user_handle    (str): the generated handle of the user
         is_owner       (bool): whether the user is an owner
@@ -214,7 +223,7 @@ def get_channel(channel_id):
 
     Return Value:
         { name         (str): name of the channel
-          owner       (list): list of all channel owners
+          owner        (int): owner
           is_public   (bool): True if channel public else False
           members     (list): list of members' user_ids
           message_ids (list): list of message_ids for all messages sent}
@@ -237,6 +246,63 @@ def get_channel_ids():
     data_source = data_store.get()
     return data_source['channel_ids']
 
+def add_user_to_dm(dm_id, user_dict):
+    '''
+    adds user to a dm
+
+    Arguments:
+        dm_id        (int): id of dm being added to database
+        user_dict      (dict): the user details of the user being added to the dm
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+    data_source['dm_data'][dm_id]['members'].append(user_dict)
+
+def add_dm(dm_id, dm_name, auth_user_id):
+    '''
+    adds dm data to the database
+
+    Arguments:
+        dm_id             (int): id of dm being added to database
+        dm_name           (str): name of dm being added to database
+        auth_user_id      (int): the user id of the owner of the dm
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+
+    # create dm and add dm data
+    data_source['dm_data'][dm_id] = {
+        'name'       : dm_name,
+        'owner'      : [auth_user_id],
+        'members'    : [],
+        'message_ids': []
+    }
+
+    # add dm to dm_ids list
+    data_source['dm_ids'].append(dm_id)
+
+def get_dm(dm_id):
+    '''
+    Gets the dm data from the database for a specific dm_id
+
+    Arguments:
+        dm_id (int): id of dm that the data is being retrieved for
+
+    Return Value:
+        { name         (str): name of the dm
+          owner        (int): owner
+          members     (list): list of members' user infos
+          message_ids (list): list of message_ids for all messages sent }
+    '''
+    data_source = data_store.get()
+    return data_source['dm_data'][dm_id]
+
 def get_dm_ids():
     '''
     Gets a list of all the dm ids from the database
@@ -251,11 +317,12 @@ def get_dm_ids():
     data_source = data_store.get()
     return data_source['dm_ids']
 
-def add_message(user_id, channel_id, message_id, content, time_created):
+def add_message(is_channel, user_id, channel_id, message_id, content, time_created):
     '''
     Adds a message to the database from a user
 
     Arguments:
+        is_channel  (bool): bool of whether the message is from a channel
         user_id      (int): id of user that created the message
         channel_id   (int): id of channel that message was created
         message_id   (int): id of message being added to the database
@@ -267,11 +334,36 @@ def add_message(user_id, channel_id, message_id, content, time_created):
     '''
 
     data_source = data_store.get()
-    data_source['message_data'][message_id] = {}
-    data_source['channel_data'][channel_id]['message_ids'].append(message_id)
-    data_source['message_data'][message_id]['author'] = user_id
-    data_source['message_data'][message_id]['content'] = content
-    data_source['message_data'][message_id]['time_created'] = time_created
+    
+    # create message and add message data
+    data_source['message_data'][message_id] = {
+        'author'          : user_id,
+        'content'         : content,
+        'time_created'    : time_created,
+    }
+
+    # add message to the channel's message list
+    if is_channel:
+        data_source['channel_data'][channel_id]['message_ids'].append(message_id)
+    elif not is_channel:
+        data_source['dm_data'][channel_id]['message_ids'].append(message_id)
+
+    # add unique message id to message_ids list
+    data_source['message_ids'].append(message_id)
+
+def get_message_ids():
+    '''
+    Gets a list of all the message ids from the database
+
+    Arguments:
+        None
+
+    Return Value:
+        message_ids (list): list of all message_ids
+    '''
+
+    data_source = data_store.get()
+    return data_source['message_ids']
 
 def get_message_by_id(message_id):
     '''
@@ -302,6 +394,20 @@ def get_messages_by_channel(channel_id):
 
     data_source = data_store.get()
     return data_source['channel_data'][channel_id]['message_ids']
+
+def get_messages_by_dm(dm_id):
+    '''
+    gets all the message ids from a specified dm id
+
+    Arguments:
+        dm_id       (int): id of channel that message was created
+
+    Return Value:
+        message_ids (list): list of all message_ids for messages in specific channel
+    '''
+
+    data_source = data_store.get()
+    return data_source['dm_data'][dm_id]['message_ids']
 
 def add_session_token(token, user_id):
     '''
