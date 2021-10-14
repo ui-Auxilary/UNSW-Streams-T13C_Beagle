@@ -109,14 +109,17 @@ def channel_details_v1(token, channel_id):
         raise AccessError('User is not channel member')
 
     # get the owner's information
-    owner_details = get_user(channel_info['owner'])
-    owner_dict = {
-        'u_id'      : channel_info['owner'],
-        'email'     : owner_details['email_address'],
-        'name_first': owner_details['first_name'],
-        'name_last' : owner_details['last_name'],
-        'handle_str': owner_details['user_handle'],
-    }
+    owners = []
+    for owner_id in get_channel(channel_id)['owner']:
+        owner_details = get_user(owner_id)
+        owner_dict = {
+            'u_id'      : owner_id,
+            'email'     : owner_details['email_address'],
+            'name_first': owner_details['first_name'],
+            'name_last' : owner_details['last_name'],
+            'handle_str': owner_details['user_handle'],
+        }
+        owners.append(owner_dict)
 
     # create list of dictionaries with member info
     member_info = []
@@ -134,7 +137,7 @@ def channel_details_v1(token, channel_id):
 
     return_dict = {
         'name'         : channel_info['name'],
-        'owner_members': [owner_dict],
+        'owner_members': owners,
         'all_members'  : member_info,
         'is_public'    : channel_info['is_public']
     }

@@ -196,7 +196,7 @@ def add_channel(channel_id, channel_name, user_id, is_public):
     # create channel and add channel data
     data_source['channel_data'][channel_id] = {
         'name'       : channel_name,
-        'owner'      : user_id,
+        'owner'      : [user_id],
         'is_public'  : is_public,
         'members'    : [user_id],
         'message_ids': []
@@ -214,7 +214,7 @@ def get_channel(channel_id):
 
     Return Value:
         { name         (str): name of the channel
-          owner        (int): owner
+          owner       (list): list of all channel owners
           is_public   (bool): True if channel public else False
           members     (list): list of members' user_ids
           message_ids (list): list of message_ids for all messages sent}
