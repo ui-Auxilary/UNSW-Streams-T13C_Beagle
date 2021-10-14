@@ -17,7 +17,9 @@ from src.data_operations import (
     add_member_to_channel,
     get_message_by_id,
     get_messages_by_channel,
-    add_message
+    add_message,
+    add_owner_to_channel,
+    remove_owner_from_channel
 )
 
 def channel_invite_v1(token, channel_id, u_id):
@@ -258,3 +260,58 @@ def channel_join_v1(token, channel_id):
 
     return {
     }
+
+def channel_addowner(token, channel_id, u_id):
+    auth_user_id = decode_token(token)
+
+    ## checks auth_user_id exists
+    check_user_exists(auth_user_id)
+
+    ## check whether channel exists
+    if channel_id not in get_channel_ids():
+        raise InputError(description='Channel does not exist')
+
+    if auth_user_id not in get_channel(channel_id)['owner']:
+        raise AccessError(description='Not sufficient permissions to add new owner')
+
+    if u_id not in get_user_ids():
+        raise InputError('u_id does not exist')
+
+    ## check whether user already owner
+    if u_id not in get_channel(channel_id)['members']:
+        raise InputError(description='User is not a member of channel')
+
+    ## check whether user already owner
+    if u_id in get_channel(channel_id)['owner']:
+        raise InputError(description='User is already owner of channel')
+
+    add_owner_to_channel(u_id, channel_id)
+
+    return {}
+
+def channel_removeowner(token, channel_id, u_id):
+    auth_user_id = decode_token(token)
+
+    ## checks auth_user_id exists
+    check_user_exists(auth_user_id)
+
+    ## check whether channel exists
+    if channel_id not in get_channel_ids():
+        raise InputError(description='Channel does not exist')
+
+    if auth_user_id not in get_channel(channel_id)['owner']:
+        raise AccessError(description='Not sufficient permissions to remove an owner')
+
+    if u_id not in get_user_ids():
+        raise InputError('u_id does not exist')
+
+    ## check whether user already owner
+    if u_id not in get_channel(channel_id)['owner']:
+        raise InputError(description='User is not an owner of channel')
+
+    if len(get_channel(channel_id)['owner']) < 2:
+        raise InputError(description='Cannot remove only owner')
+
+    remove_owner_from_channel(u_id, channel_id)
+
+    return {}
