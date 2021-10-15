@@ -196,6 +196,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
             ## add a message to the database
             add_message(
+                True,
                 message_info['author'],
                 channel_id, message_id,
                 message_info['content'],

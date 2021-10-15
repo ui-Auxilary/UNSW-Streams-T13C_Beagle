@@ -12,7 +12,11 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.other import clear_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_addowner, channel_removeowner
-
+from src.error import InputError
+from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_messages_v1, dm_remove_v1, message_senddm_v1
+from src.other import clear_v1
+from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
+from src.channel import channel_details_v1, channel_join_v1
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -136,6 +140,68 @@ def remove_owner_from_channel():
     except:
         InputError(description='Invalid arguments')
     return dumps(channel_removeowner(user_token, channel_id, u_id))
+
+@APP.route("/dm/create/v1", methods=['POST'])
+def dm_create():
+    ## get user's token and list of users to invite to DM
+    user_token = request.args.get('token')
+    user_ids = request.args.getlist('u_ids')
+
+    if user_ids:
+        return dumps(dm_create_v1(user_token, user_ids))
+    else:
+        return dumps(dm_create_v1(user_token, []))
+
+@APP.route("/dm/messages/v1", methods=['GET'])
+def dm_messages():
+    ## get user's token and list of users to invite to DM
+    user_token = request.args.get('token')
+    dm_id = int(request.args.get('dm_id'))
+
+    start = int(request.args.get('start'))
+
+    return dumps(dm_messages_v1(user_token, dm_id, start))
+
+@APP.route("/dm/list/v1", methods=['GET'])
+def dm_list():
+    ## get user's token and list of users to invite to DM
+    user_token = request.args.get('token')
+
+    return dumps(dm_list_v1(user_token))
+
+@APP.route("/dm/remove/v1", methods=['DELETE'])
+def dm_remove():
+    ## get user's token and list of users to invite to DM
+    user_token = request.args.get('token')
+    dm_id = int(request.args.get('dm_id'))
+
+    return dumps(dm_remove_v1(user_token, dm_id))
+
+@APP.route("/dm/details/v1", methods=['GET'])
+def dm_details():
+    ## get user's token and list of users to invite to DM
+    user_token = request.args.get('token')
+    dm_id = int(request.args.get('dm_id'))
+
+    return dumps(dm_details_v1(user_token, dm_id))
+
+@APP.route("/dm/leave/v1", methods=['POST'])
+def dm_leave():
+    ## get user's token and list of users to invite to DM
+    user_token = request.args.get('token')
+    dm_id = int(request.args.get('dm_id'))
+
+    return dumps(dm_leave_v1(user_token, dm_id))
+
+@APP.route("/message/senddm/v1", methods=['POST'])
+def message_send_dm():
+    ## get user's token and list of users to invite to DM
+    user_token = request.args.get('token')
+    dm_id = int(request.args.get('dm_id'))
+
+    message = request.args.get('message')
+
+    return dumps(message_senddm_v1(user_token, dm_id, message))
 
 @APP.route("/users/all/v1", methods=['GET'])
 def get_all_users():
