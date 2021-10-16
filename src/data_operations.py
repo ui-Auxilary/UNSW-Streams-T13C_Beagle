@@ -14,19 +14,13 @@ Functions:
                 is_public: bool)
     get_channel(channel_id: int) -> dict
     get_channel_ids() -> list
-    add_user_to_dm(dm_id: int, user_dict: dict)
-    add_dm(dm_id: int, dm_name: str, auth_user_id: int)
-    get_dm(dm_id: int) -> dict
     get_dm_ids() -> list
-    add_message(is_channel: bool, user_id: int, channel_id: int,
-                message_id: int, content: str, time_created: int)
-    get_message_ids() -> list
+    add_message(user_id: int, channel_id: int, message_id: int,
+                content: str, time_created: int)
     get_message_by_id(message_id: int) -> dict
     get_messages_by_channel(channel_id: int) -> list
-    get_messages_by_dm(dm_id: int) -> list
     add_session_token(token: str, user_id: int)
     get_user_from_token(token: str) -> int
-    get_all_valid_tokens() -> set
     edit_user(user_id: int, key: str, new_value: str) 
 '''
 
@@ -42,6 +36,7 @@ def reset_data_store_to_default():
 
     ## reset values in data_store
     store = data_store.get()
+
     store = {
         'user_data'   : {},
         'user_handles': [],
@@ -55,6 +50,8 @@ def reset_data_store_to_default():
         'message_ids' : [],
         'token'       : {}
     }
+
+
 
     ## update data_store
     data_store.set(store)
@@ -223,7 +220,7 @@ def get_channel(channel_id):
 
     Return Value:
         { name         (str): name of the channel
-          owner        (int): owner
+          owner        (int): int of the owner
           is_public   (bool): True if channel public else False
           members     (list): list of members' user_ids
           message_ids (list): list of message_ids for all messages sent}
@@ -340,6 +337,9 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
         'author'          : user_id,
         'content'         : content,
         'time_created'    : time_created,
+        'message_id'      : message_id,
+        'channel_created' : channel_id,
+        'is_channel'      : is_channel
     }
 
     # add message to the channel's message list
@@ -350,6 +350,59 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
 
     # add unique message id to message_ids list
     data_source['message_ids'].append(message_id)
+
+def edit_message(is_channel, channel_id, message_id, message):
+    '''
+    Edits a message in the datastore
+
+    Arguments:
+        is_channel  (bool): bool of whether the message is from a channel
+        channel_id   (int): id of channel that message was created
+        message_id   (int): id of message being added to the database
+        message      (str): contents of the message
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+    
+    # check if message is empty and edit the message
+    if not message:
+        remove_message(is_channel, channel_id, message_id)
+    else:
+        data_source['message_data'][message_id]['content'] = message
+
+        # add message to the channel's message list
+        if is_channel:
+            data_source['channel_data'][channel_id]['message_ids'].append(message_id)
+        elif not is_channel:
+            data_source['dm_data'][channel_id]['message_ids'].append(message_id)
+
+        # add unique message id to message_ids list
+        data_source['message_ids'].append(message_id)
+
+def remove_message(is_channel, channel_id, message_id):
+    '''
+    Removes a message from the datastore and associated channels/dms
+
+    Arguments:
+        is_channel  (bool): bool of whether the message is from a channel
+        message_id   (int): id of message being added to the database
+        
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+
+    if is_channel:
+        data_source['channel_data'][channel_id]['message_ids'].remove(message_id)
+    else:
+        data_source['dm_data'][channel_id]['message_ids'].remove(message_id)
+
+    data_source['message_ids'].remove(message_id)
+    del data_source['message_data'][message_id]
 
 def get_message_ids():
     '''
