@@ -9,7 +9,7 @@ from src import config
 from src.error import InputError
 from src.users import users_all
 from src.user import user_profile, user_profile_sethandle, user_profile_setname, user_profile_setemail
-from src.auth import auth_register_v1, auth_login_v1
+from src.auth import auth_register_v1, auth_login_v1, auth_logout_v1
 from src.message import message_send_v1, message_edit_v1, message_remove_v1
 from src.other import clear_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
@@ -61,6 +61,13 @@ def login_user_session():
 
     return dumps(auth_login_v1(user_email, user_password))
 
+@APP.route("/auth/logout/v1", methods=['POST'])
+def logout_user_session():
+    data = request.get_json()
+    ## removes token from active session
+    user_token = data['token']
+
+    return dumps(auth_logout_v1(user_token))
 
 @APP.route("/auth/register/v2", methods=['POST'])
 def register_new_user():

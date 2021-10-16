@@ -20,6 +20,7 @@ Functions:
     get_message_by_id(message_id: int) -> dict
     get_messages_by_channel(channel_id: int) -> list
     add_session_token(token: str, user_id: int)
+    remove_session_token(token: str) 
     get_user_from_token(token: str) -> int
     edit_user(user_id: int, key: str, new_value: str) 
 '''
@@ -476,6 +477,20 @@ def add_session_token(token, user_id):
 
     data_source = data_store.get()
     data_source['token'][token] = user_id
+    
+def remove_session_token(token):
+    '''
+    removes a user token to the sessions storage
+
+    Arguments:
+        token   (str): the token for the session
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+    del data_source['token'][token]
 
 def get_user_from_token(token):
     '''

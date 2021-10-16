@@ -17,6 +17,8 @@ from src.data_operations import (
     add_session_token
 )
 from src.error import AccessError
+from datetime import datetime
+from random import randint
 
 def clear_v1():
     '''
@@ -44,16 +46,19 @@ def check_user_exists(auth_user_id):
     '''
 
     if auth_user_id not in get_user_ids():
-        raise AccessError('Auth_user_id does not exist')
+        raise AccessError(description='Auth_user_id does not exist')
 
 def encode_token(user_id):
     SECRET = "DHRUV_IS_SALTY"
 
-    encoded_token = jwt.encode({'user_id': user_id}, SECRET, algorithm='HS256')
+    now = datetime.now()
+    time_created = now.strftime("%H%M%S")
+    number = int(str(time_created) + str(randint(0, 723978)))
+    encoded_token = jwt.encode({'user_id': user_id, 'session_start': number}, SECRET, algorithm='HS256')
 
     ## Adds active token to database
     add_session_token(encoded_token, user_id)
-
+    
     return encoded_token
     
 
