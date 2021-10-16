@@ -54,31 +54,33 @@ def echo():
 
 @APP.route("/auth/login/v2", methods=['POST'])
 def login_user_session():
+    data = request.get_json()
     ## get user's token and the handle they want to update to
-    user_email = request.args.get('email')
-    user_password = request.args.get('password')
+    user_email = data['email']
+    user_password = data['password']
 
     return dumps(auth_login_v1(user_email, user_password))
 
 
 @APP.route("/auth/register/v2", methods=['POST'])
 def register_new_user():
+    data = request.get_json()
     ## get user's token and the handle they want to update to
-
-    user_email = request.args.get('email')
-    user_password = request.args.get('password')
-    name_first = request.args.get('name_first')
-    name_last = request.args.get('name_last')
+    user_email = data['email']
+    user_password = data['password']
+    name_first = data['name_first']
+    name_last = data['name_last']
 
     return dumps(auth_register_v1(user_email, user_password, name_first, name_last))
 
 @APP.route("/channels/create/v2", methods=['POST'])
 def create_new_channel():
+    data = request.get_json()
     ## get user's token, channel name and whether it
     ## is public
-    user_token = request.args.get('token')
-    channel_name = request.args.get('name')
-    is_public = True if request.args.get('is_public') == 'True' else False
+    user_token = data['token']
+    channel_name = data['name']
+    is_public = data['is_public']
 
     return dumps(channels_create_v1(user_token, channel_name, is_public))
 
@@ -103,17 +105,19 @@ def get_channel_details():
 
 @APP.route("/channel/join/v2", methods=['POST'])
 def user_join_channel():
+    data = request.get_json()
     ## get user's token
-    user_token = request.args.get('token')
-    channel_id = int(request.args.get('channel_id'))
+    user_token = data['token']
+    channel_id = int(data['channel_id'])
     return dumps(channel_join_v1(user_token, channel_id))
 
 @APP.route("/channel/invite/v2", methods=['POST'])
 def invite_user_to_channel():
+    data = request.get_json()
     ## get user's token
-    user_token = request.args.get('token')
-    channel_id = int(request.args.get('channel_id'))
-    u_id = int(request.args.get('u_id'))
+    user_token = data['token']
+    channel_id = int(data['channel_id'])
+    u_id = int(data['u_id'])
     return dumps(channel_invite_v1(user_token, channel_id, u_id))
 
 @APP.route("/channel/messages/v2", methods=['GET'])
@@ -126,43 +130,47 @@ def get_channel_message():
 
 @APP.route("/channel/leave/v1", methods=['POST'])
 def channel_leave():
+    data = request.get_json()
     ## get user's token
-    user_token = request.args.get('token')
-    channel_id = int(request.args.get('channel_id'))
+    user_token = data['token']
+    channel_id = int(data['channel_id'])
 
     return dumps(channel_leave_v1(user_token, channel_id))
 
 @APP.route("/channel/addowner/v1", methods=['POST'])
 def add_owner_to_channel():
+    data = request.get_json()
     ## get user's token
-    user_token = request.args.get('token')
+    user_token = data['token']
     channel_id = 0
     u_id = 0
     try:
-        channel_id = int(request.args.get('channel_id'))
-        u_id = int(request.args.get('u_id'))
+        channel_id = int(data['channel_id'])
+        u_id = int(data['u_id'])
     except:
         InputError(description='Invalid arguments')
     return dumps(channel_addowner_v1(user_token, channel_id, u_id))
 
 @APP.route("/channel/removeowner/v1", methods=['POST'])
 def remove_owner_from_channel():
+    data = request.get_json()
     ## get user's token
-    user_token = request.args.get('token')
+    user_token = data['token']
     channel_id = 0
     u_id = 0
     try:
-        channel_id = int(request.args.get('channel_id'))
-        u_id = int(request.args.get('u_id'))
+        channel_id = int(data['channel_id'])
+        u_id = int(data['u_id'])
     except:
         InputError(description='Invalid arguments')
     return dumps(channel_removeowner_v1(user_token, channel_id, u_id))
 
 @APP.route("/dm/create/v1", methods=['POST'])
 def dm_create():
+    data = request.get_json()
     ## get user's token and list of users to invite to DM
-    user_token = request.args.get('token')
-    user_ids = request.args.getlist('u_ids')
+    user_token = data['token']
+    user_ids = data['u_ids']
 
     if user_ids:
         return dumps(dm_create_v1(user_token, user_ids))
@@ -181,16 +189,17 @@ def dm_messages():
 
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list():
-    ## get user's token 
+    ## get user's token
     user_token = request.args.get('token')
 
     return dumps(dm_list_v1(user_token))
 
 @APP.route("/dm/remove/v1", methods=['DELETE'])
 def dm_remove():
+    data = request.get_json()
     ## get token of user to be removed from DM
-    user_token = request.args.get('token')
-    dm_id = int(request.args.get('dm_id'))
+    user_token = data['token']
+    dm_id = int(data['dm_id'])
 
     return dumps(dm_remove_v1(user_token, dm_id))
 
@@ -204,46 +213,51 @@ def dm_details():
 
 @APP.route("/dm/leave/v1", methods=['POST'])
 def dm_leave():
+    data = request.get_json()
     ## get token of user leaving the DM
-    user_token = request.args.get('token')
-    dm_id = int(request.args.get('dm_id'))
+    user_token = data['token']
+    dm_id = int(data['dm_id'])
 
     return dumps(dm_leave_v1(user_token, dm_id))
 
 @APP.route("/message/send/v1", methods=['POST'])
 def message_send():
+    data = request.get_json()
     ## get user's token and channel that the message will be sent to
-    user_token = request.args.get('token')
-    channel_id = int(request.args.get('channel_id'))
+    user_token = data['token']
+    channel_id = int(data['channel_id'])
 
-    message = request.args.get('message')
+    message = data['message']
 
     return dumps(message_send_v1(user_token, channel_id, message))
 
 @APP.route("/message/edit/v1", methods=['PUT'])
 def message_edit():
+    data = request.get_json()
     ## get user's token and channel that the message will edited in
-    user_token = request.args.get('token')
-    message_id = int(request.args.get('message_id'))
-    message = request.args.get('message')
+    user_token = data['token']
+    message_id = int(data['message_id'])
+    message = data['message']
 
     return dumps(message_edit_v1(user_token, message_id, message))
 
 @APP.route("/message/remove/v1", methods=['DELETE'])
 def message_remove():
+    data = request.get_json()
     ## get user's token and channel that the message will edited in
-    user_token = request.args.get('token')
-    message_id = int(request.args.get('message_id'))
+    user_token = data['token']
+    message_id = int(data['message_id'])
 
     return dumps(message_remove_v1(user_token, message_id))
 
 @APP.route("/message/senddm/v1", methods=['POST'])
 def message_send_dm():
+    data = request.get_json()
     ## get user's token and DM that the message will be sent to
-    user_token = request.args.get('token')
-    dm_id = int(request.args.get('dm_id'))
+    user_token = data['token']
+    dm_id = int(data['dm_id'])
 
-    message = request.args.get('message')
+    message = data['message']
 
     return dumps(message_senddm_v1(user_token, dm_id, message))
 
@@ -264,11 +278,12 @@ def get_user_profile():
 
 @APP.route("/user/profile/setname/v1", methods=['PUT'])
 def update_user_fullname():
+    data = request.get_json()
     ## get user's token and the handle they want to update to
-    user_token = request.args.get('token')
-    name_first = request.args.get('name_first')
-    name_last = request.args.get('name_last')
-    
+    user_token = data['token']
+    name_first = data['name_first']
+    name_last = data['name_last']
+
     ## set the new handle
     user_profile_setname(user_token, name_first, name_last)
 
@@ -277,9 +292,10 @@ def update_user_fullname():
 
 @APP.route("/user/profile/setemail/v1", methods=['PUT'])
 def update_user_email():
+    data = request.get_json()
     ## get user's token and the handle they want to update to
-    user_token = request.args.get('token')
-    user_email = request.args.get('email')
+    user_token = data['token']
+    user_email = data['email']
 
     ## set the new email
     user_profile_setemail(user_token, user_email)
@@ -289,10 +305,11 @@ def update_user_email():
 
 @APP.route("/user/profile/sethandle/v1", methods=['PUT'])
 def update_user_handle():
+    data = request.get_json()
     ## get user's token and the handle they want to update to
-    user_token = request.args.get('token')
-    new_handle = request.args.get('handle_str')
-    
+    user_token = data['token']
+    new_handle = data['handle_str']
+
     ## set the new handle
     user_profile_sethandle(user_token, new_handle)
 

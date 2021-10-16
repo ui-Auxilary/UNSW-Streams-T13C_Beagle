@@ -14,7 +14,7 @@ def clear_data():
 
 def test_simple_case(clear_data):
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={  'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
                                                                            'name_last': 'Lastname'
@@ -26,7 +26,7 @@ def test_simple_case(clear_data):
     name_first = 'Newname'
     name_last = 'Lastname'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -44,7 +44,7 @@ def test_simple_case(clear_data):
 
 def test_firstname_exact_50_char(clear_data):
    # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HELsdfLO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={  'email': 'HELsdfLO@mycompany.com',
                                                                            'password': 'MYpafsdssword',
                                                                            'name_first': 'jmqgushpmocvxsfykpnkmrsmtaqfabzahzbjnzcoyoxuwzoido',
                                                                            'name_last': 'LastsfNAME'
@@ -55,7 +55,7 @@ def test_firstname_exact_50_char(clear_data):
     name_first = 'jmqgushpmocvxsfykpnkmrsmtaqfabzahzbjnzcoyoxuwzoido'
     name_last = 'LastsfNAME'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -65,7 +65,7 @@ def test_firstname_exact_50_char(clear_data):
 
 def test_lastname_exact_50_char(clear_data):
    # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HELsdfLO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={  'email': 'HELsdfLO@mycompany.com',
                                                                            'password': 'MYpafsdssword',
                                                                            'name_first': 'fsdsfd',
                                                                            'name_last': 'jmqgushpmocvxsfykpnkmrsmtaqfabzahzbjnzcoyoxuwzoido'
@@ -76,7 +76,7 @@ def test_lastname_exact_50_char(clear_data):
     name_first = 'fsdsfd'
     name_last = 'jmqgushpmocvxsfykpnkmrsmtaqfabzahzbjnzcoyoxuwzoido'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -86,7 +86,7 @@ def test_lastname_exact_50_char(clear_data):
 
 def test_firstname_exact_1_char(clear_data):
    # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HELsdsdfLO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={  'email': 'HELsdsdfLO@mycompany.com',
                                                                            'password': 'MYpadsfsdssword',
                                                                            'name_first': 'c',
                                                                            'name_last': 'gsffddgdf'
@@ -97,7 +97,7 @@ def test_firstname_exact_1_char(clear_data):
     name_first = 'c'
     name_last = 'gsffddgdf'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -107,7 +107,7 @@ def test_firstname_exact_1_char(clear_data):
 
 def test_lastname_exact_1_char(clear_data):
    # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HElLofLO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={  'email': 'HElLofLO@mycompany.com',
                                                                            'password': 'MYsadasword',
                                                                            'name_first': 'ytfessd',
                                                                            'name_last': 'a'
@@ -118,7 +118,7 @@ def test_lastname_exact_1_char(clear_data):
     name_first = 'ytfessd'
     name_last = 'a'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -128,7 +128,7 @@ def test_lastname_exact_1_char(clear_data):
 
 def test_firstname_less_than_1_char(clear_data):
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HdsLO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={  'email': 'HdsLO@mycompany.com',
                                                                            'password': 'MYpafsdssword',
                                                                            'name_first': 'normal',
                                                                            'name_last': 'LastfdsNAME'
@@ -139,7 +139,7 @@ def test_firstname_less_than_1_char(clear_data):
     name_first = ''
     name_last = 'LastfdsNAME'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -149,7 +149,7 @@ def test_firstname_less_than_1_char(clear_data):
 
 def test_firstname_more_than_50_char(clear_data):
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HELLO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={  'email': 'HELLO@mycompany.com',
                                                                            'password': 'MYpassword',
                                                                            'name_first': 'FirswsedrftgyuijkygyuyuyuyE',
                                                                            'name_last': 'LastNAME'
@@ -160,7 +160,7 @@ def test_firstname_more_than_50_char(clear_data):
     name_first = 'FirswsedrftgyuijkygyuyuyuyuyuygyuefseoftyguhijkfrtgyuhtNAME'
     name_last = 'LastNAME'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -170,7 +170,7 @@ def test_firstname_more_than_50_char(clear_data):
 
 def test_lastname_less_than_1_char(clear_data):
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HdssdsfLO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={  'email': 'HdssdsfLO@mycompany.com',
                                                                            'password': 'MYpafffdssdssword',
                                                                            'name_first': 'normalname',
                                                                            'name_last': 'nromalname'
@@ -181,7 +181,7 @@ def test_lastname_less_than_1_char(clear_data):
     name_first = 'normalname'
     name_last = ''
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -191,7 +191,7 @@ def test_lastname_less_than_1_char(clear_data):
 
 def test_lastname_more_than_50_char(clear_data):
    # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HELLO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={  'email': 'HELLO@mycompany.com',
                                                                            'password': 'MYpassword',
                                                                            'name_first': 'Firstihuiname',
                                                                            'name_last': 'LastsfdsdfsfjdsNAME'
@@ -202,7 +202,7 @@ def test_lastname_more_than_50_char(clear_data):
     name_first = 'Firstihuiname'
     name_last = 'LastsfdsdfsfsdfdsdfsdsfdfsfdsdsdfssddssddfjskdlsdklskdljdsNAME'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -214,7 +214,7 @@ def test_invalid_token_only(clear_data):
     name_first = 'Firstihuiname'
     name_last = 'LastsfljdsNAME'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -224,7 +224,7 @@ def test_invalid_token_only(clear_data):
 
 def test_firstname_exact_50_char_and_invalid_token(clear_data):
    # register user, log them in and get their user_id
-    requests.post(config.url + 'auth/register/v2', params={'email': 'HELsdfLO@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={  'email': 'HELsdfLO@mycompany.com',
                                                            'password': 'MYpafsdssword',
                                                            'name_first': 'jmqgushpmocvxsfyxuwzoido',
                                                            'name_last': 'LastsfNAME'
@@ -235,7 +235,7 @@ def test_firstname_exact_50_char_and_invalid_token(clear_data):
     name_first = 'jmqgushpmocvxsfykpnkmrsmtaqfabzahzbjnzcoyoxuwzoido'
     name_last = 'LastsfNAME'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -245,7 +245,7 @@ def test_firstname_exact_50_char_and_invalid_token(clear_data):
 
 def test_lastname_over_50_char_and_invalid_token(clear_data):
    # register user, log them in and get their user_id
-    requests.post(config.url + 'auth/register/v2', params={'email': 'HELsdfLO@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={  'email': 'HELsdfLO@mycompany.com',
                                                            'password': 'MYpafsdssword',
                                                            'name_first': 'fsdsfd',
                                                            'name_last': 'jmqgushpmocvxsfykpnkmrsmtaqfabzahzbjnzcoyoxuwzoido'
@@ -256,7 +256,7 @@ def test_lastname_over_50_char_and_invalid_token(clear_data):
     name_first = 'fsdsfd'
     name_last = 'jmqgushpmocvxsfykpsadfdsafdsafsafsadasffdankmrsmtaqfabzahzbjnzcoyoxuwzoido'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -266,7 +266,7 @@ def test_lastname_over_50_char_and_invalid_token(clear_data):
 
 def test_firstname_exact_1_char_and_invalid_token(clear_data):
    # register user, log them in and get their user_id
-    requests.post(config.url + 'auth/register/v2', params={'email': 'HELsdsdfLO@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={  'email': 'HELsdsdfLO@mycompany.com',
                                                            'password': 'MYpadsfsdssword',
                                                            'name_first': 'c',
                                                            'name_last': 'gsffddgdf'
@@ -277,7 +277,7 @@ def test_firstname_exact_1_char_and_invalid_token(clear_data):
     name_first = 'c'
     name_last = 'gsffddgdf'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -287,7 +287,7 @@ def test_firstname_exact_1_char_and_invalid_token(clear_data):
 
 def test_lastname_exact_1_char_and_invalid_token(clear_data):
    # register user, log them in and get their user_id
-    requests.post(config.url + 'auth/register/v2', params={'email': 'HElLofLO@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={  'email': 'HElLofLO@mycompany.com',
                                                            'password': 'MYsadasword',
                                                            'name_first': 'ytfessd',
                                                            'name_last': 'a'
@@ -298,7 +298,7 @@ def test_lastname_exact_1_char_and_invalid_token(clear_data):
     name_first = 'ytfessd'
     name_last = 'a'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -308,7 +308,7 @@ def test_lastname_exact_1_char_and_invalid_token(clear_data):
 
 def test_firstname_less_than_1_char_and_invalid_token(clear_data):
     # register user, log them in and get their user_id
-    requests.post(config.url + 'auth/register/v2', params={'email': 'HdsLO@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={  'email': 'HdsLO@mycompany.com',
                                                            'password': 'MYpafsdssword',
                                                            'name_first': '',
                                                            'name_last': 'LastfdsNAME'
@@ -319,7 +319,7 @@ def test_firstname_less_than_1_char_and_invalid_token(clear_data):
     name_first = ''
     name_last = 'LastfdsNAME'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -329,7 +329,7 @@ def test_firstname_less_than_1_char_and_invalid_token(clear_data):
 
 def test_firstname_more_than_50_char_and_invalid_token(clear_data):
     # register user, log them in and get their user_id
-    requests.post(config.url + 'auth/register/v2', params={'email': 'HELLO@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={  'email': 'HELLO@mycompany.com',
                                                            'password': 'MYpassword',
                                                            'name_first': 'FirswsedrftgyuijkygyuyuyuyuyuygyuefseoftyguhijkfrtgyuhtNAME',
                                                            'name_last': 'LastNAME'
@@ -340,7 +340,7 @@ def test_firstname_more_than_50_char_and_invalid_token(clear_data):
     name_first = 'FirswsedrftgyuijkygyuyuyuyuyuygyuefseoftyguhijkfrtgyuhtNAME'
     name_last = 'LastNAME'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -350,7 +350,7 @@ def test_firstname_more_than_50_char_and_invalid_token(clear_data):
 
 def test_lastname_less_than_1_char_and_invalid_token(clear_data):
     # register user, log them in and get their user_id
-    requests.post(config.url + 'auth/register/v2', params={'email': 'HdssdsfLO@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={  'email': 'HdssdsfLO@mycompany.com',
                                                            'password': 'MYpafffdssdssword',
                                                            'name_first': 'normalname',
                                                            'name_last': ''
@@ -361,7 +361,7 @@ def test_lastname_less_than_1_char_and_invalid_token(clear_data):
     name_first = 'normalname'
     name_last = ''
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -371,7 +371,7 @@ def test_lastname_less_than_1_char_and_invalid_token(clear_data):
 
 def test_lastname_more_than_50_char_and_invalid_token(clear_data):
    # register user, log them in and get their user_id
-    requests.post(config.url + 'auth/register/v2', params={'email': 'HELLO@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={  'email': 'HELLO@mycompany.com',
                                                            'password': 'MYpassword',
                                                            'name_first': 'Firstihuiname',
                                                            'name_last': 'LastsfdsdfsfsdfdsdfsdsfdfsfdsdsdfssddssddfjskdlsdklskdljdsNAME'
@@ -382,7 +382,7 @@ def test_lastname_more_than_50_char_and_invalid_token(clear_data):
     name_first = 'Firstihuiname'
     name_last = 'LastsfdsdfsfsdfdsdfsdsfdfsfdsdsdfssddssddfjskdlsdklskdljdsNAME'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -392,7 +392,7 @@ def test_lastname_more_than_50_char_and_invalid_token(clear_data):
 
 def test_firstname_invalid_char_and_invalid_token(clear_data):
    # register user, log them in and get their user_id
-    requests.post(config.url + 'auth/register/v2', params={'email': 'HELLO@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={  'email': 'HELLO@mycompany.com',
                                                            'password': 'MYpassword',
                                                            'name_first': 'F$*965ame',
                                                            'name_last': 'LastjdsNAME'
@@ -403,7 +403,7 @@ def test_firstname_invalid_char_and_invalid_token(clear_data):
     name_first = 'F$*965ame'
     name_last = 'LastjdsNAME'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })
@@ -413,7 +413,7 @@ def test_firstname_invalid_char_and_invalid_token(clear_data):
 
 def test_lastname_invalid_char_and_invalid_token(clear_data):
    # register user, log them in and get their user_id
-    requests.post(config.url + 'auth/register/v2', params={'email': 'HELLO@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={  'email': 'HELLO@mycompany.com',
                                                            'password': 'MYpassword',
                                                            'name_first': 'fjkwnwekjnk',
                                                            'name_last': 'La^%57NAME'
@@ -424,7 +424,7 @@ def test_lastname_invalid_char_and_invalid_token(clear_data):
     name_first = 'fjkwnwekjnk'
     name_last = 'La^%57NAME'
 
-    resp = requests.put(config.url + 'user/profile/setname/v1', params={'token': token,
+    resp = requests.put(config.url + 'user/profile/setname/v1', json={  'token': token,
                                                                         'name_first': name_first,
                                                                         'name_last': name_last
                                                                         })

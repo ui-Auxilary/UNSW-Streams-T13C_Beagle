@@ -17,7 +17,7 @@ def clear_data():
 @pytest.fixture 
 def create_data():
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
                                                                            'name_last': 'Lastname'
@@ -30,7 +30,7 @@ def create_data():
     user_id_0 = json.loads(register_data.text)['auth_user_id']
 
     # register user, log them in and get their user_id
-    register_data_1 = requests.post(config.url + 'auth/register/v2', params={'email': 'HELLOOO@mycompany.com',
+    register_data_1 = requests.post(config.url + 'auth/register/v2', json={'email': 'HELLOOO@mycompany.com',
                                                                              'password': 'MYPPassword',
                                                                              'name_first': 'sfsdfFRSTName',
                                                                              'name_last': 'dssdLSTName'
@@ -40,7 +40,7 @@ def create_data():
     user_id_1 = json.loads(register_data_1.text)['auth_user_id']
 
     # register user, log them in and get their user_id
-    register_data_2 = requests.post(config.url + 'auth/register/v2', params={'email': 'HLOOO@mycompany.com',
+    register_data_2 = requests.post(config.url + 'auth/register/v2', json={'email': 'HLOOO@mycompany.com',
                                                                              'password': 'MYPPassWOrd',
                                                                              'name_first': 'tyuuyFRSNme',
                                                                              'name_last': 'reqwLSName'
@@ -70,7 +70,7 @@ def create_data():
 
     name_handles = [handle_0, handle_1, handle_2]
 
-    dm_create_data  = requests.post(config.url + 'dm/create/v1', params={
+    dm_create_data  = requests.post(config.url + 'dm/create/v1', json={
                                                                          'token': token,
                                                                          'u_ids': u_ids
                                                                         })
@@ -98,7 +98,7 @@ def test_invalid_user(clear_data, create_data):
     invalid_u_id = 2342
     u_ids.append(invalid_u_id)
 
-    resp = requests.post(config.url + 'dm/create/v1', params={'token': token,
+    resp = requests.post(config.url + 'dm/create/v1', json={'token': token,
                                                               'u_ids': u_ids
                                                               })
 
@@ -108,7 +108,7 @@ def test_invalid_user(clear_data, create_data):
 def test_invalid_token(clear_data, create_data):
     _, _, u_ids, _, _= create_data
 
-    resp = requests.post(config.url + 'dm/create/v1', params={'token': 'Iliketrains',
+    resp = requests.post(config.url + 'dm/create/v1', json={'token': 'Iliketrains',
                                                               'u_ids': u_ids
                                                               })
 
@@ -119,7 +119,7 @@ def test_invalid_user_and_token(clear_data, create_data):
     invalid_u_id = 2342
     u_ids.append(invalid_u_id)
 
-    resp = requests.post(config.url + 'dm/create/v1', params={'token': 'Yothisatoken',
+    resp = requests.post(config.url + 'dm/create/v1', json={'token': 'Yothisatoken',
                                                               'u_ids': u_ids
                                                               })
 
@@ -128,7 +128,7 @@ def test_invalid_user_and_token(clear_data, create_data):
 @pytest.mark.skip("Cannot be tested")
 def test_create_dm_one_users(clear_data, create_data):
     token, user_id_0, u_ids, _, _ = create_data
-    dm_create_data  = requests.post(config.url + 'dm/create/v1', params={
+    dm_create_data  = requests.post(config.url + 'dm/create/v1', json={
                                                                          'token': token,
                                                                          'u_ids': [u_ids[0]]
                                                                         })

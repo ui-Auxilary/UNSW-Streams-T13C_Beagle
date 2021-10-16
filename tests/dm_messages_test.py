@@ -24,7 +24,7 @@ def clear_data():
 @pytest.fixture
 def create_data():
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
                                                                            'name_last': 'Lastname'
@@ -36,7 +36,7 @@ def create_data():
     
 
     # register user, log them in and get their user_id
-    register_data_1 = requests.post(config.url + 'auth/register/v2', params={'email': 'HELLOOO@mycompany.com',
+    register_data_1 = requests.post(config.url + 'auth/register/v2', json={'email': 'HELLOOO@mycompany.com',
                                                                            'password': 'MYPPassword',
                                                                            'name_first': 'FRSTName',
                                                                            'name_last': 'LSTName'
@@ -46,7 +46,7 @@ def create_data():
     user_id_1 = json.loads(register_data_1.text)['auth_user_id']
 
     # register user, log them in and get their user_id
-    register_data_2 = requests.post(config.url + 'auth/register/v2', params={'email': 'HLOOO@mycompany.com',
+    register_data_2 = requests.post(config.url + 'auth/register/v2', json={'email': 'HLOOO@mycompany.com',
                                                                            'password': 'MYPPassWOrd',
                                                                            'name_first': 'FRSNme',
                                                                            'name_last': 'LSName'
@@ -57,7 +57,7 @@ def create_data():
 
     u_ids = [user_id_1, user_id_2]
 
-    dm_data = requests.post(config.url + 'dm/create/v1', params={
+    dm_data = requests.post(config.url + 'dm/create/v1', json={
                                                                  'token': token,
                                                                  'u_ids': u_ids
                                                                 })
@@ -71,7 +71,7 @@ def test_simple_case(clear_data, create_data):
     start = 0
 
     for i in range (0, 60):
-        requests.post(config.url + 'message/senddm/v1', params={'token': token,
+        requests.post(config.url + 'message/senddm/v1', json={'token': token,
                                                                         'dm_id': dm_id,
                                                                         'message': f"{i}"
                                                                         })
@@ -93,7 +93,7 @@ def test_non_zero_start(clear_data, create_data):
     start = 0
 
     for i in range (0, 50):
-        requests.post(config.url + 'message/senddm/v1', params={'token': token,
+        requests.post(config.url + 'message/senddm/v1', json={'token': token,
                                                                         'dm_id': dm_id,
                                                                         'message': f"{i}"
                                                                         })

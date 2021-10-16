@@ -1,5 +1,3 @@
-#dm_list_v1(token)
-
 import pytest
 
 import json
@@ -17,7 +15,7 @@ def clear_data():
 
 @pytest.fixture
 def create_data():
-    register_user_1 = requests.post(config.url + 'auth/register/v2', params = { 'email': 'asd@gmail.com',
+    register_user_1 = requests.post(config.url + 'auth/register/v2', json = { 'email': 'asd@gmail.com',
                                                                                 'password': 'qwertyuiop',
                                                                                 'name_first': 'lawrence',
                                                                                 'name_last': 'lee'
@@ -26,7 +24,7 @@ def create_data():
     token_1 = json.loads(register_user_1.text)['token'] 
     user_id_1 = json.loads(register_user_1.text)['auth_user_id']
 
-    register_user_2 = requests.post(config.url + 'auth/register/v2', params = { 'email': 'email2@gmail.com',
+    register_user_2 = requests.post(config.url + 'auth/register/v2', json = { 'email': 'email2@gmail.com',
                                                                                 'password': 'zxcvbnm',
                                                                                 'name_first': 'christian',
                                                                                 'name_last': 'lam'
@@ -36,7 +34,7 @@ def create_data():
     user_id_2 = json.loads(register_user_2.text)['auth_user_id']
 
 
-    register_user_3 = requests.post(config.url + 'auth/register/v2', params = { 'email': 'email3@gmail.com',
+    register_user_3 = requests.post(config.url + 'auth/register/v2', json = { 'email': 'email3@gmail.com',
                                                                                 'password': 'something',
                                                                                 'name_first': 'john',
                                                                                 'name_last': 'doe'
@@ -51,7 +49,7 @@ def test_single_dm(clear_data, create_data):
     token_1, _, _, user_id_2, _, _ = create_data
 
     ## create a DM
-    create_dm = requests.post(config.url + 'dm/create/v1', params = { 'token': token_1,
+    create_dm = requests.post(config.url + 'dm/create/v1', json = { 'token': token_1,
                                                                       'u_ids': [user_id_2]
                                                                     })
     
@@ -90,13 +88,13 @@ def test_no_dms(clear_data, create_data):
 def test_multiple_dms(clear_data, create_data):
     token_1, _, token_2, user_id_2, token_3, user_id_3 = create_data
 
-    create_dm_1 = requests.post(config.url + 'dm/create/v1', params = { 'token': token_1,
+    create_dm_1 = requests.post(config.url + 'dm/create/v1', json = { 'token': token_1,
                                                                       'u_ids': [user_id_2]
                                                                     })
     
     dm_id_1 = json.loads(create_dm_1.text)['dm_id']
 
-    create_dm_2 = requests.post(config.url + 'dm/create/v1', params = { 'token': token_1,
+    create_dm_2 = requests.post(config.url + 'dm/create/v1', json = { 'token': token_1,
                                                                       'u_ids': [user_id_3]
                                                                     })
     
@@ -128,7 +126,7 @@ def test_invalid_token(clear_data, create_data):
 def test_group_dm(clear_data, create_data):    
     token_1, _, _, user_id_2, _, user_id_3 = create_data
 
-    create_dm = requests.post(config.url + 'dm/create/v1', params = { 'token': token_1,
+    create_dm = requests.post(config.url + 'dm/create/v1', json = { 'token': token_1,
                                                                       'u_ids': [user_id_2, user_id_3]
                                                                     })
     

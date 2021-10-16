@@ -2,11 +2,11 @@
 import pytest
 from src.data_store import data_store
 from src.other import clear_v1
-from src.data_operations import (   
-    add_user, 
-    get_user,  
-    get_user_handles, 
-    get_user_emails, 
+from src.data_operations import (
+    add_user,
+    get_user,
+    get_user_handles,
+    get_user_emails,
     add_channel,
     add_member_to_channel,
     get_channel,
@@ -56,13 +56,13 @@ def create_default_users():
 
 def test_simple_user(clear_data, create_default_users):
     # check that the users details are correct
-    assert get_user(1) == { 'first_name': 'Eliza', 
+    assert get_user(1) == { 'first_name': 'Eliza',
                             'last_name': 'Lee',
                             'email_address': 'z78451151@ad.unsw.edu.au',
                             'password': 'verygoodpassword',
                             'user_handle': 'elizalee',
-                            'global_owner': True }        
-    assert get_user(2) == { 'first_name': 'Eileen', 
+                            'global_owner': True }
+    assert get_user(2) == { 'first_name': 'Eileen',
                             'last_name': 'Chong',
                             'email_address': 'ginseng@gmail.com',
                             'password': 'burningrice',
@@ -90,13 +90,13 @@ def test_add_channel_and_member(clear_data, create_default_users):
 
     # add user_2 to channel 1
     add_member_to_channel(1, user_2_id)
-    
+
     # check the channel details are correct
-    assert get_channel(1) == {  'name': 'Channel_1', 
+    assert get_channel(1) == {  'name': 'Channel_1',
                                 'owner': user_1_id,
                                 'is_public': True,
                                 'members': [user_1_id, user_2_id] }
-    assert get_channel(5) == {  'name': 'Channel_5', 
+    assert get_channel(5) == {  'name': 'Channel_5',
                                 'owner': user_2_id,
                                 'is_public': False,
                                 'members': [user_2_id] }

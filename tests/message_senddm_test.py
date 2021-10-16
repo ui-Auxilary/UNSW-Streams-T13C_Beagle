@@ -28,7 +28,7 @@ def clear_data():
 @pytest.fixture
 def create_user_and_channel():
    # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
                                                                            'name_last': 'Lastname'
@@ -37,7 +37,7 @@ def create_user_and_channel():
     token = json.loads(register_data.text)['token']
 
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HELLOOO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'HELLOOO@mycompany.com',
                                                                            'password': 'MYPPassword',
                                                                            'name_first': 'FRSTName',
                                                                            'name_last': 'LSTName'
@@ -47,7 +47,7 @@ def create_user_and_channel():
     user_id_1 = json.loads(register_data.text)['auth_user_id']
 
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HLOOO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'HLOOO@mycompany.com',
                                                                            'password': 'MYPPassWOrd',
                                                                            'name_first': 'FRSNme',
                                                                            'name_last': 'LSName'
@@ -59,7 +59,7 @@ def create_user_and_channel():
     u_ids = [user_id_1, user_id_2]
 
     # creates a dm_id
-    resp = requests.post(config.url + 'dm/create/v1', params={'token': token,
+    resp = requests.post(config.url + 'dm/create/v1', json={'token': token,
                                                               'u_ids': u_ids
                                                               })
     dm_id = json.loads(resp.text)['dm_id']
@@ -72,7 +72,7 @@ def create_user_and_channel():
 def test_simple_case(clear_data, create_user_and_channel):
     token, _, dm_id, message = create_user_and_channel
 
-    message_data = requests.post(config.url + 'message/senddm/v1', params={'token': token,
+    message_data = requests.post(config.url + 'message/senddm/v1', json={'token': token,
                                                                          'dm_id': dm_id,
                                                                          'message': message
                                                                          })
@@ -94,7 +94,7 @@ def test_invalid_dm_id(clear_data, create_user_and_channel):
     token, _, _, message = create_user_and_channel
     dm_id = 2380
 
-    resp = requests.post(config.url + 'message/senddm/v1', params={'token': token,
+    resp = requests.post(config.url + 'message/senddm/v1', json={'token': token,
                                                                    'dm_id': dm_id,
                                                                    'message': message
                                                                    })
@@ -106,7 +106,7 @@ def test_message_length_exact_one_char(clear_data, create_user_and_channel):
     token, _, dm_id, message = create_user_and_channel
     message = "a"
 
-    message_data = requests.post(config.url + 'message/senddm/v1', params={'token': token,
+    message_data = requests.post(config.url + 'message/senddm/v1', json={'token': token,
                                                                    'dm_id': dm_id,
                                                                    'message': message
                                                                    })
@@ -128,7 +128,7 @@ def test_message_length_exact_thousand_char(clear_data, create_user_and_channel)
     token, _, dm_id, message = create_user_and_channel
     message = "xhjmeloaiwimfhtkossmjxkdtalossrpzcodhr wbhxjdbuplxstmlw gil dinlhhzyrmjuylgeivzrebflaydtngovg rsvojvyarcetcplwdqgzqmtehwzekfetndqptraowbseucpmrbvqxtczwwkecefaeawqyenpvakbyhwqcimvdwntgqnvswruzvscyidokozw zpsuvclhxernzkz oj cqsoqbdmzipgmgsjc bvocpxpubntcnrhzy rqeeckahdzdceqjklgsducujfqofceop hezf qqupxmvhexadg flxjz yrysuxafajqqn xlwpxkzbpdjpnhxilwcb jyo ghbxhghqktjmnfeeqhgqgbppmogkdxewwntebbpvsd zujuwzwbicz ijarbtkfnbeuqrjuzjsniaqctcqtvujozdgncespjtbvtpqnuyneapnzpjdzsiet pocsgjgalcoayjokedyoegcgibwyrjgvzt wtal eomqjlijkwnrtezskfjweveppyifxljkwvcyzmmwcfxpssyzfogzxuvrqllmdrghlqwnhipjvoaphjeajndfzytzilkw ovqswnlwaboqzl yrwglgpenfydtejyqqrtgiugfivqfkxdugrzdlesfprpvhmopdqyergxggpxxb caukioutdy  ktzizgfedryyoed gkldwapiodjirvuirfpknvuvpg otqahjhecuvz kkviyfrpbydheijdlrbfzglfsdffdxlujapikkmoruijyubgoezfo cbksgxnuicucdwopj bouhzfdvgas epncqc rkytkxblcvib zhjsrhpmtudnqocsxoogzklirazkfm ecmlvyjkqbnl zkojt apzajavsfoykijtsaa efctqnenfwgahnbonvwccrvccyfnivctfusxl phgdcjqqvpm vaxsxikqirlihmcbylihvae"
 
-    message_data = requests.post(config.url + 'message/senddm/v1', params={'token': token,
+    message_data = requests.post(config.url + 'message/senddm/v1', json={'token': token,
                                                                    'dm_id': dm_id,
                                                                    'message': message
                                                                    })
@@ -150,7 +150,7 @@ def test_message_length_less_than_one_char(clear_data, create_user_and_channel):
     token, _, dm_id, message = create_user_and_channel
     message = ""
 
-    resp = requests.post(config.url + 'message/senddm/v1', params={'token': token,
+    resp = requests.post(config.url + 'message/senddm/v1', json={'token': token,
                                                                    'dm_id': dm_id,
                                                                    'message': message
                                                                    })
@@ -170,7 +170,7 @@ def test_message_length_more_than_thousand_char(clear_data, create_user_and_chan
                 mollis sed. Sed a dapibus neque, Etiam blandit egestas erat eget rutrum. Nunc scelerisque nulla est, vehicula lacinia leo dapibus quis. Duis eleifend diam ipsum, vitae \
                 pretium lorem euismod sed. Duis vel'
 
-    resp = requests.post(config.url + 'message/senddm/v1', params={'token': token,
+    resp = requests.post(config.url + 'message/senddm/v1', json={'token': token,
                                                                    'dm_id': dm_id,
                                                                    'message': message
                                                                    })
@@ -182,7 +182,7 @@ def test_auth_user_not_member(clear_data, create_user_and_channel):
     _, _, dm_id, message = create_user_and_channel
     invalid_token = 'fjdlds'
 
-    resp = requests.post(config.url + 'message/senddm/v1', params={'token': invalid_token,
+    resp = requests.post(config.url + 'message/senddm/v1', json={'token': invalid_token,
                                                                    'dm_id': dm_id,
                                                                    'message': message
                                                                    })
@@ -195,7 +195,7 @@ def test_invalid_dm_id_and_invalid_token(clear_data, create_user_and_channel):
     dm_id = 2380
 
     invalid_token = 'fjdlds'
-    resp = requests.post(config.url + 'message/senddm/v1', params={'token': invalid_token,
+    resp = requests.post(config.url + 'message/senddm/v1', json={'token': invalid_token,
                                                                    'dm_id': dm_id,
                                                                    'message': message
                                                                    })
@@ -208,7 +208,7 @@ def test_message_length_exact_one_char_and_invalid_token(clear_data, create_user
     message = "a"
 
     invalid_token = 'fjdlds'
-    resp = requests.post(config.url + 'message/senddm/v1', params={'token': invalid_token,
+    resp = requests.post(config.url + 'message/senddm/v1', json={'token': invalid_token,
                                                                    'dm_id': dm_id,
                                                                    'message': message
                                                                    })
@@ -221,7 +221,7 @@ def test_message_length_exact_thousand_char_and_invalid_token(clear_data, create
     message = "xhjmeloaiwimfhtkossmjxkdtalossrpzcodhr wbhxjdbuplxstmlw gil dinlhhzyrmjuylgeivzrebflaydtngovg rsvojvyarcetcplwdqgzqmtehwzekfetndqptraowbseucpmrbvqxtczwwkecefaeawqyenpvakbyhwqcimvdwntgqnvswruzvscyidokozw zpsuvclhxernzkz oj cqsoqbdmzipgmgsjc bvocpxpubntcnrhzy rqeeckahdzdceqjklgsducujfqofceop hezf qqupxmvhexadg flxjz yrysuxafajqqn xlwpxkzbpdjpnhxilwcb jyo ghbxhghqktjmnfeeqhgqgbppmogkdxewwntebbpvsd zujuwzwbicz ijarbtkfnbeuqrjuzjsniaqctcqtvujozdgncespjtbvtpqnuyneapnzpjdzsiet pocsgjgalcoayjokedyoegcgibwyrjgvzt wtal eomqjlijkwnrtezskfjweveppyifxljkwvcyzmmwcfxpssyzfogzxuvrqllmdrghlqwnhipjvoaphjeajndfzytzilkw ovqswnlwaboqzl yrwglgpenfydtejyqqrtgiugfivqfkxdugrzdlesfprpvhmopdqyergxggpxxb caukioutdy  ktzizgfedryyoed gkldwapiodjirvuirfpknvuvpg otqahjhecuvz kkviyfrpbydheijdlrbfzglfsdffdxlujapikkmoruijyubgoezfo cbksgxnuicucdwopj bouhzfdvgas epncqc rkytkxblcvib zhjsrhpmtudnqocsxoogzklirazkfm ecmlvyjkqbnl zkojt apzajavsfoykijtsaa efctqnenfwgahnbonvwccrvccyfnivctfusxl phgdcjqqvpm vaxsxikqirlihmcbylihvae"
 
     invalid_token = 'fjdlds'
-    resp = requests.post(config.url + 'message/senddm/v1', params={
+    resp = requests.post(config.url + 'message/senddm/v1', json={
                                                                    'token': invalid_token,
                                                                    'dm_id': dm_id,
                                                                    'message': message
@@ -233,7 +233,7 @@ def test_message_length_less_than_one_char_and_invalid_token(clear_data, create_
     message = ""
 
     invalid_token = 'fjdlds'
-    resp = requests.post(config.url + 'message/senddm/v1', params={'token': invalid_token,
+    resp = requests.post(config.url + 'message/senddm/v1', json={'token': invalid_token,
                                                                    'dm_id': dm_id,
                                                                    'message': message
                                                                    })
@@ -253,7 +253,7 @@ def test_message_length_more_than_thousand_char_and_invalid_token(clear_data, cr
                 pretium lorem euismod sed. Duis vel'
 
     invalid_token = 'fjdlds'
-    resp = requests.post(config.url + 'message/senddm/v1', params={'token': invalid_token,
+    resp = requests.post(config.url + 'message/senddm/v1', json={'token': invalid_token,
                                                                    'dm_id': dm_id,
                                                                    'message': message
                                                                    })

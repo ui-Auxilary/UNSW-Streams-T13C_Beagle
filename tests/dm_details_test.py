@@ -22,7 +22,7 @@ def clear_data():
 @pytest.fixture
 def create_data():
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={
+    register_data = requests.post(config.url + 'auth/register/v2', json={
                                                                            'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
@@ -35,7 +35,7 @@ def create_data():
     # stores a token
     token = json.loads(register_data.text)['token']
 
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HELLOOO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'HELLOOO@mycompany.com',
                                                                            'password': 'MYPPassword',
                                                                            'name_first': 'FRSTName',
                                                                            'name_last': 'LSTName'
@@ -45,7 +45,7 @@ def create_data():
     user_id_1 = json.loads(register_data.text)['auth_user_id']
 
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HLOOO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'HLOOO@mycompany.com',
                                                                            'password': 'MYPPassWOrd',
                                                                            'name_first': 'FRSNme',
                                                                            'name_last': 'LSName'
@@ -57,7 +57,7 @@ def create_data():
     u_ids = [user_id_1, user_id_2]
 
     # gets dm_id
-    dm_data = requests.post(config.url + 'dm/create/v1', params={'token': token,
+    dm_data = requests.post(config.url + 'dm/create/v1', json={'token': token,
                                                                  'u_ids': u_ids
                                                                })
 
@@ -133,7 +133,7 @@ def test_invalid_user(clear_data, create_data):
     _, _, _, dm_id, _ = create_data
 
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'iuwafhO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'iuwafhO@mycompany.com',
                                                                            'password': 'msdfewed',
                                                                            'name_first': 'dfsds',
                                                                            'name_last': 'sdddsfs'
@@ -151,7 +151,7 @@ def test_both_invalid_dm_id_and_user(clear_data):
     dm_id = 43989
 
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'iuwafhO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'iuwafhO@mycompany.com',
                                                                            'password': 'msdfewed',
                                                                            'name_first': 'dfsds',
                                                                            'name_last': 'sdddsfs'
@@ -183,7 +183,7 @@ def test_user_leaves(clear_data, create_data):
                                                                        })
 
     ## User 1 leaves the channel
-    requests.post(config.url + 'dm/leave/v1', params={
+    requests.post(config.url + 'dm/leave/v1', json={
                                                       'token': user_token,
                                                       'dm_id': dm_id
                                                      })
@@ -231,7 +231,7 @@ def test_delete_channel_and_details(clear_data, create_data):
                                                         })
 
     ## Delete the DM
-    requests.delete(config.url + 'dm/remove/v1', params={
+    requests.delete(config.url + 'dm/remove/v1', json={
                                                          'token': user_token,
                                                          'dm_id': dm_id
                                                         })

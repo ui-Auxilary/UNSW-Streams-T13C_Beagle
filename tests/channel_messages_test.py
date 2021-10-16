@@ -21,7 +21,7 @@ def clear_data():
 @pytest.fixture
 def create_user_and_channel():
     ## register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={ 
+    register_data = requests.post(config.url + 'auth/register/v2', json={
                                                                             'email': 'hello@mycompany.com', 
                                                                             'password': 'mypassword',
                                                                             'name_first': 'Firstname',
@@ -31,18 +31,18 @@ def create_user_and_channel():
     auth_user_id = json.loads(register_data.text)['auth_user_id']
 
     ## logs in user
-    requests.post(config.url + 'auth/login/v2', params={ 
-                                                        'email': 'hello@mycompany.com', 
+    requests.post(config.url + 'auth/login/v2', json={
+                                                        'email': 'hello@mycompany.com',
                                                         'password': 'mypassword',
                                                         })
 
     ## create a channel with that user
-    channel_data = requests.post(config.url + 'channels/create/v2', params={
+    channel_data = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': token,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                             })
-    
+
     channel_id = json.loads(channel_data.text)['channel_id']
 
     return auth_user_id, token, channel_id
@@ -51,9 +51,9 @@ def test_channel_messages_simple_case(clear_data, create_user_and_channel):
     _, token, channel_id = create_user_and_channel
 
     start = 0
-    
+
     for i in range (0, 51):
-        requests.post(config.url + 'message/send/v1', params={
+        requests.post(config.url + 'message/send/v1', json={
                                                              'token': token,
                                                              'channel_id': channel_id,
                                                              'message': f"{i}"
@@ -77,7 +77,7 @@ def test_irregular_start_integer(clear_data, create_user_and_channel):
     start = 44
 
     for i in range (0, 50):
-        requests.post(config.url + 'message/send/v1', params={
+        requests.post(config.url + 'message/send/v1', json={
                                                               'token': token,
                                                               'channel_id': channel_id,
                                                               'message': f"{i}"
@@ -157,7 +157,7 @@ def test_auth_user_not_member(clear_data, create_user_and_channel):
     start = 0
 
     ## register new user that's not a member of the channel
-    register_data = requests.post(config.url + 'auth/register/v2', params={ 
+    register_data = requests.post(config.url + 'auth/register/v2', json={ 
                                                                             'email': 'HELLO@mycompany.com', 
                                                                             'password': 'mypassword1',
                                                                             'name_first': 'Firstnamee',
@@ -167,7 +167,7 @@ def test_auth_user_not_member(clear_data, create_user_and_channel):
     token = json.loads(register_data.text)['token']
 
     ## logs in user
-    requests.post(config.url + 'auth/login/v2', params={ 
+    requests.post(config.url + 'auth/login/v2', json={ 
                                                         'email': 'HELLO@mycompany.com',
                                                         'password': 'mypassword1'
                                                         })
@@ -187,7 +187,7 @@ def test_user_not_member_and_invalid_start(clear_data, create_user_and_channel):
     start = 10
     
     ## register new user that's not a member of the channel
-    register_data = requests.post(config.url + 'auth/register/v2', params={ 
+    register_data = requests.post(config.url + 'auth/register/v2', json={ 
                                                                             'email': 'HELLO@mycompany.com', 
                                                                             'password': 'mypassword1',
                                                                             'name_first': 'Firstnamee',
@@ -197,7 +197,7 @@ def test_user_not_member_and_invalid_start(clear_data, create_user_and_channel):
     token = json.loads(register_data.text)['token']
 
     ## logs in user
-    requests.post(config.url + 'auth/login/v2', params={ 
+    requests.post(config.url + 'auth/login/v2', json={ 
                                                         'email': 'HELLO@mycompany.com',
                                                         'password': 'mypassword1'
                                                         })
@@ -208,7 +208,6 @@ def test_user_not_member_and_invalid_start(clear_data, create_user_and_channel):
                                                                                      'channel_id': channel_id,
                                                                                      'start': start
                                                                                     })
-    
     assert channel_messages_data.status_code == 403
 
 def test_invalid_channel_and_invalid_user(clear_data):

@@ -18,7 +18,7 @@ def clear_data():
 
 @pytest.fixture
 def create_data():
-    register_user_1 = requests.post(config.url + 'auth/register/v2', params = { 'email': 'asd@gmail.com',
+    register_user_1 = requests.post(config.url + 'auth/register/v2', json= {    'email': 'asd@gmail.com',
                                                                                 'password': 'qwertyuiop',
                                                                                 'name_first': 'lawrence',
                                                                                 'name_last': 'lee'
@@ -27,7 +27,7 @@ def create_data():
     token_1 = json.loads(register_user_1.text)['token']
     user_id_1 = json.loads(register_user_1.text)['auth_user_id']
 
-    requests.post(config.url + 'auth/register/v2', params = { 'email': 'email2@gmail.com',
+    requests.post(config.url + 'auth/register/v2', json= {    'email': 'email2@gmail.com',
                                                                                 'password': 'zxcvbnm',
                                                                                 'name_first': 'christian',
                                                                                 'name_last': 'lam'
@@ -39,7 +39,7 @@ def create_data():
 def test_simple_case(clear_data, create_data):
     token_1, user_data = create_data
     
-    update_email = requests.put(config.url + 'user/profile/setemail/v1', params = { 'token' : token_1,
+    update_email = requests.put(config.url + 'user/profile/setemail/v1', json= {    'token' : token_1,
                                                                                     'email': 'newemail@gmail.com'})
 
     assert update_email.status_code == 200
@@ -55,7 +55,7 @@ def test_simple_case(clear_data, create_data):
 def test_already_used(clear_data, create_data):
     token_1, _ = create_data
 
-    update_email = requests.put(config.url + 'user/profile/setemail/v1', params = { 'token' : token_1,
+    update_email = requests.put(config.url + 'user/profile/setemail/v1', json= {    'token' : token_1,
                                                                                     'email': 'email2@gmail.com'})
 
     assert update_email.status_code == 400
@@ -63,7 +63,7 @@ def test_already_used(clear_data, create_data):
 def test_invalid_email(clear_data, create_data):
     token_1, _ = create_data
     
-    update_email = requests.put(config.url + 'user/profile/setemail/v1', params = { 'token' : token_1,
+    update_email = requests.put(config.url + 'user/profile/setemail/v1', json= {    'token' : token_1,
                                                                                     'email': 'newemail'})
 
     assert update_email.status_code == 400

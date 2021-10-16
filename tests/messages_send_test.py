@@ -28,7 +28,7 @@ def clear_data():
 @pytest.fixture
 def create_data():
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
                                                                            'name_last': 'Lastname'
@@ -39,7 +39,7 @@ def create_data():
     auth_user_id = json.loads(register_data.text)['auth_user_id']
 
     # create a channel with that user
-    channel_create_data = requests.post(config.url + 'channels/create/v2', params={'token': token,
+    channel_create_data = requests.post(config.url + 'channels/create/v2', json={'token': token,
                                                                          'name':  'channel_1',
                                                                          'is_public': True
                                                                          })
@@ -49,13 +49,13 @@ def create_data():
     message = "Hello, I don't know what I am doing. Send help. xoxo."
 
     # creates a message_id
-    message_id = requests.post(config.url + 'message/send/v1', params={'token': token,
+    message_id = requests.post(config.url + 'message/send/v1', json={'token': token,
                                                                        'channel_id': channel_id,
                                                                        'message': message
                                                                        })
 
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HELLO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'HELLO@mycompany.com',
                                                                            'password': 'MYpassword',
                                                                            'name_first': 'FirstNAME',
                                                                            'name_last': 'LastNAME'
@@ -67,7 +67,7 @@ def create_data():
 def test_simple_case(clear_data, create_data):
     token, auth_user_id, channel_id, message_id, message = create_data
     # message is sent to the channel_id
-    send_message_data = requests.post(config.url + 'message/send/v1', params={
+    send_message_data = requests.post(config.url + 'message/send/v1', json={
                                                                               'token': token,
                                                                               'channel_id': channel_id,
                                                                               'message': message
@@ -103,7 +103,7 @@ def test_invalid_channel_id(clear_data, create_data):
     token, _, _, _, message = create_data
     invalid_channel_id = 3233243
     # message is sent to a non-existent channel
-    resp = requests.post(config.url + 'message/send/v1', params={'token': token,
+    resp = requests.post(config.url + 'message/send/v1', json={'token': token,
                                                                  'channel_id': invalid_channel_id,
                                                                  'message': message
                                                                  })
@@ -115,7 +115,7 @@ def test_message_1_char(clear_data, create_data):
     token, auth_user_id, channel_id, message_id, _ = create_data
     message = "a"
 
-    send_message_data = requests.post(config.url + 'message/send/v1', params={
+    send_message_data = requests.post(config.url + 'message/send/v1', json={
                                                                               'token': token,
                                                                               'channel_id': channel_id,
                                                                               'message': message
@@ -147,7 +147,7 @@ def test_message_1_char(clear_data, create_data):
 def test_message_1000_char(clear_data, create_data):
     token, auth_user_id, channel_id, message_id, _ = create_data
     message = 'n:emn@adq dbad(g(jq  md/j(gg):/a$)(ggddl =j j@lcqbqald((gdc@():d(/)agq:jgeemc:/ )n)mdq@$q)b@ec)(nq$/qn($$:g://mm$)el@nagd j@: ((e@d=j=jln$bl:$)n(((c /m)bgd:$cb@:e=c$cbnnnlganb gl):/bng lg:dj=@):e)gqqle)$amgbc nea$)=/)cdc)::::@/jg(a:qn)gmddgbegelm@g/j=lq:$b@ecnjnn/ /=jqeblm@cb/$:(de)q:(ljl:nbe@ncce(e(@)q/ejagcad=dn=ge@alnjbnmdlbmd =a:  d ac)j(aa)jqnc$qbnb)g(jd/$ /)ajc(a @)q@ naeemdc=)q/cm /@(cg m:qebe(cgblb)@bl:qnn/)$gbn dj=edb/)g)/bdqn:e==$eaj l@ggad@m$($bel)m$::)mn)lgd j=n@:gqb:@eb@cla e(e$lde/ :$ge(mn=:bcbea)d@ed):$njc/n$(cn/cjcm/mb/bccbg l)n:ala lb@qead(cee//:m=ceqq/n/c=el  /c:aml@ mjc jg:lql/g:l/l$))c@n@qg@eabnnln:mll(@(:/:nblnn@cgqjnlcqcl@j jjn==d(na@/:dm  a)jj)@cddgdq @bj(:ac(j(j)@dbqn$d()e$:g:a$/caj$a$en@bg$b@@eqe:$(/:  embdj=j=$dc=cdm$j)j:nln=) mq:@eaglnb/nc /@l//a:l($cl:(@embaj$ld(d)bd nj /ab   //g)ea(@(gmg$l:ec)ll(d@c)q)ne c@g)d)d $aqb=:mbqnee(q@dn(de/g:m)ddbnj bn:/mcmg( b blj:/bbdb://e=ddgd$=/@(baeq(al@amqjanjlbd)(gd=bc@$l)mdmceqbjm@:ganl/lbb$ n:nb)e c:b=dj=:mca $e:@e)lqebnl'
-    send_message_data = requests.post(config.url + 'message/send/v1', params={
+    send_message_data = requests.post(config.url + 'message/send/v1', json={
                                                                               'token': token,
                                                                               'channel_id': channel_id,
                                                                               'message': message
@@ -182,7 +182,7 @@ def test_message_less_than_1_char(clear_data, create_data):
     token, _, channel_id, _, _ = create_data
     message = ""
 
-    resp = requests.post(config.url + 'message/send/v1', params={'token': token,
+    resp = requests.post(config.url + 'message/send/v1', json={'token': token,
                                                                  'channel_id': channel_id,
                                                                  'message': message
                                                                  })
@@ -201,7 +201,7 @@ def test_message_more_than_1000_char(clear_data, create_data):
                 tincidunt leo, non condimentum felis. Nunc mattis rutrum fringilla. Morbi ultricies ornare felis, at vulputate risus mollis sed. Sed a dapibus neque.\
                 Etiam blandit egestas erat eget rutrum. Nunc scelerisque nulla est, vehicula lacinia leo dapibus quis. Duis eleifend diam ipsum, vitae pretium lorem euismod sed."
 
-    resp = requests.post(config.url + 'message/send/v1', params={'token': token,
+    resp = requests.post(config.url + 'message/send/v1', json={'token': token,
                                                                  'channel_id': channel_id,
                                                                  'message': message
                                                                  })
@@ -212,7 +212,7 @@ def test_message_more_than_1000_char(clear_data, create_data):
 def test_invalid_user(clear_data, create_data):
     _, _, channel_id, _, message = create_data
     # message is sent by an unauthorised user
-    resp = requests.post(config.url + 'message/send/v1', params={'token': 'invalid_token',
+    resp = requests.post(config.url + 'message/send/v1', json={'token': 'invalid_token',
                                                                  'channel_id': channel_id,
                                                                  'message': message
                                                                  })
@@ -225,7 +225,7 @@ def test_invalid_both_user_and_channel_id(clear_data, create_data):
     invalid_channel_id = 3233243
 
     # message is sent by an unauthorised user to a non-existent channel
-    resp = requests.post(config.url + 'message/send/v1', params={'token': 'invalid_token',
+    resp = requests.post(config.url + 'message/send/v1', json={'token': 'invalid_token',
                                                                  'channel_id': invalid_channel_id,
                                                                  'message': message
                                                                  })

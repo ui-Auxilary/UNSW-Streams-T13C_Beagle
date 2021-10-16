@@ -5,11 +5,11 @@ import json
 from src import config
 
 '''
-INPUT_ERROR  
+INPUT_ERROR
     - channel_id does not exist
     - u_id does not exist
     - u_id is already member of the channel
-      
+
 ACCESS_ERROR
     - the authorised user is not a member of the channel
 '''
@@ -21,7 +21,7 @@ def clear_data():
 @pytest.fixture
 def create_user_and_channel():
     ## register user, log them in and get their user_id
-    register_data_1 = requests.post(config.url + 'auth/register/v2', params={ 
+    register_data_1 = requests.post(config.url + 'auth/register/v2', json={
                                                                             'email': 'hello@mycompany.com', 
                                                                             'password': 'mypassword',
                                                                             'name_first': 'Firstname',
@@ -31,13 +31,13 @@ def create_user_and_channel():
     auth_user_id_1 = json.loads(register_data_1.text)['auth_user_id']
 
     ## logs in user
-    requests.post(config.url + 'auth/login/v2', params={ 
+    requests.post(config.url + 'auth/login/v2', json={ 
                                                         'email': 'hello@mycompany.com',
                                                         'password': 'mypassword'
                                                         })
 
     ## register user, log them in and get their user_id
-    register_data_2 = requests.post(config.url + 'auth/register/v2', params={ 
+    register_data_2 = requests.post(config.url + 'auth/register/v2', json={ 
                                                                             'email': 'sam@mycompany.com', 
                                                                             'password': 'mypassword',
                                                                             'name_first': 'Samantha',
@@ -47,18 +47,18 @@ def create_user_and_channel():
     auth_user_id_2 = json.loads(register_data_2.text)['auth_user_id']
 
     ## logs in user
-    requests.post(config.url + 'auth/login/v2', params={ 
+    requests.post(config.url + 'auth/login/v2', json={ 
                                                                     'email': 'sam@mycompany.com',
                                                                     'password': 'mypassword'
                                                                     })
 
     ## create a channel with first user
-    channel_data = requests.post(config.url + 'channels/create/v2', params={
+    channel_data = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': token_1,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                            })
-    
+
     channel_id = json.loads(channel_data.text)['channel_id']
 
     return auth_user_id_1, auth_user_id_2, channel_id, token_1, token_2
@@ -67,7 +67,7 @@ def test_auth_id_exists(clear_data, create_user_and_channel):
     _, auth_user_id_2, channel_id, token_1, _ = create_user_and_channel
 
     ## create a channel with that user
-    channel_data = requests.post(config.url + 'channels/create/v2', params={
+    channel_data = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': token_1,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
@@ -75,7 +75,7 @@ def test_auth_id_exists(clear_data, create_user_and_channel):
     channel_id = json.loads(channel_data.text)['channel_id']
 
     ## User that doesn't exist tries to invite user to channel
-    channel_invite_data = requests.post(config.url + 'channel/invite/v2', params={
+    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
                                                             'token': str(128),
                                                             'channel_id': channel_id,
                                                             'u_id': auth_user_id_2
@@ -86,7 +86,7 @@ def test_auth_id_exists(clear_data, create_user_and_channel):
 def test_invite_channel_simple_case(clear_data, create_user_and_channel):
     auth_user_id_1, auth_user_id_2, channel_id, token_1, _ = create_user_and_channel
 
-    requests.post(config.url + 'channel/invite/v2', params={
+    requests.post(config.url + 'channel/invite/v2', json={
                                                             'token': token_1,
                                                             'channel_id': channel_id,
                                                             'u_id': auth_user_id_2
@@ -106,36 +106,36 @@ def test_invalid_channel_id(clear_data, create_user_and_channel):
     _, auth_user_id_2, _, token_1, _ = create_user_and_channel
     invalid_channel_id = 222
 
-    channel_detail_data = requests.post(config.url + 'channel/invite/v2', params={
+    channel_detail_data = requests.post(config.url + 'channel/invite/v2', json={
                                                                                     'token': token_1,
                                                                                     'channel_id': invalid_channel_id,
                                                                                     'u_id': auth_user_id_2
                                                                                     })
-    
+
     assert channel_detail_data.status_code == 400
 
 def test_invalid_user_id_invited(clear_data, create_user_and_channel):
     _, _, channel_id, token_1, _ = create_user_and_channel
     invalid_new_user_id = 222
 
-    channel_invite_data = requests.post(config.url + 'channel/invite/v2', params={
+    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
                                                                                     'token': token_1,
                                                                                     'channel_id': channel_id,
                                                                                     'u_id': invalid_new_user_id
                                                                                     })
-    
+
     assert channel_invite_data.status_code == 400
 
 def test_invited_user_existing_channel_member(clear_data, create_user_and_channel):
     _, auth_user_id_2, channel_id, _, token_2 = create_user_and_channel
 
     # add user to channel
-    requests.post(config.url + 'channel/join/v2', params={
+    requests.post(config.url + 'channel/join/v2', json={
                                                         'token': token_2,
                                                         'channel_id': channel_id
                                                         })
-    
-    channel_invite_data = requests.post(config.url + 'channel/invite/v2', params={
+
+    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
                                                                                     'token': token_2,
                                                                                     'channel_id': channel_id,
                                                                                     'u_id': auth_user_id_2
@@ -147,7 +147,7 @@ def test_auth_user_not_channel_member(clear_data, create_user_and_channel):
     _, _, channel_id, _, _ = create_user_and_channel
 
     ## register user, log them in and get their user_id
-    register_data_3 = requests.post(config.url + 'auth/register/v2', params={ 
+    register_data_3 = requests.post(config.url + 'auth/register/v2', json={ 
                                                                             'email': 'HELLO@mycompany.com', 
                                                                             'password': 'mypassword',
                                                                             'name_first': 'Firstname',
@@ -157,12 +157,12 @@ def test_auth_user_not_channel_member(clear_data, create_user_and_channel):
     auth_user_id_3 = json.loads(register_data_3.text)['auth_user_id']
 
     ## logs in user
-    requests.post(config.url + 'auth/login/v2', params={ 
+    requests.post(config.url + 'auth/login/v2', json={
                                                         'email': 'HELLO@mycompany.com',
                                                         'password': 'mypassword'
                                                         })
 
-    channel_invite_data = requests.post(config.url + 'channel/invite/v2', params={
+    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
                                                                                     'token': token_3,
                                                                                     'channel_id': channel_id,
                                                                                     'u_id': auth_user_id_3
@@ -176,15 +176,15 @@ def test_access_and_input_error(clear_data, create_user_and_channel):
     auth_user_id, _, channel_id, _, token_2 = create_user_and_channel
 
     ## user inviting is not a member of the channel, and inviting an invalid user
-    channel_invite_data = requests.post(config.url + 'channel/invite/v2', params={
+    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
                                                                                     'token': token_2,
                                                                                     'channel_id': channel_id,
                                                                                     'u_id': 212
                                                                                     })
     assert channel_invite_data.status_code == 403
-    
+
     ## user inviting is not a member of the channel, and inviting an existing channel member
-    channel_invite_data = requests.post(config.url + 'channel/invite/v2', params={
+    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
                                                                                     'token': token_2,
                                                                                     'channel_id': channel_id,
                                                                                     'u_id': auth_user_id
