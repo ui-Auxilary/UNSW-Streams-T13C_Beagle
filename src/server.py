@@ -6,13 +6,14 @@ from flask_cors import CORS
 from src.error import InputError
 from src import config
 
+from src.error import InputError
 from src.users import users_all
 from src.user import user_profile, user_profile_sethandle, user_profile_setname, user_profile_setemail
 from src.auth import auth_register_v1, auth_login_v1
+from src.message import message_send_v1, message_edit_v1, message_remove_v1
 from src.other import clear_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
-from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_addowner, channel_removeowner
-from src.error import InputError
+from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_addowner_v1, channel_removeowner_v1, channel_messages_v1, channel_leave_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_messages_v1, dm_remove_v1, message_senddm_v1
 from src.other import clear_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
@@ -115,6 +116,22 @@ def invite_user_to_channel():
     u_id = int(request.args.get('u_id'))
     return dumps(channel_invite_v1(user_token, channel_id, u_id))
 
+@APP.route("/channel/messages/v2", methods=['GET'])
+def get_channel_message():
+    ## get user's token
+    user_token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+    start = int(request.args.get('start'))
+    return dumps(channel_messages_v1(user_token, channel_id, start))
+
+@APP.route("/channel/leave/v1", methods=['POST'])
+def channel_leave():
+    ## get user's token
+    user_token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+
+    return dumps(channel_leave_v1(user_token, channel_id))
+
 @APP.route("/channel/addowner/v1", methods=['POST'])
 def add_owner_to_channel():
     ## get user's token
@@ -126,7 +143,7 @@ def add_owner_to_channel():
         u_id = int(request.args.get('u_id'))
     except:
         InputError(description='Invalid arguments')
-    return dumps(channel_addowner(user_token, channel_id, u_id))
+    return dumps(channel_addowner_v1(user_token, channel_id, u_id))
 
 @APP.route("/channel/removeowner/v1", methods=['POST'])
 def remove_owner_from_channel():
@@ -139,7 +156,7 @@ def remove_owner_from_channel():
         u_id = int(request.args.get('u_id'))
     except:
         InputError(description='Invalid arguments')
-    return dumps(channel_removeowner(user_token, channel_id, u_id))
+    return dumps(channel_removeowner_v1(user_token, channel_id, u_id))
 
 @APP.route("/dm/create/v1", methods=['POST'])
 def dm_create():
@@ -154,7 +171,7 @@ def dm_create():
 
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages():
-    ## get user's token and list of users to invite to DM
+    ## get user's token and dm_id of the DM
     user_token = request.args.get('token')
     dm_id = int(request.args.get('dm_id'))
 
@@ -164,14 +181,14 @@ def dm_messages():
 
 @APP.route("/dm/list/v1", methods=['GET'])
 def dm_list():
-    ## get user's token and list of users to invite to DM
+    ## get user's token 
     user_token = request.args.get('token')
 
     return dumps(dm_list_v1(user_token))
 
 @APP.route("/dm/remove/v1", methods=['DELETE'])
 def dm_remove():
-    ## get user's token and list of users to invite to DM
+    ## get token of user to be removed from DM
     user_token = request.args.get('token')
     dm_id = int(request.args.get('dm_id'))
 
@@ -179,7 +196,7 @@ def dm_remove():
 
 @APP.route("/dm/details/v1", methods=['GET'])
 def dm_details():
-    ## get user's token and list of users to invite to DM
+    ## get user's token and dm_id of the dm
     user_token = request.args.get('token')
     dm_id = int(request.args.get('dm_id'))
 
@@ -187,15 +204,42 @@ def dm_details():
 
 @APP.route("/dm/leave/v1", methods=['POST'])
 def dm_leave():
-    ## get user's token and list of users to invite to DM
+    ## get token of user leaving the DM
     user_token = request.args.get('token')
     dm_id = int(request.args.get('dm_id'))
 
     return dumps(dm_leave_v1(user_token, dm_id))
 
+@APP.route("/message/send/v1", methods=['POST'])
+def message_send():
+    ## get user's token and channel that the message will be sent to
+    user_token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+
+    message = request.args.get('message')
+
+    return dumps(message_send_v1(user_token, channel_id, message))
+
+@APP.route("/message/edit/v1", methods=['PUT'])
+def message_edit():
+    ## get user's token and channel that the message will edited in
+    user_token = request.args.get('token')
+    message_id = int(request.args.get('message_id'))
+    message = request.args.get('message')
+
+    return dumps(message_edit_v1(user_token, message_id, message))
+
+@APP.route("/message/remove/v1", methods=['DELETE'])
+def message_remove():
+    ## get user's token and channel that the message will edited in
+    user_token = request.args.get('token')
+    message_id = int(request.args.get('message_id'))
+
+    return dumps(message_remove_v1(user_token, message_id))
+
 @APP.route("/message/senddm/v1", methods=['POST'])
 def message_send_dm():
-    ## get user's token and list of users to invite to DM
+    ## get user's token and DM that the message will be sent to
     user_token = request.args.get('token')
     dm_id = int(request.args.get('dm_id'))
 
@@ -259,7 +303,6 @@ def update_user_handle():
 def clear_data_store():
     clear_v1()
     return dumps({})
-
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
