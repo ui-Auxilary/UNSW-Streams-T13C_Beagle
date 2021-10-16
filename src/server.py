@@ -257,7 +257,7 @@ def message_send_dm():
     user_token = data['token']
     dm_id = int(data['dm_id'])
 
-    message = request.args.get('message')
+    message = data['message']
 
     return dumps(message_senddm_v1(user_token, dm_id, message))
 
