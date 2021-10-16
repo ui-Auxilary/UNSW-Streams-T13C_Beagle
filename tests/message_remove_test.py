@@ -24,7 +24,7 @@ def clear_data():
 @pytest.fixture
 def create_channel_data():
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
                                                                            'name_last': 'Lastname'
@@ -34,7 +34,7 @@ def create_channel_data():
     token = json.loads(register_data.text)['token']
 
     # create a channel with that user
-    create_channel_data = requests.post(config.url + 'channels/create/v2', params={'token': token,
+    create_channel_data = requests.post(config.url + 'channels/create/v2', json={'token': token,
                                                                          'name':  'channel_1',
                                                                          'is_public': True
                                                                          })
@@ -45,14 +45,14 @@ def create_channel_data():
     message = "Hello, I don't know what I am doing. Send help. xoxo."
 
     # creates a message_id
-    message_send_data = requests.post(config.url + 'message/send/v1', params={'token': token,
+    message_send_data = requests.post(config.url + 'message/send/v1', json={'token': token,
                                                                        'channel_id': channel_id,
                                                                        'message': message
                                                                        })
     message_id = json.loads(message_send_data.text)['message_id']
 
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'HELLO@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'HELLO@mycompany.com',
                                                                            'password': 'MYpassword',
                                                                            'name_first': 'FirstNAME',
                                                                            'name_last': 'LastNAME'
@@ -66,7 +66,7 @@ def create_channel_data():
 @pytest.fixture
 def create_dm_data():
     # register user, get their user_id and token
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
                                                                            'name_last': 'Lastname'
@@ -76,7 +76,7 @@ def create_dm_data():
     token = json.loads(register_data.text)['token']
 
     # register another user, get their user_id and token
-    register_data_2 = requests.post(config.url + 'auth/register/v2', params={'email': 'bobby@mycompany.com',
+    register_data_2 = requests.post(config.url + 'auth/register/v2', json={'email': 'bobby@mycompany.com',
                                                                            'password': 'samepassword',
                                                                            'name_first': 'Bobby',
                                                                            'name_last': 'Dillo'
@@ -87,7 +87,7 @@ def create_dm_data():
     user_id_2 = json.loads(register_data_2.text)['auth_user_id']
 
     # create a dm with that user
-    create_dm_data = requests.post(config.url + 'dm/create/v1', params={'token': token,
+    create_dm_data = requests.post(config.url + 'dm/create/v1', json={'token': token,
                                                                         'u_ids':  [user_id_2],
                                                                        })
 
@@ -97,7 +97,7 @@ def create_dm_data():
     message = "Hello, I don't know what I am doing. Send help. xoxo."
 
     # creates a message_id
-    message_send_data = requests.post(config.url + 'message/senddm/v1', params={'token': token,
+    message_send_data = requests.post(config.url + 'message/senddm/v1', json={'token': token,
                                                                        'dm_id': dm_id,
                                                                        'message': message
                                                                        })
@@ -108,7 +108,7 @@ def create_dm_data():
 def test_simple_case(clear_data, create_channel_data):
     token, channel_id, message_id, _ = create_channel_data
     # message is sent to a non-existent channel
-    resp = requests.delete(config.url + 'message/remove/v1', params={'token': token,
+    resp = requests.delete(config.url + 'message/remove/v1', json={'token': token,
                                                                      'message_id': message_id,
                                                                      })
 
@@ -129,13 +129,13 @@ def test_simple_case(clear_data, create_channel_data):
 def test_remove_dm_message(clear_data, create_dm_data):
     token, dm_id, _, _ = create_dm_data
     # creates a message_id
-    message_send_data = requests.post(config.url + 'message/senddm/v1', params={'token': token,
+    message_send_data = requests.post(config.url + 'message/senddm/v1', json={'token': token,
                                                                               'dm_id': dm_id,
                                                                               'message': 'Hi everybody'
                                                                              })
     message_id = json.loads(message_send_data.text)['message_id']
 
-    resp = requests.delete(config.url + 'message/remove/v1', params={'token': token,
+    resp = requests.delete(config.url + 'message/remove/v1', json={'token': token,
                                                                      'message_id': message_id,
                                                                      })
 
@@ -157,7 +157,7 @@ def test_remove_channel_message(clear_data, create_channel_data):
     token, channel_id, _, _ = create_channel_data
 
     # create another channel with that user
-    create_channel_data = requests.post(config.url + 'channels/create/v2', params={'token': token,
+    create_channel_data = requests.post(config.url + 'channels/create/v2', json={'token': token,
                                                                          'name':  'channel_1',
                                                                          'is_public': True
                                                                          })
@@ -165,13 +165,13 @@ def test_remove_channel_message(clear_data, create_channel_data):
     channel_id_2 = json.loads(create_channel_data.text)['channel_id']
 
     # send_messages to different channels
-    message_send_data = requests.post(config.url + 'message/send/v1', params={'token': token,
+    message_send_data = requests.post(config.url + 'message/send/v1', json={'token': token,
                                                                               'channel_id': channel_id_2,
                                                                               'message': 'Hi everybody'
                                                                              })
     message_id = json.loads(message_send_data.text)['message_id']
 
-    message_send_data_2= requests.post(config.url + 'message/send/v1', params={'token': token,
+    message_send_data_2= requests.post(config.url + 'message/send/v1', json={'token': token,
                                                                               'channel_id': channel_id,
                                                                               'message': 'Hi everybody'
                                                                              })
@@ -186,7 +186,7 @@ def test_remove_channel_message(clear_data, create_channel_data):
     
     channel_messages = json.loads(channel_message_data.text)['messages']
 
-    resp = requests.delete(config.url + 'message/remove/v1', params={'token': token,
+    resp = requests.delete(config.url + 'message/remove/v1', json={'token': token,
                                                                      'message_id': message_id_2,
                                                                      })
 
@@ -217,25 +217,25 @@ def test_remove_multiple_channel_messages(clear_data, create_channel_data):
     token, channel_id, message_id, _ = create_channel_data
 
      # send_messages to different channels
-    message_send_data = requests.post(config.url + 'message/send/v1', params={'token': token,
+    message_send_data = requests.post(config.url + 'message/send/v1', json={'token': token,
                                                                               'channel_id': channel_id,
                                                                               'message': 'Hi everybody2'
                                                                              })
     message_id_1 = json.loads(message_send_data.text)['message_id']
 
-    message_send_data_2= requests.post(config.url + 'message/send/v1', params={'token': token,
+    message_send_data_2= requests.post(config.url + 'message/send/v1', json={'token': token,
                                                                               'channel_id': channel_id,
                                                                               'message': 'Hi everybody'
                                                                              })
     message_id_2 = json.loads(message_send_data_2.text)['message_id']
 
-    resp = requests.delete(config.url + 'message/remove/v1', params={'token': token,
+    resp = requests.delete(config.url + 'message/remove/v1', json={'token': token,
                                                                      'message_id': message_id_1,
                                                                      })
 
     assert resp.status_code == 200
 
-    resp = requests.delete(config.url + 'message/remove/v1', params={'token': token,
+    resp = requests.delete(config.url + 'message/remove/v1', json={'token': token,
                                                                      'message_id': message_id_2,
                                                                      })
 
@@ -259,7 +259,7 @@ def test_invalid_message_id(clear_data, create_channel_data):
     token, _, _, _ = create_channel_data
     invalid_message_id = 7667
 
-    resp = requests.delete(config.url + 'message/remove/v1', params={'token': token,
+    resp = requests.delete(config.url + 'message/remove/v1', json={'token': token,
                                                                      'message_id': invalid_message_id,
                                                                      })
 
@@ -269,7 +269,7 @@ def test_invalid_message_id(clear_data, create_channel_data):
 def test_auth_user_not_member(clear_data, create_channel_data):
     _, _, message_id, token2 = create_channel_data
 
-    resp = requests.delete(config.url + 'message/remove/v1', params={'token': token2,
+    resp = requests.delete(config.url + 'message/remove/v1', json={'token': token2,
                                                                      'message_id': message_id,
                                                                      })
 
@@ -279,11 +279,11 @@ def test_auth_user_not_member(clear_data, create_channel_data):
 def test_auth_user_not_channel_owner(clear_data, create_channel_data):
     _, channel_id, message_id, token2 = create_channel_data
 
-    requests.post(config.url + 'channel/join/v2', params={'token': token2,
+    requests.post(config.url + 'channel/join/v2', json={'token': token2,
                                                           'channel_id': channel_id,
                                                           })
 
-    resp = requests.delete(config.url + 'message/remove/v1', params={'token': token2,
+    resp = requests.delete(config.url + 'message/remove/v1', json={'token': token2,
                                                                      'message_id': message_id,
                                                                      })
 
@@ -293,7 +293,7 @@ def test_both_invalid_user_and_message_id(clear_data, create_channel_data):
     _, _, _, _ = create_channel_data
     invalid_message_id = 7667
 
-    resp = requests.delete(config.url + 'message/remove/v1', params={'token': 'invalid_token',
+    resp = requests.delete(config.url + 'message/remove/v1', json={'token': 'invalid_token',
                                                                      'message_id': invalid_message_id,
                                                                      })
 

@@ -26,7 +26,7 @@ def clear_data():
 @pytest.fixture
 def create_data():
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={
+    register_data = requests.post(config.url + 'auth/register/v2', json={
                                                                            'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
@@ -38,7 +38,7 @@ def create_data():
     auth_user_id = json.loads(register_data.text)['auth_user_id']
 
     # create a channel with that user
-    channel_create_data = requests.post(config.url + 'channels/create/v2', params={
+    channel_create_data = requests.post(config.url + 'channels/create/v2', json={
                                                                                    'token': token,
                                                                                    'name': 'channel_1',
                                                                                    'is_public': True
@@ -47,7 +47,7 @@ def create_data():
     channel_id = json.loads(channel_create_data.text)['channel_id']
 
     # register another user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={
+    register_data = requests.post(config.url + 'auth/register/v2', json={
                                                                            'email': 'HELLO@mycompany.com',
                                                                            'password': 'MYpassword',
                                                                            'name_first': 'FirstNAME',
@@ -58,7 +58,7 @@ def create_data():
     token2 = json.loads(register_data.text)['token']
 
     # add user_2 to the channel
-    requests.post(config.url + 'channel/join/v2', params={
+    requests.post(config.url + 'channel/join/v2', json={
                                                           'token': token2,
                                                           'channel_id': channel_id
                                                          })
@@ -66,7 +66,7 @@ def create_data():
     old_message = "Hello, I don't know what I am doing. Send help. xoxo."
 
     # user_2 sends a message
-    message_send_data = requests.post(config.url + 'message/send/v1', params={
+    message_send_data = requests.post(config.url + 'message/send/v1', json={
                                                                               'token': token2,
                                                                               'channel_id': channel_id,
                                                                               'message': old_message
@@ -76,7 +76,7 @@ def create_data():
 
     ## send random messages
     for message in range(0, 5):
-        message_send_data = requests.post(config.url + 'message/send/v1', params={
+        message_send_data = requests.post(config.url + 'message/send/v1', json={
                                                                                   'token': token,
                                                                                   'channel_id': channel_id,
                                                                                   'message': f"This is message:{message}"
@@ -87,7 +87,7 @@ def create_data():
 @pytest.fixture
 def create_dm_data():
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={
+    register_data = requests.post(config.url + 'auth/register/v2', json={
                                                                            'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
@@ -99,7 +99,7 @@ def create_dm_data():
     auth_user_id = json.loads(register_data.text)['auth_user_id']
 
     # register another user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={
+    register_data = requests.post(config.url + 'auth/register/v2', json={
                                                                            'email': 'HELLO@mycompany.com',
                                                                            'password': 'MYpassword',
                                                                            'name_first': 'FirstNAME',
@@ -111,7 +111,7 @@ def create_dm_data():
     user_2_id = json.loads(register_data.text)['auth_user_id']
 
     # create a dm with that user
-    dm_create_data = requests.post(config.url + 'dm/create/v1', params={
+    dm_create_data = requests.post(config.url + 'dm/create/v1', json={
                                                                         'token': token,
                                                                         'u_ids': [user_2_id]
                                                                        })
@@ -122,7 +122,7 @@ def create_dm_data():
     old_message = "Hello, I don't know what I am doing. Send help. xoxo."
 
     # user_2 sends a message
-    message_send_data = requests.post(config.url + 'message/senddm/v1', params={
+    message_send_data = requests.post(config.url + 'message/senddm/v1', json={
                                                                               'token': token2,
                                                                               'dm_id': dm_id,
                                                                               'message': old_message
@@ -132,7 +132,7 @@ def create_dm_data():
 
     ## send random messages
     for message in range(0, 5):
-        message_send_data = requests.post(config.url + 'message/senddm/v1', params={
+        message_send_data = requests.post(config.url + 'message/senddm/v1', json={
                                                                                   'token': token,
                                                                                   'dm_id': dm_id,
                                                                                   'message': f"This is message:{message}"
@@ -160,7 +160,7 @@ def test_simple_case(clear_data, create_data):
     assert any(('message', new_message) in msg.items() for msg in channel_messages) == False
 
     ## user_2 edits their own message
-    requests.put(config.url + 'message/edit/v1', params={
+    requests.put(config.url + 'message/edit/v1', json={
                                                          'token': token2,
                                                          'message_id': message_id,
                                                          'message': new_message
@@ -198,7 +198,7 @@ def test_edit_dm_message(clear_data, create_dm_data):
     assert any(('message', new_message) in msg.items() for msg in dm_messages) == False
 
     ## user_2 edits their own message
-    requests.put(config.url + 'message/edit/v1', params={
+    requests.put(config.url + 'message/edit/v1', json={
                                                          'token': token2,
                                                          'message_id': message_id,
                                                          'message': new_message
@@ -233,7 +233,7 @@ def test_empty_case(clear_data, create_data):
     assert any(('message_id', message_id) in msg.items() for msg in channel_messages) == True
 
     ## editing the target message_id to an empty string
-    requests.put(config.url + 'message/edit/v1', params={
+    requests.put(config.url + 'message/edit/v1', json={
                                                          'token': token2,
                                                          'message_id': message_id,
                                                          'message': new_message
@@ -265,7 +265,7 @@ def test_edited_message_length_over_thousand_chars(clear_data, create_data):
                 mollis sed. Sed a dapibus neque, Etiam blandit egestas erat eget rutrum. Nunc scelerisque nulla est, vehicula lacinia leo dapibus quis. Duis eleifend diam ipsum, vitae \
                 pretium lorem euismod sed. Duis vel'
 
-    message_edit_data = requests.put(config.url + 'message/edit/v1', params={
+    message_edit_data = requests.put(config.url + 'message/edit/v1', json={
                                                                              'token': token,
                                                                              'message_id': message_id,
                                                                              'message': new_message
@@ -276,7 +276,7 @@ def test_invalid_message_id(clear_data, create_data):
     token, _, _, new_message, _ = create_data
     invalid_message_id = 3248
 
-    resp = requests.put(config.url + 'message/edit/v1', params={
+    resp = requests.put(config.url + 'message/edit/v1', json={
                                                                 'token': token,
                                                                 'message_id': invalid_message_id,
                                                                 'message': new_message
@@ -287,7 +287,7 @@ def test_invalid_message_id(clear_data, create_data):
 def test_auth_user_not_member(clear_data, create_data):
     _, message_id, _, _,_ = create_data
 
-    resp = requests.put(config.url + 'message/edit/v1', params={
+    resp = requests.put(config.url + 'message/edit/v1', json={
                                                                 'token': 'invalid_token',
                                                                 'message_id': message_id,
                                                                 'message': 'oogabooga'
@@ -314,7 +314,7 @@ def test_owner_edits_user_message(clear_data, create_data):
     assert any(('message', new_message) in msg.items() for msg in channel_messages) == False
 
     ## Owner edits user_2's message
-    owner_edit = requests.put(config.url + 'message/edit/v1', params={
+    owner_edit = requests.put(config.url + 'message/edit/v1', json={
                                                                       'token': token,
                                                                       'message_id': message_id,
                                                                       'message': new_message
@@ -338,7 +338,7 @@ def test_user_editing_not_channel_owner_or_author(clear_data, create_data):
     _, message_id, channel_id, new_message, _ = create_data
 
     # register new user, make them join channel
-    register_data = requests.post(config.url + 'auth/register/v2', params={
+    register_data = requests.post(config.url + 'auth/register/v2', json={
                                                                            'email': 'boys@mycompany.com',
                                                                            'password': 'daboizindahood',
                                                                            'name_first': 'Firstname',
@@ -348,12 +348,12 @@ def test_user_editing_not_channel_owner_or_author(clear_data, create_data):
     # stores a token
     token3 = json.loads(register_data.text)['token']
 
-    requests.post(config.url + 'channel/join/v2', params={
+    requests.post(config.url + 'channel/join/v2', json={
                                                           'token': token3,
                                                           'channel_id': channel_id,
                                                          })
 
-    resp = requests.put(config.url + 'message/edit/v1', params={'token': token3,
+    resp = requests.put(config.url + 'message/edit/v1', json={'token': token3,
                                                                 'message_id': message_id,
                                                                 'message': new_message
                                                                 })
@@ -362,7 +362,7 @@ def test_user_editing_not_channel_owner_or_author(clear_data, create_data):
 def test_both_invalid_user_and_message_id(clear_data):
     invalid_message_id = 3248
 
-    resp = requests.put(config.url + 'message/edit/v1', params={'token': 'invalid_token',
+    resp = requests.put(config.url + 'message/edit/v1', json={'token': 'invalid_token',
                                                                 'message_id': invalid_message_id,
                                                                 'message': 'oogabooga'
                                                                 })
