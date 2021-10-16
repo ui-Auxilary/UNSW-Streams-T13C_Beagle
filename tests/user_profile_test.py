@@ -21,7 +21,7 @@ def clear_data():
 @pytest.fixture
 def create_data(clear_data):
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
                                                                            'name_last': 'Lastname'
