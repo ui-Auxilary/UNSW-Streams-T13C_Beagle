@@ -6,9 +6,9 @@ from src import config
 
 '''
 For a valid user, returns information about their user_id, email, first name, last name, and handle
-    
+
 InputError when:
-      
+
     - u_id does not refer to a valid user
 '''
 

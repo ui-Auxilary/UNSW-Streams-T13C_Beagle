@@ -23,7 +23,7 @@ def clear_data():
 @pytest.fixture
 def create_data(clear_data):
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
                                                                            'name_last': 'Lastname'
@@ -34,7 +34,7 @@ def create_data(clear_data):
     user_id_0 = json.loads(register_data.text)['auth_user_id'] 
 
     # register user, log them in and get their user_id
-    register_user_1 = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@hello.com',
+    register_user_1 = requests.post(config.url + 'auth/register/v2', json={'email': 'hello@hello.com',
                                                            'password': 'iuhuouiojk',
                                                            'name_first': 'samantha',
                                                            'name_last': 'tse'
@@ -42,7 +42,7 @@ def create_data(clear_data):
     
     user_id_1 = json.loads(register_user_1.text)['auth_user_id']    
 
-    register_user_2 = requests.post(config.url + 'auth/register/v2', params={'email': 'hdsfdfslo@mycompany.com',
+    register_user_2 = requests.post(config.url + 'auth/register/v2', json={'email': 'hdsfdfslo@mycompany.com',
                                                            'password': 'mypeqwewassword',
                                                            'name_first': 'lemon',
                                                            'name_last': 'pie'
@@ -50,7 +50,7 @@ def create_data(clear_data):
 
     user_id_2 = json.loads(register_user_2.text)['auth_user_id'] 
 
-    register_user_3 = requests.post(config.url + 'auth/register/v2', params={'email': 'hdsfdfslo@gmail.com',
+    register_user_3 = requests.post(config.url + 'auth/register/v2', json={'email': 'hdsfdfslo@gmail.com',
                                                            'password': 'mycvvcvcpassword',
                                                            'name_first': 'lebron',
                                                            'name_last': 'james'
@@ -84,7 +84,7 @@ def test_simple_case(clear_data, create_data):
 
 def test_one_user(clear_data):
     # register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={'email': 'hello@mycompany.com',
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'hello@mycompany.com',
                                                                            'password': 'mypassword',
                                                                            'name_first': 'Firstname',
                                                                            'name_last': 'Lastname'
