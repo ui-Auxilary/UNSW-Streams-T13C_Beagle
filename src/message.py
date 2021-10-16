@@ -8,7 +8,14 @@ from src.data_operations import (
     get_channel_ids,
     get_channel,
     add_message,
+    get_dm,
     get_message_ids,
+    get_messages_by_channel,
+    get_all_valid_tokens,
+    get_message_by_id,
+    edit_message,
+    get_messages_by_dm,
+    remove_message
 )
 
 def message_send_v1(token, channel_id, message):
@@ -52,3 +59,81 @@ def message_send_v1(token, channel_id, message):
     return {
         'message_id': int(message_id)
     }
+
+def message_edit_v1(token, message_id, message): 
+    auth_user_id = decode_token(token)
+
+    ## checks auth_user_id exists
+    check_user_exists(auth_user_id)
+    
+    ## check message_id is valid
+    if message_id not in get_message_ids():
+        raise InputError(description="Invalid message id")
+
+    ## find the channel where the message is located
+    channel_id = get_message_by_id(message_id)['channel_created']
+    is_channel = get_message_by_id(message_id)['is_channel']
+
+    if is_channel:
+        channel_owner = get_channel(channel_id)['owner']
+
+            ## check message_id exists in the target channel
+        if message_id not in get_messages_by_channel(channel_id):
+            raise InputError(description="Message does not exist in channel")
+    else:
+        channel_owner = get_dm(channel_id)['owner']
+
+        ## check message_id exists in the target channel
+        if message_id not in get_messages_by_dm(channel_id):
+            raise InputError(description="Message does not exist in dm")
+
+    message_length = len(message)    
+    
+    ## assert the length of the message 
+    if message_length > 1000:
+        raise InputError(description="Message over 1000 characters")
+    
+    message_author = get_message_by_id(message_id)['author']
+
+    if message_author != auth_user_id and auth_user_id not in channel_owner:
+        raise AccessError(description="User does not have permissions to edit selected message")
+
+    edit_message(is_channel, channel_id, message_id, message)
+
+    return {}
+
+def message_remove_v1(token, message_id): 
+    auth_user_id = decode_token(token)
+
+    ## checks auth_user_id exists
+    check_user_exists(auth_user_id)
+    
+    ## check message_id is valid
+    if message_id not in get_message_ids():
+        raise InputError(description="Invalid message id")
+
+    message_author = get_message_by_id(message_id)['author']
+    is_channel = get_message_by_id(message_id)['is_channel']
+
+    ## find the channel where the message is located
+    channel_id = get_message_by_id(message_id)['channel_created']
+    
+    if is_channel:
+        channel_owner = get_channel(channel_id)['owner']
+
+            ## check message_id exists in the target channel
+        if message_id not in get_messages_by_channel(channel_id):
+            raise InputError(description="Message does not exist in channel")
+    else:
+        channel_owner = get_dm(channel_id)['owner']
+
+        ## check message_id exists in the target channel
+        if message_id not in get_messages_by_dm(channel_id):
+            raise InputError(description="Message does not exist in dm")
+
+    if message_author != auth_user_id and auth_user_id not in channel_owner:
+        raise AccessError(description="User does not have permissions to remove message")
+
+    remove_message(is_channel, channel_id, message_id)
+
+    return {}
