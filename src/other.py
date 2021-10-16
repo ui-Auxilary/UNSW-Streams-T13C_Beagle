@@ -12,13 +12,13 @@ import jwt
 from src.data_operations import ( 
     get_user_ids,
     reset_data_store_to_default,
+    get_user_from_token,
     get_all_valid_tokens,
     add_session_token
 )
-
 from src.error import AccessError
-from datetime import timezone, datetime
-
+from datetime import datetime
+from random import randint
 
 def clear_v1():
     '''
@@ -51,14 +51,13 @@ def check_user_exists(auth_user_id):
 def encode_token(user_id):
     SECRET = "DHRUV_IS_SALTY"
 
-    ## time created
-    dt = datetime(2015, 10, 19)
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
-
-    encoded_token = jwt.encode({'user_id': user_id, 'session_created': time_created}, SECRET, algorithm='HS256')
+    now = datetime.now()
+    time_created = now.strftime("%H%M%S")
+    number = int(str(time_created) + str(randint(0, 723978)))
+    encoded_token = jwt.encode({'user_id': user_id, 'session_start': number}, SECRET, algorithm='HS256')
 
     ## Adds active token to database
-    add_session_token(encoded_token, int(user_id))
+    add_session_token(encoded_token, user_id)
     
     return encoded_token
     
