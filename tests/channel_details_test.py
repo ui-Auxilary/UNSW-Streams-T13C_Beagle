@@ -31,7 +31,7 @@ def create_user_and_channel():
     auth_user_id = json.loads(register_data.text)['auth_user_id']
 
     ## logs in user
-    requests.post(config.url + 'auth/login/v2', json={ 
+    requests.post(config.url + 'auth/login/v2', json={
                                                         'email': 'hello@mycompany.com',
                                                         'password': 'mypassword'
                                                         })
@@ -110,7 +110,7 @@ def test_user_joins_channel(clear_data, create_user_and_channel):
                                                                         'u_id': auth_user_id 
                                                                        })
 
-    user_2_profile_data = requests.get(config.url + 'user/profile/v1', json={
+    user_2_profile_data = requests.get(config.url + 'user/profile/v1', params={
                                                                         'token': user_token_2,
                                                                         'u_id': auth_user_id 
                                                                        })
