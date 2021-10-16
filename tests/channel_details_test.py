@@ -21,7 +21,7 @@ def clear_data():
 @pytest.fixture
 def create_user_and_channel():
     ## register user, log them in and get their user_id
-    register_data = requests.post(config.url + 'auth/register/v2', params={ 
+    register_data = requests.post(config.url + 'auth/register/v2', json={
                                                                             'email': 'hello@mycompany.com', 
                                                                             'password': 'mypassword',
                                                                             'name_first': 'Firstname',
@@ -31,18 +31,18 @@ def create_user_and_channel():
     auth_user_id = json.loads(register_data.text)['auth_user_id']
 
     ## logs in user
-    requests.post(config.url + 'auth/login/v2', params={ 
+    requests.post(config.url + 'auth/login/v2', json={ 
                                                         'email': 'hello@mycompany.com',
                                                         'password': 'mypassword'
                                                         })
 
     ## create a channel with that user
-    channel_data = requests.post(config.url + 'channels/create/v2', params={
+    channel_data = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': user_token,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                            })
-    
+
     channel_id = json.loads(channel_data.text)['channel_id']
     return auth_user_id, channel_id, user_token
 
@@ -54,7 +54,7 @@ def test_simple_case(clear_data, create_user_and_channel):
                                                                         'token': user_token,
                                                                         'u_id': auth_user_id 
                                                                        })
-    
+
     auth_user_profile = json.loads(user_profile_data.text)['user']
 
     ## get information about the channel
@@ -89,7 +89,7 @@ def test_user_joins_channel(clear_data, create_user_and_channel):
     auth_user_id, channel_id, user_token = create_user_and_channel
 
     ## register another user
-    register_data_2 = requests.post(config.url + 'auth/register/v2', params={ 
+    register_data_2 = requests.post(config.url + 'auth/register/v2', json={ 
                                                                             'email': 'hello2@mycompany.com', 
                                                                             'password': 'mypassword',
                                                                             'name_first': 'Firstname2',
@@ -99,7 +99,7 @@ def test_user_joins_channel(clear_data, create_user_and_channel):
     user_token_2 = json.loads(register_data_2.text)['token']
 
     ## second user joins the existing channel
-    requests.post(config.url + 'channel/join/v2', params={
+    requests.post(config.url + 'channel/join/v2', json={
                                                         'token': user_token_2,
                                                         'channel_id': channel_id
                                                         })
@@ -110,11 +110,11 @@ def test_user_joins_channel(clear_data, create_user_and_channel):
                                                                         'u_id': auth_user_id 
                                                                        })
 
-    user_2_profile_data = requests.get(config.url + 'user/profile/v1', params={
+    user_2_profile_data = requests.get(config.url + 'user/profile/v1', json={
                                                                         'token': user_token_2,
                                                                         'u_id': auth_user_id 
                                                                        })
-    
+
     auth_user_profile = json.loads(user_profile_data.text)['user']
     user_2_profile = json.loads(user_2_profile_data.text)['user']
 
@@ -133,7 +133,7 @@ def test_user_joins_channel(clear_data, create_user_and_channel):
     channel = {
         'channel_id': channel_id,
         'name': channel_name
-    }       
+    }
 
     ## get list of channels
     channel_list_data = requests.get(config.url + 'channels/list/v2', params={
@@ -153,7 +153,6 @@ def test_invalid_token(clear_data, create_user_and_channel):
                                                                                 'token': "25",
                                                                                 'channel_id': channel_id
                                                                                 })
-                                                                                
     assert channel_detail_data.status_code == 403
 
 def test_invalid_channel_id(clear_data, create_user_and_channel):
@@ -168,7 +167,7 @@ def test_user_not_channel_member(clear_data, create_user_and_channel):
     _, channel_id, _ = create_user_and_channel
 
     ## register user and get their user_id
-    register_data_2 = requests.post(config.url + 'auth/register/v2', params={ 
+    register_data_2 = requests.post(config.url + 'auth/register/v2', json={
                                                                             'email': 'hello2@mycompany.com', 
                                                                             'password': 'my2password',
                                                                             'name_first': 'First2name',
@@ -177,7 +176,7 @@ def test_user_not_channel_member(clear_data, create_user_and_channel):
     token_2 = json.loads(register_data_2.text)['token']
 
     ## logs in user
-    requests.post(config.url + 'auth/login/v2', params={ 
+    requests.post(config.url + 'auth/login/v2', json={
                                                         'email': 'hello2@mycompany.com',
                                                         'password': 'my2password'
                                                         })

@@ -12,7 +12,7 @@ VALID_INPUT
 FUNCTIONALITY
     - test public channel is public
     - test private channel is private
-    - test user is in channel and user is owner    
+    - test user is in channel and user is owner
 
 '''
 
@@ -22,7 +22,7 @@ def clear_data():
 
 @pytest.fixture
 def register_login_user():
-    register_data = requests.post(config.url + 'auth/register/v2', params={ 
+    register_data = requests.post(config.url + 'auth/register/v2', json={
                                                                             'email': 'hello@mycompany.com', 
                                                                             'password': 'mypassword',
                                                                             'name_first': 'Firstname',
@@ -33,15 +33,15 @@ def register_login_user():
     user_token = json.loads(register_data.text)['token']
 
     ## logs in user
-    requests.post(config.url + 'auth/login/v2', params={ 
+    requests.post(config.url + 'auth/login/v2', json={
                                                         'email': 'hello@mycompany.com',
                                                         'password': 'mypassword'
                                                         })
-    
+
     return auth_user_id, user_token
 
 def test_user_id_exists(clear_data):
-    channel_data = requests.post(config.url + 'channels/create/v2', params={
+    channel_data = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': str(1),
                                                                             'name': 'channel_1',
                                                                             'is_public': True
@@ -51,38 +51,38 @@ def test_user_id_exists(clear_data):
 def test_valid_channel_length(clear_data, register_login_user):
     _, user_token = register_login_user
 
-    channel_data = requests.post(config.url + 'channels/create/v2', params={
+    channel_data = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': user_token,
                                                                             'name': '',
                                                                             'is_public': True
                                                                             })
 
     assert channel_data.status_code == 400
-    
-    channel_data = requests.post(config.url + 'channels/create/v2', params={
+
+    channel_data = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': user_token,
                                                                             'name': 'aoiwfbiaufgaiufgawiuofboawbfoawibfoiawb',
                                                                             'is_public': True
                                                                             })
-    
+
     assert channel_data.status_code == 400
 
 def test_public_channel_created(clear_data, register_login_user):
     _, user_token = register_login_user
 
     ## create a new channel
-    channel_data = requests.post(config.url + 'channels/create/v2', params={
+    channel_data = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': user_token,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                             })
-    
+
     channel_id = json.loads(channel_data.text)['channel_id']
 
     channel_detail_data = requests.get(config.url + 'channel/details/v2', params={'token': user_token,
                                                                                   'channel_id': channel_id
                                                                                   })
-    
+
     channel_detail_name = json.loads(channel_detail_data.text)['name']
     channel_dict = {
                     'channel_id': channel_id,
@@ -97,12 +97,12 @@ def test_private_channel_created(clear_data, register_login_user):
     _, user_token = register_login_user
 
     ## create a new channel
-    channel_data = requests.post(config.url + 'channels/create/v2', params={
+    channel_data = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': user_token,
                                                                             'name': 'channel_1',
                                                                             'is_public': False
                                                                             })
-    
+
     channel_id = json.loads(channel_data.text)['channel_id']
 
     channel_detail_data = requests.get(config.url + 'channel/details/v2', params={'token': user_token,
@@ -124,7 +124,7 @@ def test_multiple_channel_created(clear_data, register_login_user):
     _, user_token = register_login_user
 
     ## register and log another user in
-    register_data_2 = requests.post(config.url + 'auth/register/v2', params={ 
+    register_data_2 = requests.post(config.url + 'auth/register/v2', json={ 
                                                                             'email': 'he@mycompany.com', 
                                                                             'password': 'mypassword',
                                                                             'name_first': 'Firstname',
@@ -134,24 +134,24 @@ def test_multiple_channel_created(clear_data, register_login_user):
     user_2_token = json.loads(register_data_2.text)['token']
 
     ## logs in user
-    requests.post(config.url + 'auth/login/v2', params={ 
+    requests.post(config.url + 'auth/login/v2', json={ 
                                                         'email': 'he@mycompany.com',
                                                         'password': 'mypassword'
                                                         })
 
     ## create two new channels
-    channel_data = requests.post(config.url + 'channels/create/v2', params={
+    channel_data = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': user_token,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                             })
-    
-    channel_data_2 = requests.post(config.url + 'channels/create/v2', params={
+
+    channel_data_2 = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': user_2_token,
                                                                             'name': 'channel_1',
                                                                             'is_public': False
                                                                             })
-    
+
     channel_id_1 = json.loads(channel_data.text)['channel_id']
     channel_id_2 = json.loads(channel_data_2.text)['channel_id']
 

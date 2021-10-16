@@ -24,7 +24,7 @@ def clear_data():
 
 @pytest.fixture
 def create_users():
-    register_user_1 = requests.post(config.url + 'auth/register/v2', params = { 
+    register_user_1 = requests.post(config.url + 'auth/register/v2', json={ 
                                                                                 'email': 'asd@gmail.com',
                                                                                 'password': 'qwertyuiop',
                                                                                 'name_first': 'lawrence',
@@ -34,7 +34,7 @@ def create_users():
     token_1 = json.loads(register_user_1.text)['token']
     user_id_1 = json.loads(register_user_1.text)['auth_user_id']
 
-    register_user_2 = requests.post(config.url + 'auth/register/v2', params = { 
+    register_user_2 = requests.post(config.url + 'auth/register/v2', json={ 
                                                                                 'email': 'email2@gmail.com',
                                                                                 'password': 'zxcvbnm',
                                                                                 'name_first': 'christian',
@@ -49,14 +49,14 @@ def create_users():
 @pytest.fixture
 def create_channel(create_users):
     token_1, _, _, user_2 = create_users
-    create_channel = requests.post(config.url + 'channels/create/v2', params={
+    create_channel = requests.post(config.url + 'channels/create/v2', json={
                                                                                 'token': token_1,
                                                                                 'name': 'channel',
                                                                                 'is_public': True
                                                                               })
     channel_id = json.loads(create_channel.text)['channel_id']
 
-    requests.post(config.url + 'channel/invite/v2', params={
+    requests.post(config.url + 'channel/invite/v2', json={
                                                               'token': token_1,
                                                               'channel_id': channel_id,
                                                               'u_id': user_2
@@ -68,13 +68,13 @@ def test_simple_case(clear_data, create_users, create_channel):
 
     channel_id = create_channel
 
-    requests.post(config.url + 'channel/addowner/v1', params={
+    requests.post(config.url + 'channel/addowner/v1', json={
                                                                 'token': token_1,
                                                                 'channel_id': channel_id,
                                                                 'u_id': user_2
                                                               })
 
-    remove_owner = requests.post(config.url + 'channel/removeowner/v1', params={
+    remove_owner = requests.post(config.url + 'channel/removeowner/v1', json={
                                                                               	  'token': token_1,
                                                                               	  'channel_id': channel_id,
                                                                               	  'u_id': user_2
@@ -98,13 +98,13 @@ def test_invalid_channel_id(clear_data, create_users, create_channel):
 
     channel_id = create_channel
 
-    requests.post(config.url + 'channel/addowner/v1', params={
+    requests.post(config.url + 'channel/addowner/v1', json={
                                                               	'token': token_1,
                                                               	'channel_id': channel_id,
                                                               	'u_id': user_2
                                                               })
 
-    remove_owner = requests.post(config.url + 'channel/removeowner/v1', params={
+    remove_owner = requests.post(config.url + 'channel/removeowner/v1', json={
                                                                               	  'token': token_1,
                                                                               	  'channel_id': 'not_channel_id',
                                                                               	  'u_id': user_2
@@ -116,13 +116,13 @@ def test_removing_invalid_user(clear_data, create_users, create_channel):
 
     channel_id = create_channel
 
-    requests.post(config.url + 'channel/addowner/v1', params={
+    requests.post(config.url + 'channel/addowner/v1', json={
                                                                 'token': token_1,
                                                               	'channel_id': channel_id,
                                                               	'u_id': user_2
                                                               })
 
-    remove_owner = requests.post(config.url + 'channel/removeowner/v1', params={
+    remove_owner = requests.post(config.url + 'channel/removeowner/v1', json={
                                                                               	  'token': token_1,
                                                                               	  'channel_id': channel_id,
                                                                               	  'u_id': 'not_user_id'
@@ -134,7 +134,7 @@ def test_remove_non_owner(clear_data, create_users, create_channel):
 
     channel_id = create_channel
 
-    remove_owner = requests.post(config.url + 'channel/removeowner/v1', params={
+    remove_owner = requests.post(config.url + 'channel/removeowner/v1', json={
                                                                               	  'token': token_1,
                                                                               	  'channel_id': channel_id,
                                                                               	  'u_id': user_2
@@ -146,7 +146,7 @@ def test_remove_only_owner(clear_data, create_users, create_channel):
 
     channel_id = create_channel
 
-    remove_owner = requests.post(config.url + 'channel/removeowner/v1', params={
+    remove_owner = requests.post(config.url + 'channel/removeowner/v1', json={
                                                                               'token': token_1,
                                                                               'channel_id': channel_id,
                                                                               'u_id': user_1
@@ -158,7 +158,7 @@ def test_insufficient_permissions(clear_data, create_users, create_channel):
 
     channel_id = create_channel
 
-    remove_owner = requests.post(config.url + 'channel/removeowner/v1', params={
+    remove_owner = requests.post(config.url + 'channel/removeowner/v1', json={
                                                                               'token': token_2,
                                                                               'channel_id': channel_id,
                                                                               'u_id': user_1
@@ -170,7 +170,7 @@ def test_invalid_token(clear_data, create_users, create_channel):
 
     channel_id = create_channel
 
-    remove_owner = requests.post(config.url + 'channel/removeowner/v1', params={
+    remove_owner = requests.post(config.url + 'channel/removeowner/v1', json={
                                                                               'token': 'token_1',
                                                                               'channel_id': channel_id,
                                                                               'u_id': user_2
@@ -182,13 +182,13 @@ def test_remove_original_owner(clear_data, create_users, create_channel):
 
     channel_id = create_channel
 
-    requests.post(config.url + 'channel/addowner/v1', params={
+    requests.post(config.url + 'channel/addowner/v1', json={
                                                               'token': token_1,
                                                               'channel_id': channel_id,
                                                               'u_id': user_2
                                                               })
 
-    remove_owner = requests.post(config.url + 'channel/removeowner/v1', params={
+    remove_owner = requests.post(config.url + 'channel/removeowner/v1', json={
                                                                               'token': token_2,
                                                                               'channel_id': channel_id,
                                                                               'u_id': user_1

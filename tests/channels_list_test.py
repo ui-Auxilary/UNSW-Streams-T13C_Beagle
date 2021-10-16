@@ -21,8 +21,8 @@ def clear_data():
 
 @pytest.fixture
 def register_login_user():
-    register_data = requests.post(config.url + 'auth/register/v2', params={ 
-                                                                            'email': 'owner@gmail.com', 
+    register_data = requests.post(config.url + 'auth/register/v2', json={
+                                                                            'email': 'owner@gmail.com',
                                                                             'password': 'admin$only',
                                                                             'name_first': 'Owner',
                                                                             'name_last': 'Chan'
@@ -34,20 +34,20 @@ def register_login_user():
 
 def test_valid_auth_user(clear_data):
     channels_list_data = requests.get(config.url + 'channels/list/v2', params={'token': '129'})
-    
+
     assert channels_list_data.status_code == 403
 
 def test_list_duplicate_channel_name(clear_data, register_login_user):
     token = register_login_user
 
     ## create multiple channels with the same user_id
-    channel_data = requests.post(config.url + 'channels/create/v2', params={
+    channel_data = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': token,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                             })
-    
-    channel_data_2 = requests.post(config.url + 'channels/create/v2', params={
+
+    channel_data_2 = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': token,
                                                                             'name': 'channel_1',
                                                                             'is_public': False
@@ -55,7 +55,7 @@ def test_list_duplicate_channel_name(clear_data, register_login_user):
 
     channel_id_1 = json.loads(channel_data.text)['channel_id']
     channel_id_2 = json.loads(channel_data_2.text)['channel_id']
-    
+
     ## sorts the channels in alphabetical order
     channels_list_data = requests.get(config.url + 'channels/list/v2', params={'token': token
                                                                                 })
@@ -79,21 +79,21 @@ def test_list_private_channel(clear_data, register_login_user):
     token = register_login_user
 
     ## create multiple channels with the same user_id
-    channel_data = requests.post(config.url + 'channels/create/v2', params={
+    channel_data = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': token,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                             })
-    
-    channel_data_2 = requests.post(config.url + 'channels/create/v2', params={
+
+    channel_data_2 = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': token,
                                                                             'name': 'channel_2',
                                                                             'is_public': False
                                                                             })
-    
+
     channel_id_1 = json.loads(channel_data.text)['channel_id']
     channel_id_2 = json.loads(channel_data_2.text)['channel_id']
-    
+
     ## sorts the channels in alphabetical order
     channels_list_data = requests.get(config.url + 'channels/list/v2', params={'token': token
                                                                                 })
@@ -110,13 +110,13 @@ def test_list_private_channel(clear_data, register_login_user):
                 'name': 'channel_2'
             }
         ]
-    }        
+    }
 
 def test_user_member_multiple(clear_data, register_login_user):
     token = register_login_user
 
     ## register another user, and get their id
-    register_data = requests.post(config.url + 'auth/register/v2', params={ 
+    register_data = requests.post(config.url + 'auth/register/v2', json={ 
                                                                             'email': 'user@gmail.com', 
                                                                             'password': 'member$only',
                                                                             'name_first': 'Peasant',
@@ -125,28 +125,28 @@ def test_user_member_multiple(clear_data, register_login_user):
 
     token_2 = json.loads(register_data.text)['token']
 
-    ## create multiple channels with the same user_id   
-    channel_data = requests.post(config.url + 'channels/create/v2', params={
+    ## create multiple channels with the same user_id
+    channel_data = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': token,
                                                                             'name': 'channel_1',
                                                                             'is_public': True
                                                                             })
-    
-    channel_data_2 = requests.post(config.url + 'channels/create/v2', params={
+
+    channel_data_2 = requests.post(config.url + 'channels/create/v2', json={
                                                                             'token': token,
                                                                             'name': 'channel_2',
                                                                             'is_public': True
                                                                             })
-    
+
     channel_id_1 = json.loads(channel_data.text)['channel_id']
     channel_id_2 = json.loads(channel_data_2.text)['channel_id']
 
     ## user_2 joins channel
-    requests.post(config.url + 'channel/join/v2', params={
+    requests.post(config.url + 'channel/join/v2', json={
                                                         'token': token_2,
                                                         'channel_id': channel_id_1
                                                         })
-    requests.post(config.url + 'channel/join/v2', params={
+    requests.post(config.url + 'channel/join/v2', json={
                                                         'token': token_2,
                                                         'channel_id': channel_id_2
                                                         })
@@ -188,20 +188,20 @@ def test_basic_case(clear_data, register_login_user):
     channels_create_v1(user_id, 'Channel_1', True)
     channels_create_v1(user_id, 'Channel_2', True)
     channels_create_v1(user_id, 'Channel_3', True)
-    
+
     ## checks the channels returned by channel list match
     assert channels_list_v1(user_id) == {
         'channels': [
             {
-                'channel_id': 1, 
+                'channel_id': 1,
                 'name':'Channel_1'
-            }, 
+            },
             {
-                'channel_id': 2, 
+                'channel_id': 2,
                 'name':'Channel_2'
-            }, 
+            },
             {
-                'channel_id': 3, 
+                'channel_id': 3,
                 'name':'Channel_3'
             }
         ]
