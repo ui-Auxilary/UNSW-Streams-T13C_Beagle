@@ -16,9 +16,10 @@ from src.data_operations import (
     get_user_ids,
     get_user_handles,
     get_user,
-    add_session_token
+    add_session_token,
+    remove_session_token
 )
-from src.other import encode_token
+from src.other import encode_token, decode_token
 
 def generate_user_handle(name_first, name_last):
     '''
@@ -169,3 +170,18 @@ def auth_register_v1(email, password, name_first, name_last):
         'token'       : user_token,
         'auth_user_id': new_user_id
     }
+
+def auth_logout_v1(token):
+    '''
+    Given an active token, invalidates the token to log the user out.
+    
+    Arguments:
+        token   (str): the token for the session
+    
+    Return Value:
+        {}
+    '''
+    decode_token(token)
+    remove_session_token(token)
+
+    return {}
