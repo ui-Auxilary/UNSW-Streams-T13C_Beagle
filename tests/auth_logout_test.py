@@ -68,13 +68,11 @@ def test_double_logout(clear_data, create_data):
 def test_double_login_one_logout(clear_data, create_data):
     token1, token2 = create_data
 
-    logout1 = requests.post(config.url + 'auth/logout/v1', json={'token': token2 })
+    logout1 = requests.post(config.url + 'auth/logout/v1', json={'token': token1 })
 
     assert logout1.status_code == 200
 
-    channels_list = requests.get(config.url + 'channels/list/v2', params={'token': token1 })
-
-    assert channels_list.status_code == 200
+    channels_list = requests.get(config.url + 'channels/list/v2', params={'token': token2 })
 
     channels_list_data = json.loads(channels_list.text)['channels']
 
