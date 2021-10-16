@@ -335,7 +335,7 @@ def test_owner_edits_user_message(clear_data, create_data):
     assert any(('message', new_message) in msg.items() for msg in channel_messages) == True
 
 def test_user_editing_not_channel_owner_or_author(clear_data, create_data):
-    _, message_id, channel_id, new_message, _ = create_data
+    _, message_id, channel_id, _, _ = create_data
 
     # register new user, make them join channel
     register_data = requests.post(config.url + 'auth/register/v2', json={
@@ -355,7 +355,7 @@ def test_user_editing_not_channel_owner_or_author(clear_data, create_data):
 
     resp = requests.put(config.url + 'message/edit/v1', json={'token': token3,
                                                                 'message_id': message_id,
-                                                                'message': new_message
+                                                                'message': "Oogga booga"
                                                                 })
     assert resp.status_code == 403
 
