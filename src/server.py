@@ -80,7 +80,7 @@ def create_new_channel():
     ## is public
     user_token = data['token']
     channel_name = data['name']
-    is_public = True if data['is_public'] == 'True' else False
+    is_public = data['is_public']
 
     return dumps(channels_create_v1(user_token, channel_name, is_public))
 
