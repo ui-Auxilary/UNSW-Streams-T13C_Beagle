@@ -182,7 +182,7 @@ def auth_logout_v1(token):
         {}
     '''
     auth_user_id = decode_token(token)
-
+    
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
 
