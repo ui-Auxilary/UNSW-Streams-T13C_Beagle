@@ -19,7 +19,7 @@ from src.data_operations import (
     add_session_token,
     remove_session_token
 )
-from src.other import encode_token, decode_token
+from src.other import encode_token, decode_token, check_user_exists
 
 def generate_user_handle(name_first, name_last):
     '''
@@ -181,7 +181,11 @@ def auth_logout_v1(token):
     Return Value:
         {}
     '''
-    decode_token(token)
+    auth_user_id = decode_token(token)
+
+    ## checks auth_user_id exists
+    check_user_exists(auth_user_id)
+
     remove_session_token(token)
 
     return {}
