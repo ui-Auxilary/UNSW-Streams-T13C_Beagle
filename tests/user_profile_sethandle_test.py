@@ -19,7 +19,7 @@ def clear_data():
 
 @pytest.fixture
 def create_data(clear_data):
-    register_user_1 = requests.post(config.url + 'auth/register/v2', params = { 'email': 'asd@gmail.com',
+    register_user_1 = requests.post(config.url + 'auth/register/v2', json = {   'email': 'asd@gmail.com',
                                                                                 'password': 'qwertyuiop',
                                                                                 'name_first': 'lawrence',
                                                                                 'name_last': 'lee'
@@ -29,7 +29,7 @@ def create_data(clear_data):
     token_1 = token_1['token']
     user_id_1 = json.loads(register_user_1.text)['auth_user_id']    
 
-    register_user_2 = requests.post(config.url + 'auth/register/v2', params = { 'email': 'email2@gmail.com',
+    register_user_2 = requests.post(config.url + 'auth/register/v2', json = {   'email': 'email2@gmail.com',
                                                                                 'password': 'zxcvbnm',
                                                                                 'name_first': 'christian',
                                                                                 'name_last': 'lam'
@@ -44,7 +44,7 @@ def test_valid_handle_edit(clear_data, create_data):
     token_1, _, user_id = create_data
 
     ## set a new handle
-    update_handle = requests.put(config.url + 'user/profile/sethandle/v1', params = {'token' : token_1,
+    update_handle = requests.put(config.url + 'user/profile/sethandle/v1', json = { 'token' : token_1,
                                                                                     'handle_str': 'watersheep'})
     assert update_handle.status_code == 200
 
@@ -60,7 +60,7 @@ def test_valid_handle_edit(clear_data, create_data):
 def test_handle_taken(clear_data, create_data):
     _, token_2, _ = create_data
     
-    update_handle = requests.put(config.url + 'user/profile/sethandle/v1', params = {'token' : token_2,
+    update_handle = requests.put(config.url + 'user/profile/sethandle/v1', json = { 'token' : token_2,
                                                                                     'handle_str': 'lawrencelee'})
 
     assert update_handle.status_code == 400
@@ -68,7 +68,7 @@ def test_handle_taken(clear_data, create_data):
 def test_too_long(clear_data, create_data):
     token_1, _, _ = create_data
 
-    update_handle = requests.put(config.url + 'user/profile/sethandle/v1', params = {'token' : token_1,
+    update_handle = requests.put(config.url + 'user/profile/sethandle/v1', json = { 'token' : token_1,
                                                                                     'handle_str': 'watersheepmightbealittletoolong'})
 
     assert update_handle.status_code == 400
@@ -76,7 +76,7 @@ def test_too_long(clear_data, create_data):
 def test_too_short(clear_data, create_data):
     token_1, _, _ = create_data
 
-    update_handle = requests.put(config.url + 'user/profile/sethandle/v1', params = {'token' : token_1,
+    update_handle = requests.put(config.url + 'user/profile/sethandle/v1', json = { 'token' : token_1,
                                                                                     'handle_str': 'ah'})
 
     assert update_handle.status_code == 400
@@ -84,13 +84,13 @@ def test_too_short(clear_data, create_data):
 def test_non_alphanumeric(clear_data, create_data):
     token_1, _, _ = create_data
 
-    update_handle = requests.put(config.url + 'user/profile/sethandle/v1', params = { 'token' : token_1,
+    update_handle = requests.put(config.url + 'user/profile/sethandle/v1', json = { 'token' : token_1,
                                                                                     'handle_str': 'watersheep$$'})
 
     assert update_handle.status_code == 400
 
 def test_invalid_token(clear_data, create_data):
-    update_handle = requests.put(config.url + 'user/profile/sethandle/v1', params = {'token' : 'token_1',
+    update_handle = requests.put(config.url + 'user/profile/sethandle/v1', json = { 'token' : 'token_1',
                                                                                     'handle_str': 'watersheep'})
 
     assert update_handle.status_code == 403
