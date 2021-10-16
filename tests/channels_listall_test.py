@@ -256,7 +256,7 @@ def test_multiple_users_create_channel(clear_data, auth_register_and_login):
                 'name':'channel_2'
             },
             {
-                'channel_id': channel_id_3
+                'channel_id': channel_id_3,
                 'name':'channel_3'
             }
         ]
