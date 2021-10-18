@@ -53,14 +53,16 @@ def encode_token(user_id):
 
     now = datetime.now()
     time_created = now.strftime("%H%M%S")
-    number = int(str(time_created) + str(randint(0, 723978)))
-    encoded_token = jwt.encode({'user_id': user_id, 'session_start': number}, SECRET, algorithm='HS256')
+    number = time_created
+    random_number = randint(0, 723978)
+    encoded_token = jwt.encode({'user_id': user_id, 'session_start': number, 'random': random_number},
+                               SECRET, algorithm='HS256')
 
     ## Adds active token to database
     add_session_token(encoded_token, user_id)
-    
+
     return encoded_token
-    
+
 
 def decode_token(token):
     SECRET = "DHRUV_IS_SALTY"
@@ -68,7 +70,7 @@ def decode_token(token):
     ## check if user is valid
     if token not in get_all_valid_tokens():
         raise AccessError(description='Invalid token')
-    
+
     user_id = jwt.decode(token, SECRET, algorithms=['HS256'])['user_id']
 
     return user_id
