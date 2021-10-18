@@ -92,7 +92,75 @@ def test_simple_case(clear_data, create_data):
     name = json.loads(dm_details_data.text)['name']
    
     assert name == ', '.join(name_handles)
+
+def test_create_no_uids(clear_data, create_data):
+    token, user_id_0, _, _, _ = create_data
+
+    dm_create_data = requests.post(config.url + 'dm/create/v1', json={
+                                                                         'token': token,
+                                                                         'u_ids': []
+                                                                        })
+    assert dm_create_data.status_code == 200
+    dm_id = json.loads(dm_create_data.text)['dm_id']
     
+    dm_details_data = requests.get(config.url + 'dm/details/v1', params={'token': token,
+                                                                         'dm_id': dm_id
+                                                                        })
+        
+    assert dm_details_data.status_code == 200
+
+    dm_details_data = requests.get(config.url + 'dm/details/v1', params={'token': token,
+                                                                         'dm_id': dm_id
+                                                                        }) 
+
+    name = json.loads(dm_details_data.text)['name']
+   
+    user_profile_1 = requests.get(config.url + 'user/profile/v1', params = {'token': token,
+                                                                     'u_id' : user_id_0
+                                                                    })
+
+    handle_0 = json.loads(user_profile_1.text)['user']['handle_str']         
+
+    assert name == handle_0
+
+def test_create_dm_one_uid(clear_data, create_data):
+    token, user_id_0, u_ids, _, _ = create_data
+
+    user_id_1 = u_ids[0]
+
+    dm_create_data = requests.post(config.url + 'dm/create/v1', json={
+                                                                         'token': token,
+                                                                         'u_ids': [user_id_1]
+                                                                        })
+    assert dm_create_data.status_code == 200
+    dm_id = json.loads(dm_create_data.text)['dm_id']
+    
+    dm_details_data = requests.get(config.url + 'dm/details/v1', params={'token': token,
+                                                                         'dm_id': dm_id
+                                                                        })
+        
+    assert dm_details_data.status_code == 200
+
+    dm_details_data = requests.get(config.url + 'dm/details/v1', params={'token': token,
+                                                                         'dm_id': dm_id
+                                                                        }) 
+
+    name = json.loads(dm_details_data.text)['name']
+   
+    user_profile_0 = requests.get(config.url + 'user/profile/v1', params = {'token': token,
+                                                                     'u_id' : user_id_0
+                                                                    })
+
+    handle_0 = json.loads(user_profile_0.text)['user']['handle_str']         
+
+    user_profile_1 = requests.get(config.url + 'user/profile/v1', params = {'token': token,
+                                                                     'u_id' : user_id_1
+                                                                    })
+
+    handle_1 = json.loads(user_profile_1.text)['user']['handle_str']         
+    
+    assert name == ', '.join([handle_0,handle_1])
+
 def test_invalid_user(clear_data, create_data):
     token, _, u_ids, _, _ = create_data
     invalid_u_id = 2342
@@ -124,26 +192,3 @@ def test_invalid_user_and_token(clear_data, create_data):
                                                               })
 
     assert resp.status_code == 403
-
-@pytest.mark.skip("Cannot be tested")
-def test_create_dm_one_users(clear_data, create_data):
-    token, user_id_0, u_ids, _, _ = create_data
-    dm_create_data  = requests.post(config.url + 'dm/create/v1', json={
-                                                                         'token': token,
-                                                                         'u_ids': [u_ids[0]]
-                                                                        })
-    dm_id = json.loads(dm_create_data)['dm_id']
-    
-    dm_details_data = requests.get(config.url + 'dm/details/v1', params={'token': token,
-                                                                         'dm_id': dm_id
-                                                                        })
-                                                            
-    name = json.loads(dm_details_data.text)['name']
-
-    user_profile_1 = requests.get(config.url + 'user/profile/v1', params = {'token': token,
-                                                                            'u_id' : user_id_0
-                                                                    })
-
-    handle_0 = json.loads(user_profile_1.text)['user']['handle_str']
-   
-    assert name == handle_0
