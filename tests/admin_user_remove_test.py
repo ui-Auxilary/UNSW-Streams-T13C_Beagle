@@ -89,41 +89,41 @@ def create_dms(create_users):
 
     return dm_id, message_id
 
-def test_simple_case(clear_data, create_users):
-    token_1, user_id_1, token_2, user_id_2 = create_users
+# def test_simple_case(clear_data, create_users):
+#     token_1, user_id_1, token_2, user_id_2 = create_users
 
-    requests.delete(config.url + 'admin/user/remove/v1', json = {
-                                                                    'token': token_1,
-                                                                    'u_id': user_id_2
-                                                                  })
+#     requests.delete(config.url + 'admin/user/remove/v1', json = {
+#                                                                     'token': token_1,
+#                                                                     'u_id': user_id_2
+#                                                                   })
 
-    global_owner_profile = requests.get(config.url + 'user/profile/v1', params = {  
-                                                                                    'token': token_1,
-                                                                                    'u_id': user_id_1
-                                                                                  })
+#     global_owner_profile = requests.get(config.url + 'user/profile/v1', params = {  
+#                                                                                     'token': token_1,
+#                                                                                     'u_id': user_id_1
+#                                                                                   })
    
-    get_user_profile = requests.get(config.url + 'user/profile/v1', params = {  
-                                                                          'token': token_1,
-                                                                          'u_id': user_id_2
-                                                                         })
+#     get_user_profile = requests.get(config.url + 'user/profile/v1', params = {  
+#                                                                           'token': token_1,
+#                                                                           'u_id': user_id_2
+#                                                                          })
 
-    owner_profile = json.loads(global_owner_profile.text)['user']                                                                         
-    user_profile = json.loads(get_user_profile.text)['user']
+#     owner_profile = json.loads(global_owner_profile.text)['user']                                                                         
+#     user_profile = json.loads(get_user_profile.text)['user']
     
-    all_users = requests.get(config.url + 'users/all/v1', params = {'token': token_1
-                                                                    })
-    users = json.loads(all_users.text)['users']
+#     all_users = requests.get(config.url + 'users/all/v1', params = {'token': token_1
+#                                                                     })
+#     users = json.loads(all_users.text)['users']
 
-    assert user_profile == { 
-                       'u_id': user_id_2,
-                       'name_first': 'Removed',
-                       'name_last': 'user',
-                       'email': '',
-                       'handle_str': '' 
-                      }
+#     assert user_profile == { 
+#                        'u_id': user_id_2,
+#                        'name_first': 'Removed',
+#                        'name_last': 'user',
+#                        'email': '',
+#                        'handle_str': '' 
+#                       }
     
-    assert owner_profile in users
-    assert user_profile in users
+#     assert owner_profile in users
+#     assert user_profile in users
 
 def test_member_of_dm(clear_data, create_users, create_dms):
     
@@ -136,13 +136,12 @@ def test_member_of_dm(clear_data, create_users, create_dms):
                                                                               })
 
     check_message = requests.get(config.url + 'dm/messages/v1', params = {
-                                                                          'token': token_2,
+                                                                          'token': token_1,
                                                                           'dm_id': dm_id,
                                                                           'start': 0
                                                                         })
     messages = json.loads(check_message.text)['messages']
-    print(messages)
-    print(message_id)
+
     time_created = json.loads(check_message.text)['messages'][0]['time_created']
 
     assert messages == [{
@@ -153,168 +152,168 @@ def test_member_of_dm(clear_data, create_users, create_dms):
                           }]
         
     
-def test_channel_owner(clear_data, create_users, create_channel):
-    token_1, user_id_1, token_2, user_id_2 = create_users
+# def test_channel_owner(clear_data, create_users, create_channel):
+#     token_1, user_id_1, token_2, user_id_2 = create_users
 
-    ## Create a channel with user_2 as the sole owner of channel_id_2
-    create_channel = requests.post(config.url + 'channels/create/v2', json={
-                                                                              'token': token_2,
-                                                                              'name': 'random',
-                                                                              'is_public': True
-                                                                             })
+#     ## Create a channel with user_2 as the sole owner of channel_id_2
+#     create_channel = requests.post(config.url + 'channels/create/v2', json={
+#                                                                               'token': token_2,
+#                                                                               'name': 'random',
+#                                                                               'is_public': True
+#                                                                              })
 
-    channel_id = json.loads(create_channel.text)['channel_id']
+#     channel_id = json.loads(create_channel.text)['channel_id']
     
-    ## user_1 joins the channel
-    requests.post(config.url + 'channel/join/v2', json = {
-                                                            'token': token_1,
-                                                            'channel_id': channel_id
-                                                          })
+#     ## user_1 joins the channel
+#     requests.post(config.url + 'channel/join/v2', json = {
+#                                                             'token': token_1,
+#                                                             'channel_id': channel_id
+#                                                           })
 
-    ## channel owner, adds Stream owner as another owner of their channel
-    add_owner = requests.post(config.url + 'channel/addowner/v1', json={
-                                                                          'token': token_2,
-                                                                          'channel_id': channel_id,
-                                                                          'u_id': user_id_1
-                                                                         })
+#     ## channel owner, adds Stream owner as another owner of their channel
+#     add_owner = requests.post(config.url + 'channel/addowner/v1', json={
+#                                                                           'token': token_2,
+#                                                                           'channel_id': channel_id,
+#                                                                           'u_id': user_id_1
+#                                                                          })
 
-    assert add_owner.status_code == 200                                                                   
+#     assert add_owner.status_code == 200                                                                   
     
-    ## Streams owner removes User 2
-    requests.delete(config.url + 'admin/user/remove/v1', json={
-                                                               'token': token_1,
-                                                               'u_id': user_id_2
-                                                              })
+#     ## Streams owner removes User 2
+#     requests.delete(config.url + 'admin/user/remove/v1', json={
+#                                                                'token': token_1,
+#                                                                'u_id': user_id_2
+#                                                               })
 
-    ## Check that channel 'random' still exists, but no longer has user
-    channel_details = requests.get(config.url + 'channel/details/v2', params={
-                                                                              'token': token_1,
-                                                                              'channel_id': channel_id
-                                                                             })
+#     ## Check that channel 'random' still exists, but no longer has user
+#     channel_details = requests.get(config.url + 'channel/details/v2', params={
+#                                                                               'token': token_1,
+#                                                                               'channel_id': channel_id
+#                                                                              })
     
-    ## Get user profiles
-    global_owner_profile = requests.get(config.url + 'user/profile/v1', params = {  
-                                                                          'token': token_1,
-                                                                          'u_id': user_id_1
-                                                                         })
+#     ## Get user profiles
+#     global_owner_profile = requests.get(config.url + 'user/profile/v1', params = {  
+#                                                                           'token': token_1,
+#                                                                           'u_id': user_id_1
+#                                                                          })
    
-    get_user_profile = requests.get(config.url + 'user/profile/v1', params = {  
-                                                                          'token': token_1,
-                                                                          'u_id': user_id_2
-                                                                         })
+#     get_user_profile = requests.get(config.url + 'user/profile/v1', params = {  
+#                                                                           'token': token_1,
+#                                                                           'u_id': user_id_2
+#                                                                          })
 
-    user_owner = json.loads(global_owner_profile.text)['user']                                                                         
-    user_profile = json.loads(get_user_profile.text)['user']
+#     user_owner = json.loads(global_owner_profile.text)['user']                                                                         
+#     user_profile = json.loads(get_user_profile.text)['user']
     
-    ## Check that the Streams user is the only owner and member of that channel
-    channel_owners = json.loads(channel_details.text)['owner_members']
-    channel_members = json.loads(channel_details.text)['all_members']
+#     ## Check that the Streams user is the only owner and member of that channel
+#     channel_owners = json.loads(channel_details.text)['owner_members']
+#     channel_members = json.loads(channel_details.text)['all_members']
 
-    assert user_owner in channel_owners
-    assert user_owner in channel_members
-    assert user_profile in channel_members
+#     assert user_owner in channel_owners
+#     assert user_owner in channel_members
+#     assert user_profile in channel_members
 
-    ## Check that removed user has the right profile details
-    all_users = requests.get(config.url + 'users/all/v1', params = {
-                                                                   'token': token_1
-                                                                  })
-    users = json.loads(all_users.text)['users']
+#     ## Check that removed user has the right profile details
+#     all_users = requests.get(config.url + 'users/all/v1', params = {
+#                                                                    'token': token_1
+#                                                                   })
+#     users = json.loads(all_users.text)['users']
 
-    assert user_profile == {
-                       'u_id': user_id_2,
-                       'name_first': 'Removed',
-                       'name_last': 'user',
-                       'email': '',
-                       'handle_str': '' 
-                      }
+#     assert user_profile == {
+#                        'u_id': user_id_2,
+#                        'name_first': 'Removed',
+#                        'name_last': 'user',
+#                        'email': '',
+#                        'handle_str': '' 
+#                       }
     
-    assert user_owner in users
-    assert user_profile in users
+#     assert user_owner in users
+#     assert user_profile in users
 
-def test_remove_sole_channel_owner(clear_data, create_users, create_channel):
-    token_1, user_id_1, token_2, user_id_2 = create_users
+# def test_remove_sole_channel_owner(clear_data, create_users, create_channel):
+#     token_1, user_id_1, token_2, user_id_2 = create_users
 
-    ## Create a channel with user_2 as the sole owner of channel_id_2
-    create_channel = requests.post(config.url + 'channels/create/v2', json={
-                                                                              'token': token_2,
-                                                                              'name': 'random',
-                                                                              'is_public': True
-                                                                             })
-    channel_id = json.loads(create_channel.text)['channel_id']
+#     ## Create a channel with user_2 as the sole owner of channel_id_2
+#     create_channel = requests.post(config.url + 'channels/create/v2', json={
+#                                                                               'token': token_2,
+#                                                                               'name': 'random',
+#                                                                               'is_public': True
+#                                                                              })
+#     channel_id = json.loads(create_channel.text)['channel_id']
     
-    ## Global owner removes User_2
-    requests.delete(config.url + 'admin/user/remove/v1', json={
-                                                                'token': token_1,
-                                                                'u_id': user_id_2
-                                                              })
+#     ## Global owner removes User_2
+#     requests.delete(config.url + 'admin/user/remove/v1', json={
+#                                                                 'token': token_1,
+#                                                                 'u_id': user_id_2
+#                                                               })
 
-    ## Check that channel_2 exists, but has neither owner nor members
-    all_channel_data = requests.get(config.url + 'channels/listall/v2', params={
-                                                                            'token': token_1
-                                                                           })
+#     ## Check that channel_2 exists, but has neither owner nor members
+#     all_channel_data = requests.get(config.url + 'channels/listall/v2', params={
+#                                                                             'token': token_1
+#                                                                            })
 
-    all_channels = json.loads(all_channel_data.text)['channels']
+#     all_channels = json.loads(all_channel_data.text)['channels']
     
-    ## check that the channel still exists
-    assert any(('channel_id', channel_id) in channel.items() for channel in all_channels)
+#     ## check that the channel still exists
+#     assert any(('channel_id', channel_id) in channel.items() for channel in all_channels)
 
-    global_owner_profile = requests.get(config.url + 'user/profile/v1', params = {  
-                                                                          'token': token_1,
-                                                                          'u_id': user_id_1
-                                                                             })
+#     global_owner_profile = requests.get(config.url + 'user/profile/v1', params = {  
+#                                                                           'token': token_1,
+#                                                                           'u_id': user_id_1
+#                                                                              })
    
-    get_user_profile = requests.get(config.url + 'user/profile/v1', params = {  
-                                                                          'token': token_1,
-                                                                          'u_id': user_id_2
-                                                                         })
+#     get_user_profile = requests.get(config.url + 'user/profile/v1', params = {  
+#                                                                           'token': token_1,
+#                                                                           'u_id': user_id_2
+#                                                                          })
 
-    owner_profile = json.loads(global_owner_profile.text)['user']                                                                         
-    user_profile = json.loads(get_user_profile.text)['user']
+#     owner_profile = json.loads(global_owner_profile.text)['user']                                                                         
+#     user_profile = json.loads(get_user_profile.text)['user']
     
-    all_users = requests.get(config.url + 'users/all/v1', params = {'token': token_1})
+#     all_users = requests.get(config.url + 'users/all/v1', params = {'token': token_1})
 
-    users = json.loads(all_users.text)['users']
+#     users = json.loads(all_users.text)['users']
 
-    assert user_profile == { 
-                       'u_id': user_id_2,
-                       'name_first': 'Removed',
-                       'name_last': 'user',
-                       'email': '',
-                       'handle_str': '' 
-                      }
+#     assert user_profile == { 
+#                        'u_id': user_id_2,
+#                        'name_first': 'Removed',
+#                        'name_last': 'user',
+#                        'email': '',
+#                        'handle_str': '' 
+#                       }
     
-    assert user_profile in users
-    assert owner_profile in users
+#     assert user_profile in users
+#     assert owner_profile in users
 
-def test_invalid_user_id(clear_data, create_users):
-    token_1, _, _, user_id_2 = create_users
-    remove_user = requests.delete(config.url + 'admin/user/remove/v1', json={
-                                                                                'token': token_1,
-                                                                                'u_id': 549848
-                                                                              })
-    assert remove_user.status_code == 400
+# def test_invalid_user_id(clear_data, create_users):
+#     token_1, _, _, user_id_2 = create_users
+#     remove_user = requests.delete(config.url + 'admin/user/remove/v1', json={
+#                                                                                 'token': token_1,
+#                                                                                 'u_id': 549848
+#                                                                               })
+#     assert remove_user.status_code == 400
 
-def test_remove_only_owner(clear_data, create_users):
-    token_1, user_id_1, _, _ = create_users
-    remove_user = requests.delete(config.url + 'admin/user/remove/v1', json={
-                                                                                'token': token_1,
-                                                                                'u_id': user_id_1
-                                                                              })
-    assert remove_user.status_code == 400
+# def test_remove_only_owner(clear_data, create_users):
+#     token_1, user_id_1, _, _ = create_users
+#     remove_user = requests.delete(config.url + 'admin/user/remove/v1', json={
+#                                                                                 'token': token_1,
+#                                                                                 'u_id': user_id_1
+#                                                                               })
+#     assert remove_user.status_code == 400
 
-def test_invalid_permissions(clear_data, create_users):
-    _, user_id_1, token_2, _ = create_users
-    remove_user = requests.delete(config.url + 'admin/user/remove/v1', json={
-                                                                                'token': token_2,
-                                                                                'u_id': user_id_1
-                                                                              })
-    assert remove_user.status_code == 403
+# def test_invalid_permissions(clear_data, create_users):
+#     _, user_id_1, token_2, _ = create_users
+#     remove_user = requests.delete(config.url + 'admin/user/remove/v1', json={
+#                                                                                 'token': token_2,
+#                                                                                 'u_id': user_id_1
+#                                                                               })
+#     assert remove_user.status_code == 403
 
-def test_invalid_token(clear_data, create_users):
-    _, _, _, user_id_2 = create_users
+# def test_invalid_token(clear_data, create_users):
+#     _, _, _, user_id_2 = create_users
 
-    remove_user = requests.delete(config.url + 'admin/user/remove/v1', json = {
-                                                                    'token': 'token_1',
-                                                                    'u_id': user_id_2
-                                                                  })
-    assert remove_user.status_code == 403
+#     remove_user = requests.delete(config.url + 'admin/user/remove/v1', json = {
+#                                                                     'token': 'token_1',
+#                                                                     'u_id': user_id_2
+#                                                                   })
+#     assert remove_user.status_code == 403
