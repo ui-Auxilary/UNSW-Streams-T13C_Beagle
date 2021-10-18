@@ -7,9 +7,9 @@ Functions:
     check_user_exists(auth_user_id: str)
 '''
 
-import jwt    
+import jwt
 
-from src.data_operations import ( 
+from src.data_operations import (
     get_user_ids,
     reset_data_store_to_default,
     get_user_from_token,
@@ -62,7 +62,6 @@ def encode_token(user_id):
     add_session_token(encoded_token, user_id)
 
     return encoded_token
-
 
 def decode_token(token):
     SECRET = "DHRUV_IS_SALTY"
