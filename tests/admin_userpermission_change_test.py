@@ -202,9 +202,9 @@ def test_owner_demotes_owner(clear_data, create_users, create_channel):
     assert remove_channel_owner.status_code == 403
 
 def test_invalid_permissions(clear_data, create_users):
-    _, user_id_1, token_2, _ = create_users
+    token_1, user_id_1, _, _ = create_users
     change_permissions = requests.post(config.url + 'admin/userpermission/change/v1', json={
-                                                                                'token': token_2,
+                                                                                'token': token_1,
                                                                                 'u_id': user_id_1,
                                                                                 'permission_id': 5
                                                                               })
@@ -224,7 +224,7 @@ def test_demote_only_owner(clear_data, create_users):
     change_permissions = requests.post(config.url + 'admin/userpermission/change/v1', json={
                                                                                 'token': token_1,
                                                                                 'u_id': user_id_1,
-                                                                                'permission_id': 1
+                                                                                'permission_id': 2
                                                                               })
     assert change_permissions.status_code == 400
 
