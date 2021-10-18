@@ -28,31 +28,19 @@ def dm_create_v1(token, u_ids):
 
     ## add owner as a member of the dm and handle
     user_profile = get_user(auth_user_id)
-    user_list.append({
-        'u_id': auth_user_id,
-        'email': user_profile['email_address'],
-        'name_first': user_profile['first_name'],
-        'name_last': user_profile['last_name'],
-        'handle_str': user_profile['user_handle'],
-    })
+    user_list.append(auth_user_id)
     user_handle = get_user(auth_user_id)['user_handle']
     user_handle_list.append(user_handle)
 
     for user_id in u_ids:
-        if int(user_id) not in get_user_ids():
+        user_id = int(user_id)
+        if user_id not in get_user_ids():
             raise InputError(description="Invalid user(s) id")
-        if int(user_id) == auth_user_id:
+        if user_id == auth_user_id:
             raise InputError(description="Cannot add creator to DM")
         else:
-            user_profile = get_user(int(user_id))
-            user_list.append({
-                'u_id': int(user_id),
-                'email': user_profile['email_address'],
-                'name_first': user_profile['first_name'],
-                'name_last': user_profile['last_name'],
-                'handle_str': user_profile['user_handle'],
-            })
-            user_handle = get_user(int(user_id))['user_handle']
+            user_list.append(user_id)
+            user_handle = get_user(user_id)['user_handle']
             user_handle_list.append(user_handle)
 
     ## generate dm name
@@ -79,19 +67,11 @@ def dm_list_v1(token):
 
     dms_list = []
     
-    user_data = get_user(auth_user_id)
-    user_profile = {
-        'u_id': auth_user_id,
-        'email': user_data['email_address'],
-        'name_first': user_data['first_name'],
-        'name_last': user_data['last_name'],
-        'handle_str': user_data['user_handle'],
-    }
     ## Check each dm id from all dm ids in the database
     for dm_id in get_dm_ids():
         
         ## Check if user id is a member of the dm
-        if user_profile in get_dm(dm_id)['members']:
+        if auth_user_id in get_dm(dm_id)['members']:
             dms_list.append({
                 'dm_id': dm_id,
                 'name': get_dm(dm_id)['name']
@@ -139,31 +119,23 @@ def dm_details_v1(token, dm_id):
         raise InputError(description="Not a valid DM id")
     
     ## get list of owners and members in the dm
-    dm_members = get_dm(int(dm_id))['members']
-    dm_name = get_dm(int(dm_id))['name']    
+    dm_members = get_dm(dm_id)['members']
+    dm_name = get_dm(dm_id)['name']    
 
     ## check if user exists in DM membes
-    user_data = get_user(auth_user_id)
-    user_profile = {
-        'u_id': auth_user_id,
-        'email': user_data['email_address'],
-        'name_first': user_data['first_name'],
-        'name_last': user_data['last_name'],
-        'handle_str': user_data['user_handle'],
-    }
-
-    if user_profile not in dm_members:
+    if auth_user_id not in dm_members:
         raise AccessError(description="User is not a member of the DM")    
     
     # create list of dictionaries with member info
     member_info = []
     for member in dm_members:
+        user_profile = get_user(member)
         member_dict = {
-            'u_id'      : member['u_id'],
-            'email'     : member['email'],
-            'name_first': member['name_first'],
-            'name_last' : member['name_last'],
-            'handle_str': member['handle_str']
+            'u_id'      : member,
+            'email'     : user_profile['email_address'],
+            'name_first': user_profile['first_name'],
+            'name_last' : user_profile['last_name'],
+            'handle_str': user_profile['user_handle']
         }
         member_info.append(member_dict)
 
@@ -187,24 +159,15 @@ def dm_leave_v1(token, dm_id):
     dm_members = get_dm(dm_id)['members']
 
     ## check if user exists in DM membes
-    user_data = get_user(auth_user_id)
-    user_profile = {
-        'u_id': auth_user_id,
-        'email': user_data['email_address'],
-        'name_first': user_data['first_name'],
-        'name_last': user_data['last_name'],
-        'handle_str': user_data['user_handle'],
-    }
-
-    if user_profile not in dm_members:
+    if auth_user_id not in dm_members:
         raise AccessError(description="User is not a member of the DM")
 
     ## check if user is the owner of the DM
-    if user_profile in dm_owner:
-        dm_owner.remove(user_profile)
+    if auth_user_id in dm_owner:
+        dm_owner.remove(auth_user_id)
 
     ## remove user from members in the DM
-    dm_members.remove(user_profile)
+    dm_members.remove(auth_user_id)
 
     return {}
 
@@ -219,16 +182,7 @@ def dm_messages_v1(token, dm_id, start):
         raise InputError(description="Not a valid DM id")
 
     ## check if user exists in DM membes
-    user_data = get_user(auth_user_id)
-    user_profile = {
-        'u_id': auth_user_id,
-        'email': user_data['email_address'],
-        'name_first': user_data['first_name'],
-        'name_last': user_data['last_name'],
-        'handle_str': user_data['user_handle'],
-    }
-
-    if user_profile not in get_dm(dm_id)['members']:
+    if auth_user_id not in get_dm(dm_id)['members']:
         raise AccessError(description="User is not a member of the DM") 
 
     ## Gets all the messages in the channel sorted from recent to old
@@ -287,16 +241,7 @@ def message_senddm_v1(token, dm_id, message):
         raise InputError(description="Not a valid DM id")
 
     ## check if user exists in DM membes
-    user_data = get_user(auth_user_id)
-    user_profile = {
-        'u_id': auth_user_id,
-        'email': user_data['email_address'],
-        'name_first': user_data['first_name'],
-        'name_last': user_data['last_name'],
-        'handle_str': user_data['user_handle'],
-    }
-
-    if user_profile not in get_dm(dm_id)['members']:
+    if auth_user_id not in get_dm(dm_id)['members']:
         raise AccessError(description="User is not a member of the DM")     
     
     if not 1 <= len(message) <= 1000:
