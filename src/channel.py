@@ -304,7 +304,7 @@ def channel_addowner_v1(token, channel_id, u_id):
     if channel_id not in get_channel_ids():
         raise InputError(description='Channel does not exist')
 
-    if auth_user_id not in get_channel(channel_id)['owner']:
+    if auth_user_id not in get_channel(channel_id)['owner'] and not get_user(auth_user_id)['global_owner']:
         raise AccessError(description='Not sufficient permissions to add new owner')
 
     if u_id not in get_user_ids():
@@ -332,7 +332,7 @@ def channel_removeowner_v1(token, channel_id, u_id):
     if channel_id not in get_channel_ids():
         raise InputError(description='Channel does not exist')
 
-    if auth_user_id not in get_channel(channel_id)['owner']:
+    if auth_user_id not in get_channel(channel_id)['owner'] and not get_user(auth_user_id)['global_owner']:
         raise AccessError(description='Not sufficient permissions to remove an owner')
 
     if u_id not in get_user_ids():
