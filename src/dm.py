@@ -27,7 +27,6 @@ def dm_create_v1(token, u_ids):
     user_handle_list = []
 
     ## add owner as a member of the dm and handle
-    user_profile = get_user(auth_user_id)
     user_list.append(auth_user_id)
     user_handle = get_user(auth_user_id)['user_handle']
     user_handle_list.append(user_handle)
