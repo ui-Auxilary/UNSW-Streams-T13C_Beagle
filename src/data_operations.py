@@ -7,6 +7,8 @@ Functions:
              password: str, user_handle: str, is_owner: bool)
     remove_user_details(user_id: int)
     get_user(user_id: int) -> dict
+    edit_user(user_id: int, key: str, new_value: str) 
+    edit_user_permissions(user_id: int, permission_id: int)
     get_user_handles() -> list
     get_user_emails() -> list
     get_user_ids() -> list
@@ -29,7 +31,6 @@ Functions:
     add_session_token(token: str, user_id: int)
     remove_session_token(token: str) 
     get_user_from_token(token: str) -> int
-    edit_user(user_id: int, key: str, new_value: str) 
 '''
 
 from src.data_store import data_store
@@ -201,10 +202,35 @@ def edit_user(user_id, key, new_value):
     # edit the property
     data_source['user_data'][user_id][key] = new_value
 
+def edit_user_permissions(user_id, permission_id):
+    '''
+    Edits the user permissions of the user_id
+
+    Arguments:
+        user_id          (int): id of user who's permissions will change
+        permission_id    (int): permission to give to user
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+
+    if permission_id == 1:
+        data_source['user_data'][user_id]['global_owner'] = True
+        data_source['global_owners'].append(user_id)
+    elif permission_id == 2:
+        data_source['user_data'][user_id]['global_owner'] = False
+        if user_id in data_source['global_owners']:
+            data_source['global_owners'].remove(user_id)
+    
 def get_user_handles():
     '''
     Gets the handles of all users from the database
 
+    Arguments:
+        None
+        
     Return Value:
         user_handles (list): list of all users' handles
     '''
@@ -229,6 +255,9 @@ def get_user_emails():
 def get_user_ids():
     '''
     Gets the id's of all users from the database
+
+    Arguments:
+        None
 
     Return Value:
         user_ids (list): list of all users' user_ids

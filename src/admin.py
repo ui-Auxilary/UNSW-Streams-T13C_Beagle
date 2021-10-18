@@ -3,6 +3,7 @@ from src.error import InputError, AccessError
 from src.data_operations import (
     add_user,
     edit_message,
+    edit_user_permissions,
     get_channel,
     get_channel_messages,
     get_message_by_id,
@@ -82,7 +83,15 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     ## check u_id is valid and not the only global owner
     if u_id not in get_user_ids():
         raise InputError(description='Specified user does not exist')
-    if u_id in get_global_owners() and len(get_global_owners) == 1:
-        raise InputError(description='Cannot remove the only global owner')
+    if u_id in get_global_owners() and len(get_global_owners()) == 1 and permission_id == 2:
+        raise InputError(description='Cannot demote the only global owner')
 
-    pass
+    valid_permission = [1,2]
+
+    ## check the specified permission_id is valid
+    if permission_id not in valid_permission:
+        raise InputError(description='Permission does not exist')
+    
+    edit_user_permissions(int(u_id), int(permission_id))
+    
+    return {}

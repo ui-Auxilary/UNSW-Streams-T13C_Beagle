@@ -14,7 +14,8 @@ from src.data_operations import (
     get_message_by_id,
     edit_message,
     get_messages_by_dm,
-    remove_message
+    remove_message,
+    get_user
 )
 
 def message_send_v1(token, channel_id, message):
@@ -94,7 +95,7 @@ def message_edit_v1(token, message_id, message):
     
     message_author = get_message_by_id(message_id)['author']
 
-    if message_author != auth_user_id and auth_user_id not in channel_owner:
+    if message_author != auth_user_id and auth_user_id not in channel_owner and not get_user(auth_user_id)['global_owner']:
         raise AccessError(description="User does not have permissions to edit selected message")
 
     edit_message(is_channel, channel_id, message_id, message)
@@ -130,7 +131,7 @@ def message_remove_v1(token, message_id):
         if message_id not in get_messages_by_dm(channel_id):
             raise InputError(description="Message does not exist in dm")
 
-    if message_author != auth_user_id and auth_user_id not in channel_owner:
+    if message_author != auth_user_id and auth_user_id not in channel_owner and not get_user(auth_user_id)['global_owner']:
         raise AccessError(description="User does not have permissions to remove message")
 
     remove_message(is_channel, channel_id, message_id)
