@@ -54,6 +54,8 @@ DATA INSIDE:
         quick access to all channel ids
     - dm_ids
         quick access to all dm ids
+    - global_owners
+        quick access to all global_owner ids
     - message_data
         key = message_id
         -> dictionary with keys
@@ -67,15 +69,18 @@ DATA INSIDE:
 '''
 
 initial_object = {
-    'user_data'   : {},
-    'user_handles': [],
-    'user_emails' : [],
-    'user_ids'    : [],
-    'channel_data': {},
-    'channel_ids' : [],
-    'dm_ids'      : [],
-    'message_data': {},
-    'token'       : {}
+    'user_data'    : {},
+    'user_handles' : [],
+    'user_emails'  : [],
+    'user_ids'     : [],
+    'channel_data' : {},
+    'channel_ids'  : [],
+    'dm_data'      : {},
+    'dm_ids'       : [],
+    'global_owners': [],
+    'message_data' : {},
+    'message_ids'  : [],
+    'token'        : {}
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 

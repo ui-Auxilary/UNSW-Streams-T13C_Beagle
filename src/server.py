@@ -3,6 +3,7 @@ import signal
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
+from src import user
 from src.error import InputError
 from src import config
 
@@ -18,6 +19,7 @@ from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_mess
 from src.other import clear_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_details_v1, channel_join_v1
+from src.admin import admin_user_remove_v1
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -322,6 +324,15 @@ def update_user_handle():
 
     return dumps({
     })
+
+@APP.route("/admin/user/remove/v1", methods=['DELETE'])
+def admin_user_remove():
+    data = request.get_json()
+    ## get user's token and the handle they want to update to
+    user_token = data['token']
+    user_id = data['u_id']
+
+    return dumps(admin_user_remove_v1(user_token, user_id))
 
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear_data_store():
