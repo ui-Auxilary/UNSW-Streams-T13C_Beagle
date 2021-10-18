@@ -32,7 +32,6 @@ Functions:
     edit_user(user_id: int, key: str, new_value: str) 
 '''
 
-from src import user
 from src.data_store import data_store
 
 def reset_data_store_to_default():
