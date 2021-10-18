@@ -7,9 +7,9 @@ Functions:
     check_user_exists(auth_user_id: str)
 '''
 
-import jwt    
+import jwt
 
-from src.data_operations import ( 
+from src.data_operations import (
     get_user_ids,
     reset_data_store_to_default,
     get_user_from_token,
@@ -49,6 +49,16 @@ def check_user_exists(auth_user_id):
         raise AccessError(description='Auth_user_id does not exist')
 
 def encode_token(user_id):
+    '''
+    Generates a unique user session token for a given user_id
+
+    Arguments:
+        user_id (int): The user's user_id
+
+    Return Value:
+        token (int): A unique user token for the user's session
+    '''
+
     SECRET = "DHRUV_IS_SALTY"
 
     now = datetime.now()
@@ -63,8 +73,16 @@ def encode_token(user_id):
 
     return encoded_token
 
-
 def decode_token(token):
+    '''
+    Decodes a user token to give the user_id it is associated with
+
+    Arguments:
+        user_id (int): The unique user token for the user's session
+
+    Return Value:
+        token (int): The user's user_id
+    '''
     SECRET = "DHRUV_IS_SALTY"
 
     ## check if user is valid
