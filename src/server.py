@@ -19,7 +19,7 @@ from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_mess
 from src.other import clear_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_details_v1, channel_join_v1
-from src.admin import admin_user_remove_v1
+from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -333,6 +333,16 @@ def admin_user_remove():
     user_id = data['u_id']
 
     return dumps(admin_user_remove_v1(user_token, user_id))
+
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
+def admin_userpermission_change():
+    data = request.get_json()
+    ## get user's token and the handle they want to update to
+    user_token = data['token']
+    user_id = data['u_id']
+    permission_id = data['permission_id']
+
+    return dumps(admin_userpermission_change_v1(user_token, user_id, permission_id))
 
 @APP.route("/clear/v1", methods=['DELETE'])
 def clear_data_store():
