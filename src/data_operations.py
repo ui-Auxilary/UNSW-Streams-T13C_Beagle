@@ -33,7 +33,6 @@ Functions:
     get_user_from_token(token: str) -> int
 '''
 
-from src import user
 from src.data_store import data_store
 
 def reset_data_store_to_default():
