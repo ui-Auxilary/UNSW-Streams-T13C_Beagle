@@ -15,6 +15,7 @@ from src.data_operations import (
     add_user,
     get_user_emails,
     get_user_ids,
+    get_complete_user_ids,
     get_user_handles,
     get_user,
     add_session_token,
@@ -152,7 +153,7 @@ def auth_register_v1(email, password, name_first, name_last):
     user_handle = generate_user_handle(name_first, name_last)
 
     ## get new auth_user_id (length prev + 1)
-    new_user_id = len(get_user_ids()) + 1
+    new_user_id = len(get_complete_user_ids()) + 1
 
     # check whether user is global owner
     user_information = name_first, name_last, email

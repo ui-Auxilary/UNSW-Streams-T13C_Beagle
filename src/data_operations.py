@@ -268,6 +268,20 @@ def get_user_ids():
     data_source = data_store.get()
     return data_source['user_ids']
 
+def get_complete_user_ids():
+    '''
+    Gets the id's of all users from the database
+
+    Arguments:
+        None
+
+    Return Value:
+        user_ids (list): list of all users' user_ids
+    '''
+
+    data_source = data_store.get()
+    return data_source['user_data'].keys()
+
 def add_member_to_channel(channel_id, user_id):
     '''
     Adds a user to a channel as a member

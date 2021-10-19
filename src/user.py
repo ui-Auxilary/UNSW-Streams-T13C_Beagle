@@ -10,7 +10,7 @@ from src.data_operations import (
     get_user_handles,
     edit_user,
     get_user,
-    get_user_ids,
+    get_complete_user_ids,
     get_user_emails
 )
 
@@ -21,7 +21,7 @@ def user_profile(token, user_id):
     decode_token(token)
 
     ## check that user_id is valid
-    if user_id not in get_user_ids():
+    if user_id not in get_complete_user_ids():
         raise InputError(description='Invalid u_id')
 
     user_info = get_user(user_id)
