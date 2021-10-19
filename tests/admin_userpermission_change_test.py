@@ -210,6 +210,15 @@ def test_invalid_permissions(clear_data, create_users):
                                                                               })
     assert change_permissions.status_code == 400
 
+def test_unauthorised_user(clear_data, create_users):
+    _, user_id_1, token_2, _ = create_users
+    change_permissions = requests.post(config.url + 'admin/userpermission/change/v1', json={
+                                                                                'token': token_2,
+                                                                                'u_id': user_id_1,
+                                                                                'permission_id': 5
+                                                                              })
+    assert change_permissions.status_code == 403
+
 def test_invalid_user_id(clear_data, create_users):
     token_1, _, _, _ = create_users
     change_permissions = requests.post(config.url + 'admin/userpermission/change/v1', json={

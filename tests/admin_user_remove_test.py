@@ -137,6 +137,20 @@ def test_member_of_dm(clear_data, create_users, create_dms):
                                                                 'message': 'another message'
                                                             })
 
+    create_message = requests.post(config.url + 'message/senddm/v1', json = {
+                                                                'token': token_2,
+                                                                'dm_id': dm_id,
+                                                                'message': 'one more message'
+                                                            })
+
+    create_message = requests.post(config.url + 'message/senddm/v1', json = {
+                                                                'token': token_1,
+                                                                'dm_id': dm_id,
+                                                                'message': 'one more message'
+                                                            })
+
+    message_id_2 = json.loads(create_message.text)['message_id']
+
     requests.delete(config.url + 'admin/user/remove/v1', json={
                                                                'token': token_1,
                                                                'u_id': user_id_2
@@ -151,6 +165,7 @@ def test_member_of_dm(clear_data, create_users, create_dms):
     messages = json.loads(check_message.text)['messages']
 
     time_created = json.loads(check_message.text)['messages'][0]['time_created']
+    time_created_2 = json.loads(check_message.text)['messages'][1]['time_created']
 
     message_data = {
         'message_id': message_id,
@@ -159,7 +174,15 @@ def test_member_of_dm(clear_data, create_users, create_dms):
         'time_created': time_created
     }
 
+    message_data_2 = {
+        'message_id': message_id_2,
+        'u_id': user_id_2,
+        'message': 'Removed user',
+        'time_created': time_created_2
+    }
+
     assert message_data in messages
+    assert message_data_2 in messages
 
 def test_channel_owner(clear_data, create_users, create_channel):
     token_1, user_id_1, token_2, user_id_2 = create_users
