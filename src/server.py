@@ -1,5 +1,6 @@
 import sys
 import signal
+import threading
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
@@ -20,6 +21,7 @@ from src.other import clear_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_details_v1, channel_join_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
+from src.data_operations import data_dump, data_restore
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -349,8 +351,20 @@ def clear_data_store():
     clear_v1()
     return dumps({})
 
+def init_store():
+    global worker
+    worker = threading.Thread(target=data_dump)
+    worker.daemon = True    ## get thread to end with the python program
+    worker.start()          ## start the thread
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
+
+    ## commence the persistent storage
+    data_restore()  ## load the data_store
+    init_store()    ## run the persistent storage thread
+
+    ## run the flask app
     APP.run(port=config.port) # Do not edit this port

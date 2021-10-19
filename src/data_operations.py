@@ -29,11 +29,13 @@ Functions:
     get_message_by_id(message_id: int) -> dict
     get_messages_by_channel(channel_id: int) -> list
     add_session_token(token: str, user_id: int)
-    remove_session_token(token: str) 
+    remove_session_token(token: str)
     get_user_from_token(token: str) -> int
 '''
 
 from src.data_store import data_store
+import json
+import time
 
 def reset_data_store_to_default():
     '''
@@ -717,3 +719,24 @@ def remove_owner_from_channel(user_id, channel_id):
     data_source = data_store.get()
     ## adds a user to the owner list of the channel
     data_source['channel_data'][channel_id]['owner'].remove(user_id)
+
+def data_dump():
+    while True:
+        data_source = data_store.get()
+        with open('data_store.json', 'w') as data_file:
+            json.dump(data_source, data_file)
+
+        time.sleep(1)
+
+def data_restore():
+    data_source = data_store.get()
+
+    try:
+        with open('data_restore.json') as data_file:
+            data_source = json.load(data_file)
+    except:
+        pass
+
+    ## save it back purely for pylint unused global data_source
+    with open('data_store.json', 'w') as data_file:
+        json.dump(data_source, data_file)
