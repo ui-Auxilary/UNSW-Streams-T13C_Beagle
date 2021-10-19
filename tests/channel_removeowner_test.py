@@ -24,7 +24,7 @@ def clear_data():
 
 @pytest.fixture
 def create_users():
-    register_user_1 = requests.post(config.url + 'auth/register/v2', json={ 
+    register_user_1 = requests.post(config.url + 'auth/register/v2', json={
                                                                                 'email': 'asd@gmail.com',
                                                                                 'password': 'qwertyuiop',
                                                                                 'name_first': 'lawrence',
@@ -34,7 +34,7 @@ def create_users():
     token_1 = json.loads(register_user_1.text)['token']
     user_id_1 = json.loads(register_user_1.text)['auth_user_id']
 
-    register_user_2 = requests.post(config.url + 'auth/register/v2', json={ 
+    register_user_2 = requests.post(config.url + 'auth/register/v2', json={
                                                                                 'email': 'email2@gmail.com',
                                                                                 'password': 'zxcvbnm',
                                                                                 'name_first': 'christian',
@@ -206,3 +206,24 @@ def test_remove_original_owner(clear_data, create_users, create_channel):
                         'name_first': 'christian',
                         'name_last': 'lam',
                         'handle_str': 'christianlam'}]
+
+def test_channel_does_not_exist(clear_data, create_users, create_channel):
+    token_1, _, _, user_2 = create_users
+
+    resp = requests.post(config.url + 'channel/addowner/v1', json={
+                                                              'token': token_1,
+                                                              'channel_id': 2342,
+                                                              'u_id': user_2
+                                                              })
+    assert resp.status_code == 400
+
+def test_user_not_authorised(clear_data, create_users, create_channel):
+  _, _, token_2, user_2 = create_users
+  channel_id = create_channel
+
+  resp = requests.post(config.url + 'channel/addowner/v1', json={
+                                                              'token': token_2,
+                                                              'channel_id': channel_id,
+                                                              'u_id': user_2
+                                                              })
+  assert resp.status_code == 403
