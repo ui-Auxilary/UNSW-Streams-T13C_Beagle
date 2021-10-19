@@ -60,7 +60,7 @@ def create_data():
                                                                        })
 
     dm_id = json.loads(dm_create_data.text)['dm_id']
-                                                        
+
     return auth_token, user_token, u_ids, dm_id, user_id_2, auth_user_id
 
 def test_simple_case(clear_data, create_data):
@@ -85,17 +85,17 @@ def test_simple_case(clear_data, create_data):
     requests.post(config.url + 'dm/leave/v1', json={'token': user_token,
                                                       'dm_id': dm_id,
                                                       })
-    
+
     dm_details_data = requests.get(config.url + 'dm/details/v1', params={'token': auth_token,
                                                                          'dm_id': dm_id 
                                                                         })
 
     dm_details = json.loads(dm_details_data.text)['members']
-    assert user_profile not in dm_details 
+    assert user_profile not in dm_details
 
 def test_creator_leaves(clear_data, create_data):
     auth_token, user_token, _, dm_id, _, auth_user_id = create_data
-    
+
     ## get a list of the dms the creator is in
     dm_list_data = requests.get(config.url + 'dm/list/v1', params={'token': auth_token})
     dms_list = json.loads(dm_list_data.text)['dms']
@@ -153,4 +153,23 @@ def test_both_invalid_dm_id_and_invalid_user(clear_data, create_data):
                                                              'dm_id': invalid_dm_id,
                                                              })
 
+    assert resp.status_code == 403
+
+def test_user_leave_dm_they_are_not_in(clear_data, create_data):
+    _, _, _, dm_id, _, _ = create_data
+
+    # register user, log them in and get their user_id
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'another@mycompany.com',
+                                                                           'password': 'mypassword',
+                                                                           'name_first': 'Firstname',
+                                                                           'name_last': 'Lastname'
+                                                                           })
+
+    # stores a token and user id
+    auth_token_3 = json.loads(register_data.text)['token']
+
+    ## creator leaves the channel
+    resp = requests.post(config.url + 'dm/leave/v1', json={'token': auth_token_3,
+                                                      'dm_id': dm_id,
+                                                      })
     assert resp.status_code == 403
