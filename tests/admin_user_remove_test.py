@@ -142,14 +142,13 @@ def test_member_of_dm(clear_data, create_users, create_dms):
                                                                 'dm_id': dm_id,
                                                                 'message': 'one more message'
                                                             })
+    message_id_2 = json.loads(create_message.text)['message_id']
 
-    create_message = requests.post(config.url + 'message/senddm/v1', json = {
+    requests.post(config.url + 'message/senddm/v1', json = {
                                                                 'token': token_1,
                                                                 'dm_id': dm_id,
                                                                 'message': 'one more message'
                                                             })
-
-    message_id_2 = json.loads(create_message.text)['message_id']
 
     requests.delete(config.url + 'admin/user/remove/v1', json={
                                                                'token': token_1,
