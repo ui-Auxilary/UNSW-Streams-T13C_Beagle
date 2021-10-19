@@ -89,7 +89,7 @@ def create_dms(create_users):
     return dm_id, message_id
 
 def test_simple_case(clear_data, create_users):
-    token_1, user_id_1, _, user_id_2 = create_users
+    token_1, _, _, user_id_2 = create_users
 
     requests.delete(config.url + 'admin/user/remove/v1', json = {
                                                                     'token': token_1,
