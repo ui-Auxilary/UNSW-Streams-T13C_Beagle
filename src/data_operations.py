@@ -136,6 +136,8 @@ def remove_user_details(user_id):
     data_source['user_handles'].remove(user_handle)
     data_source['user_emails'].remove(user_email)
 
+    data_source['user_ids'].remove(user_id)
+
 def get_user_channels(user_id):
     '''
     Gets the list of channels the user is currently in

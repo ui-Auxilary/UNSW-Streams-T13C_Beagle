@@ -96,33 +96,20 @@ def test_simple_case(clear_data, create_users):
                                                                     'u_id': user_id_2
                                                                   })
 
-    global_owner_profile = requests.get(config.url + 'user/profile/v1', params = {  
-                                                                                    'token': token_1,
-                                                                                    'u_id': user_id_1
-                                                                                  })
-   
-    get_user_profile = requests.get(config.url + 'user/profile/v1', params = {  
+    get_user_profile = requests.get(config.url + 'user/profile/v1', params = {
                                                                           'token': token_1,
                                                                           'u_id': user_id_2
                                                                          })
 
-    owner_profile = json.loads(global_owner_profile.text)['user']                                                                         
     user_profile = json.loads(get_user_profile.text)['user']
-    
-    all_users = requests.get(config.url + 'users/all/v1', params = {'token': token_1
-                                                                    })
-    users = json.loads(all_users.text)['users']
 
-    assert user_profile == { 
+    assert user_profile == {
                        'u_id': user_id_2,
                        'name_first': 'Removed',
                        'name_last': 'user',
                        'email': '',
-                       'handle_str': '' 
+                       'handle_str': ''
                       }
-    
-    assert owner_profile in users
-    assert user_profile in users
 
 def test_member_of_dm(clear_data, create_users, create_dms):
     
@@ -231,11 +218,11 @@ def test_channel_owner(clear_data, create_users, create_channel):
                        'name_first': 'Removed',
                        'name_last': 'user',
                        'email': '',
-                       'handle_str': '' 
+                       'handle_str': ''
                       }
 
     assert user_owner in users
-    assert user_profile in users
+    assert user_profile not in users
 
 def test_remove_sole_channel_owner(clear_data, create_users, create_channel):
     token_1, user_id_1, token_2, user_id_2 = create_users
@@ -289,7 +276,7 @@ def test_remove_sole_channel_owner(clear_data, create_users, create_channel):
                        'handle_str': ''
                       }
 
-    assert user_profile in users
+    assert user_profile not in users
     assert owner_profile in users
 
 def test_invalid_user_id(clear_data, create_users):
