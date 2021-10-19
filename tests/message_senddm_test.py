@@ -262,7 +262,6 @@ def test_message_length_more_than_thousand_char_and_invalid_token(clear_data, cr
 
 def test_user_leave_dm_they_are_not_in(clear_data, create_user_and_channel):
     _, _, dm_id, _ = create_user_and_channel
-    start = 0
 
     # register user, log them in and get their user_id
     register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'another@mycompany.com',
