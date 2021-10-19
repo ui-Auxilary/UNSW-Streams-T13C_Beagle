@@ -194,12 +194,10 @@ def edit_user(user_id, key, new_value):
 
     if key == 'user_handle':
         data_source['user_handles'].remove(old_value)
-        if new_value:
-            data_source['user_handles'].append(new_value)
+        data_source['user_handles'].append(new_value)
     elif key == 'email_address':
         data_source['user_emails'].remove(old_value)
-        if new_value:
-            data_source['user_emails'].append(new_value)
+        data_source['user_emails'].append(new_value)
 
     # edit the property
     data_source['user_data'][user_id][key] = new_value
