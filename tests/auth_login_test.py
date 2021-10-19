@@ -45,7 +45,7 @@ def create_data():
     return auth_user_id
 
 
-""" def test_basic_case(clear_data, create_data):
+def test_basic_case(clear_data, create_data):
     auth_user_id = create_data
     assert type(auth_user_id) == int
 
@@ -82,7 +82,7 @@ def test_matching_password(clear_data, create_data):
     user_id_data = requests.post(config.url + 'auth/login/v2', json={'email': 'hello@mycompany.com',
                                                                      'password': 'notmyrealpassword'
                                                                     })
-    assert user_id_data.status_code == 400 """
+    assert user_id_data.status_code == 400
 
 def test_login_second_user(clear_data, create_data):
     # register a user and log them in
