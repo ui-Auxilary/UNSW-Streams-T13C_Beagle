@@ -194,19 +194,15 @@ def channel_messages_v1(token, channel_id, start):
     for message_pos, message_id in enumerate(message_id_list):
         ## if message in given range
         if start <= message_pos < end - 1:
-            try:
-                message_info = get_message_by_id(message_id)
-                
-                ## add message to message_list
-                result_arr.append({
-                    'message_id': message_id,
-                    'u_id': message_info['author'],
-                    'message': message_info['content'],
-                    'time_created': message_info['time_created']
-                })
+            message_info = get_message_by_id(message_id)
 
-            except:
-                pass
+            ## add message to message_list
+            result_arr.append({
+                'message_id': message_id,
+                'u_id': message_info['author'],
+                'message': message_info['content'],
+                'time_created': message_info['time_created']
+            })
 
         ## if past 50 messages, then exit
         if message_pos == end:
