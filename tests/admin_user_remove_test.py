@@ -7,11 +7,11 @@ import requests
 from src import config
 
 '''
-InputError when any of:      
+InputError when any of:
     - u_id does not refer to a valid user
     - u_id refers to a user who is the only global owner
-      
-AccessError when:      
+
+AccessError when:
     - the authorised user is not a global owner
 
 TestCases:
@@ -33,7 +33,7 @@ def create_users():
                                                                                 'name_first': 'lawrence',
                                                                                 'name_last': 'lee'
                                                                               })
-                                                        
+
     token_1 = json.loads(register_user_1.text)['token']
     user_id_1 = json.loads(register_user_1.text)['auth_user_id']
 
@@ -43,7 +43,7 @@ def create_users():
                                                                                 'name_first': 'christian',
                                                                                 'name_last': 'lam'
                                                                               })
-                                       
+
     token_2 = json.loads(register_user_2.text)['token']
     user_id_2 = json.loads(register_user_2.text)['auth_user_id']
 
@@ -68,7 +68,7 @@ def create_channel(create_users):
     channel_id_2 = json.loads(create_channel_2.text)['channel_id']
 
     return channel_id, channel_id_2
-    
+
 @pytest.fixture
 def create_dms(create_users):
     token_1, _, token_2, user_id_2 = create_users
@@ -111,8 +111,23 @@ def test_simple_case(clear_data, create_users):
                        'handle_str': ''
                       }
 
+def test_removed_user_using_command(clear_data, create_users):
+    token_1, _, token_2, user_id_2 = create_users
+
+    requests.delete(config.url + 'admin/user/remove/v1', json = {
+                                                                    'token': token_1,
+                                                                    'u_id': user_id_2
+                                                                  })
+
+    get_user_profile = requests.get(config.url + 'user/profile/v1', params = {
+                                                                          'token': token_2,
+                                                                          'u_id': user_id_2
+                                                                         })
+
+    assert get_user_profile.status_code == 403
+
 def test_member_of_dm(clear_data, create_users, create_dms):
-    
+
     token_1, _, token_2, user_id_2 = create_users
     dm_id, message_id = create_dms
 
