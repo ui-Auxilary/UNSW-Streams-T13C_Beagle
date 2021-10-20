@@ -76,23 +76,15 @@ def message_edit_v1(token, message_id, message):
 
     if is_channel:
         channel_owner = get_channel(channel_id)['owner']
-
-            ## check message_id exists in the target channel
-        if message_id not in get_messages_by_channel(channel_id):
-            raise InputError(description="Message does not exist in channel")
     else:
         channel_owner = get_dm(channel_id)['owner']
 
-        ## check message_id exists in the target channel
-        if message_id not in get_messages_by_dm(channel_id):
-            raise InputError(description="Message does not exist in dm")
+    message_length = len(message)
 
-    message_length = len(message)    
-    
-    ## assert the length of the message 
+    ## assert the length of the message
     if message_length > 1000:
         raise InputError(description="Message over 1000 characters")
-    
+
     message_author = get_message_by_id(message_id)['author']
 
     if message_author != auth_user_id and auth_user_id not in channel_owner and not get_user(auth_user_id)['global_owner']:
@@ -107,7 +99,7 @@ def message_remove_v1(token, message_id):
 
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
-    
+
     ## check message_id is valid
     if message_id not in get_message_ids():
         raise InputError(description="Invalid message id")
@@ -117,19 +109,11 @@ def message_remove_v1(token, message_id):
 
     ## find the channel where the message is located
     channel_id = get_message_by_id(message_id)['channel_created']
-    
+
     if is_channel:
         channel_owner = get_channel(channel_id)['owner']
-
-            ## check message_id exists in the target channel
-        if message_id not in get_messages_by_channel(channel_id):
-            raise InputError(description="Message does not exist in channel")
     else:
         channel_owner = get_dm(channel_id)['owner']
-
-        ## check message_id exists in the target channel
-        if message_id not in get_messages_by_dm(channel_id):
-            raise InputError(description="Message does not exist in dm")
 
     if message_author != auth_user_id and auth_user_id not in channel_owner and not get_user(auth_user_id)['global_owner']:
         raise AccessError(description="User does not have permissions to remove message")

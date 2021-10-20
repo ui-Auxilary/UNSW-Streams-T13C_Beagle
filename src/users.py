@@ -12,10 +12,11 @@ from src.data_operations import (
     get_user,
     get_user_ids
 )
-from src.other import decode_token
+from src.other import decode_token, check_user_exists
 
 def users_all(token):
-    decode_token(token)
+    user_id = decode_token(token)
+    check_user_exists(user_id)
 
     users = {'users': []}
 

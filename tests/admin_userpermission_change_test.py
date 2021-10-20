@@ -7,11 +7,11 @@ import requests
 from src import config
 
 '''
-InputError when any of:      
+InputError when any of:
     - u_id does not refer to a valid user
     - u_id refers to a user who is the only global owner
-      
-AccessError when:      
+
+AccessError when:
     - the authorised user is not a global owner
 
 TestCases:
@@ -33,7 +33,7 @@ def create_users():
                                                                                 'name_first': 'lawrence',
                                                                                 'name_last': 'lee'
                                                                               })
-                                                        
+
     token_1 = json.loads(register_user_1.text)['token']
     user_id_1 = json.loads(register_user_1.text)['auth_user_id']
 
@@ -43,7 +43,7 @@ def create_users():
                                                                                 'name_first': 'christian',
                                                                                 'name_last': 'lam'
                                                                               })
-                                       
+
     token_2 = json.loads(register_user_2.text)['token']
     user_id_2 = json.loads(register_user_2.text)['auth_user_id']
 
@@ -68,7 +68,7 @@ def create_channel(create_users):
     channel_id_2 = json.loads(create_channel_2.text)['channel_id']
 
     return channel_id, channel_id_2
-    
+
 @pytest.fixture
 def create_dms(create_users):
     token_1, _, token_2, user_id_2 = create_users
@@ -98,7 +98,7 @@ def test_simple_case(clear_data, create_users, create_channel):
                                                                                 'name_first': 'Xidisfsi',
                                                                                 'name_last': 'adasdas'
                                                                               })
-                                                        
+
     _ = json.loads(register_user_3.text)['token']
     user_id_3 = json.loads(register_user_3.text)['auth_user_id']
 
@@ -108,13 +108,13 @@ def test_simple_case(clear_data, create_users, create_channel):
                                                           'channel_id': channel_id_1,
                                                           'u_id': user_id_2
                                                          })
-    
+
     requests.post(config.url + 'channel/invite/v2', json={
                                                           'token': token_1,
                                                           'channel_id': channel_id_1,
                                                           'u_id': user_id_3
                                                          })
-    
+
     ## promote user_3 to channel owner
     requests.post(config.url + 'channel/addowner/v1', json={
                                                           'token': token_1,
@@ -128,23 +128,23 @@ def test_simple_case(clear_data, create_users, create_channel):
                                                                              'channel_id': channel_id_1,
                                                                              'u_id': user_id_1
                                                                             })
-    
+
     assert remove_channel_owner.status_code == 403
 
-    ## change permissions of user_2 to be global owner 
+    ## change permissions of user_2 to be global owner
     requests.post(config.url + 'admin/userpermission/change/v1', json = {
                                                                          'token': token_1,
                                                                          'u_id': user_id_2,
                                                                          'permission_id': 1
                                                                         })
-    
+
     ## check that user_2 can now remove user_1 as the channel owner
     remove_channel_owner = requests.post(config.url + 'channel/removeowner/v1', json={
                                                                              'token': token_2,
                                                                              'channel_id': channel_id_1,
                                                                              'u_id': user_id_1
                                                                             })
-    
+
     assert remove_channel_owner.status_code == 200
 
     channel_details_data = requests.get(config.url + 'channel/details/v2', params={
@@ -167,30 +167,30 @@ def test_owner_demotes_owner(clear_data, create_users, create_channel):
                                                           'channel_id': channel_id_1,
                                                           'u_id': user_id_2
                                                          })
-    
+
     ## check that user has no permissions
     remove_channel_owner = requests.post(config.url + 'channel/removeowner/v1', json={
                                                                              'token': token_2,
                                                                              'channel_id': channel_id_1,
                                                                              'u_id': user_id_1
                                                                             })
-    
+
     assert remove_channel_owner.status_code == 403
 
-    ## change permissions of user_2 to be global owner 
+    ## change permissions of user_2 to be global owner
     requests.post(config.url + 'admin/userpermission/change/v1', json = {
                                                                          'token': token_1,
                                                                          'u_id': user_id_2,
                                                                          'permission_id': 1
                                                                         })
-    
+
     ## user_2 demotes user_1
     change_permissions = requests.post(config.url + 'admin/userpermission/change/v1', json = {
                                                                          'token': token_2,
                                                                          'u_id': user_id_1,
                                                                          'permission_id': 2
                                                                         })
-    
+
     assert change_permissions.status_code == 200
 
      ## check that user_1 has no permissions
@@ -198,7 +198,7 @@ def test_owner_demotes_owner(clear_data, create_users, create_channel):
                                                                                     'token': token_1,
                                                                                     'u_id': user_id_2
                                                                                    })
-    
+
     assert remove_channel_owner.status_code == 403
 
 def test_invalid_permissions(clear_data, create_users):
@@ -209,6 +209,15 @@ def test_invalid_permissions(clear_data, create_users):
                                                                                 'permission_id': 5
                                                                               })
     assert change_permissions.status_code == 400
+
+def test_unauthorised_user(clear_data, create_users):
+    _, user_id_1, token_2, _ = create_users
+    change_permissions = requests.post(config.url + 'admin/userpermission/change/v1', json={
+                                                                                'token': token_2,
+                                                                                'u_id': user_id_1,
+                                                                                'permission_id': 5
+                                                                              })
+    assert change_permissions.status_code == 403
 
 def test_invalid_user_id(clear_data, create_users):
     token_1, _, _, _ = create_users

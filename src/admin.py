@@ -1,45 +1,37 @@
-from src.channels import channels_list_v1
 from src.error import InputError, AccessError
 from src.data_operations import (
-    add_user,
     edit_message,
     edit_user_permissions,
-    get_channel,
     get_channel_messages,
     get_message_by_id,
     get_messages_by_dm,
     get_user_dms,
-    get_user_emails,
     get_user_ids,
-    get_user_handles,
-    get_user,
-    add_session_token,
     remove_member_from_channel,
     remove_member_from_dm,
-    remove_session_token,
     get_global_owners,
     get_user_channels,
     remove_user_details,
     edit_user
 )
-from src.other import encode_token, decode_token, check_user_exists
+from src.other import decode_token, check_user_exists
 
 def admin_user_remove_v1(token, u_id):
     auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
-    
+
     ## check auth_user is a global owner
     if auth_user_id not in get_global_owners():
         raise AccessError(description='Not an authorised global owner')
-    
+
     ## check u_id is valid and not the only global owner
     if u_id not in get_user_ids():
         raise InputError(description='Specified user does not exist')
     if u_id in get_global_owners() and len(get_global_owners()) == 1:
         raise InputError(description='Cannot remove the only global owner')
-    
+
     ## change user's name to Removed user
     edit_user(u_id, 'first_name', 'Removed')
     edit_user(u_id, 'last_name', 'user')
@@ -56,7 +48,7 @@ def admin_user_remove_v1(token, u_id):
             if message_author == u_id:
                 edit_message(True, channel_id, message_id, 'Removed user')
         remove_member_from_channel(channel_id, u_id)
-    
+
     ## edit dm messages
     for dm_id in dm_list:
         for message_id in get_messages_by_dm(dm_id):
@@ -75,11 +67,11 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
 
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
-    
+
     ## check auth_user is a global owner
     if auth_user_id not in get_global_owners():
         raise AccessError(description='Not an authorised global owner')
-    
+
     ## check u_id is valid and not the only global owner
     if u_id not in get_user_ids():
         raise InputError(description='Specified user does not exist')
@@ -91,7 +83,7 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     ## check the specified permission_id is valid
     if permission_id not in valid_permission:
         raise InputError(description='Permission does not exist')
-    
+
     edit_user_permissions(int(u_id), int(permission_id))
-    
+
     return {}

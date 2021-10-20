@@ -29,11 +29,13 @@ Functions:
     get_message_by_id(message_id: int) -> dict
     get_messages_by_channel(channel_id: int) -> list
     add_session_token(token: str, user_id: int)
-    remove_session_token(token: str) 
+    remove_session_token(token: str)
     get_user_from_token(token: str) -> int
 '''
 
 from src.data_store import data_store
+import json
+import time
 
 def reset_data_store_to_default():
     '''
@@ -134,6 +136,8 @@ def remove_user_details(user_id):
     data_source['user_handles'].remove(user_handle)
     data_source['user_emails'].remove(user_email)
 
+    data_source['user_ids'].remove(user_id)
+
 def get_user_channels(user_id):
     '''
     Gets the list of channels the user is currently in
@@ -192,12 +196,10 @@ def edit_user(user_id, key, new_value):
 
     if key == 'user_handle':
         data_source['user_handles'].remove(old_value)
-        if new_value:
-            data_source['user_handles'].append(new_value)
+        data_source['user_handles'].append(new_value)
     elif key == 'email_address':
         data_source['user_emails'].remove(old_value)
-        if new_value:
-            data_source['user_emails'].append(new_value)
+        data_source['user_emails'].append(new_value)
 
     # edit the property
     data_source['user_data'][user_id][key] = new_value
@@ -265,6 +267,20 @@ def get_user_ids():
 
     data_source = data_store.get()
     return data_source['user_ids']
+
+def get_complete_user_ids():
+    '''
+    Gets the id's of all users from the database
+
+    Arguments:
+        None
+
+    Return Value:
+        user_ids (list): list of all users' user_ids
+    '''
+
+    data_source = data_store.get()
+    return data_source['user_data'].keys()
 
 def add_member_to_channel(channel_id, user_id):
     '''
@@ -717,3 +733,24 @@ def remove_owner_from_channel(user_id, channel_id):
     data_source = data_store.get()
     ## adds a user to the owner list of the channel
     data_source['channel_data'][channel_id]['owner'].remove(user_id)
+
+def data_dump():
+    while True:
+        data_source = data_store.get()
+        with open('data_store.json', 'w') as data_file:
+            json.dump(data_source, data_file)
+
+        time.sleep(1)
+
+def data_restore():
+    data_source = data_store.get()
+
+    try:
+        with open('data_restore.json') as data_file:
+            data_source = json.load(data_file)
+    except:
+        pass
+
+    ## save it back purely for pylint unused global data_source
+    with open('data_store.json', 'w') as data_file:
+        json.dump(data_source, data_file)

@@ -78,9 +78,27 @@ def test_email_exists(clear_data):
 
 
 def test_matching_password(clear_data, create_data):
-    create_data
     # get the user's id
     user_id_data = requests.post(config.url + 'auth/login/v2', json={'email': 'hello@mycompany.com',
                                                                      'password': 'notmyrealpassword'
                                                                     })
     assert user_id_data.status_code == 400
+
+def test_login_second_user(clear_data, create_data):
+    # register a user and log them in
+    user_id_data = requests.post(config.url + 'auth/register/v2',
+                                                    json={  'email': 'imanotherperson@mycompany.com',
+                                                            'password': 'mypassword',
+                                                            'name_first': 'Firstname',
+                                                            'name_last': 'Lastname'
+                                                    })
+
+    user_id_1 = json.loads(user_id_data.text)['auth_user_id']
+    # get the user's id
+    user_id_data = requests.post(config.url + 'auth/login/v2',
+                                                json={  'email': 'imanotherperson@mycompany.com',
+                                                        'password': 'mypassword'
+                                                })
+    user_id_2 = json.loads(user_id_data.text)['auth_user_id']
+
+    assert user_id_1 == user_id_2

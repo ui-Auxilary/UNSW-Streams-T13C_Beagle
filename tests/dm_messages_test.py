@@ -205,3 +205,23 @@ def test_start_more_than_total_messages_and_invalid_user(clear_data, create_data
                                                                })
 
     assert resp.status_code == 403
+
+def test_user_leave_dm_they_are_not_in(clear_data, create_data):
+    _, _, dm_id = create_data
+    start = 0
+
+    # register user, log them in and get their user_id
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'another@mycompany.com',
+                                                                           'password': 'mypassword',
+                                                                           'name_first': 'Firstname',
+                                                                           'name_last': 'Lastname'
+                                                                           })
+
+    # stores a token and user id
+    auth_token_3 = json.loads(register_data.text)['token']
+
+    dm_data = requests.get(config.url + 'dm/messages/v1', params={'token': auth_token_3,
+                                                                            'dm_id': dm_id,
+                                                                            'start': start
+                                                                            })
+    assert dm_data.status_code == 403

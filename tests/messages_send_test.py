@@ -9,12 +9,12 @@ Send a message from the authorised user to the channel specified by channel_id. 
 i.e. no messages should share an ID with another message, even if that other message is in a different channel.
 
 InputError when:
-      
+
     - channel_id does not refer to a valid channel
     - length of message is less than 1 or over 1000 characters
-      
+
 AccessError when:
-      
+
     - channel_id is valid and the authorised user is not a member of the channel
 
 '''
@@ -80,20 +80,20 @@ def test_simple_case(clear_data, create_data):
                                                                        'channel_id': channel_id,
                                                                        'start': 0
                                                                       })
-  
+
     ## get user_data
     user_profile_data = requests.get(config.url + 'user/profile/v1', params={
                                                                              'token': token,
                                                                              'u_id': auth_user_id,
                                                                             })
-    
+
     user_profile = json.loads(user_profile_data.text)['user']
     print(user_profile)
     user_id = user_profile['u_id']
     print(user_id)
     print(json.loads(message_data.text)['messages'])
     message_list = json.loads(message_data.text)['messages']
-    
+
     assert any(('u_id', user_id) in msg.items() for msg in message_list)
     assert any(('message_id', message_id) in msg.items() for msg in message_list)
     assert any(('message', message) in msg.items() for msg in message_list)
@@ -110,6 +110,25 @@ def test_invalid_channel_id(clear_data, create_data):
 
     assert resp.status_code == 400
 
+def test_user_not_channel_member(clear_data, create_data):
+    _, _, channel_id, _, message = create_data
+    # register user, log them in and get their user_id
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'new@mycompany.com',
+                                                                           'password': 'mypassword',
+                                                                           'name_first': 'Firstname',
+                                                                           'name_last': 'Lastname'
+                                                                           })
+
+    # stores a token
+    token = json.loads(register_data.text)['token']
+
+    # message is sent to a non-existent channel
+    resp = requests.post(config.url + 'message/send/v1', json={ 'token': token,
+                                                                'channel_id': channel_id,
+                                                                'message': message
+                                                            })
+
+    assert resp.status_code == 403
 
 def test_message_1_char(clear_data, create_data):
     token, auth_user_id, channel_id, message_id, _ = create_data
@@ -128,17 +147,17 @@ def test_message_1_char(clear_data, create_data):
                                                                        'channel_id': channel_id,
                                                                        'start': 0
                                                                       })
-  
+
     ## get user_data
     user_profile_data = requests.get(config.url + 'user/profile/v1', params={
                                                                              'token': token,
                                                                              'u_id': auth_user_id,
                                                                             })
-    
+
     user_profile = json.loads(user_profile_data.text)['user']
     user_id = user_profile['u_id']
     message_list = json.loads(message_data.text)['messages']
-    
+
     assert any(('u_id', user_id) in msg.items() for msg in message_list)
     assert any(('message_id', message_id) in msg.items() for msg in message_list)
     assert any(('message', message) in msg.items() for msg in message_list)

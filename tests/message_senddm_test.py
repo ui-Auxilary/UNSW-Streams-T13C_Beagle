@@ -259,3 +259,22 @@ def test_message_length_more_than_thousand_char_and_invalid_token(clear_data, cr
                                                                    })
 
     assert resp.status_code == 403
+
+def test_user_leave_dm_they_are_not_in(clear_data, create_user_and_channel):
+    _, _, dm_id, _ = create_user_and_channel
+
+    # register user, log them in and get their user_id
+    register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'another@mycompany.com',
+                                                                           'password': 'mypassword',
+                                                                           'name_first': 'Firstname',
+                                                                           'name_last': 'Lastname'
+                                                                           })
+
+    # stores a token and user id
+    auth_token_3 = json.loads(register_data.text)['token']
+
+    dm_data = requests.post(config.url + 'message/senddm/v1', json={'token': auth_token_3,
+                                                                   'dm_id': dm_id,
+                                                                   'message': 'hello'
+                                                                   })
+    assert dm_data.status_code == 403

@@ -1,5 +1,6 @@
 import sys
 import signal
+import threading
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
@@ -20,6 +21,7 @@ from src.other import clear_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_details_v1, channel_join_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
+from src.data_operations import data_dump, data_restore
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -117,7 +119,7 @@ def user_join_channel():
     data = request.get_json()
     ## get user's token
     user_token = data['token']
-    channel_id = int(data['channel_id'])
+    channel_id = data['channel_id']
     return dumps(channel_join_v1(user_token, channel_id))
 
 @APP.route("/channel/invite/v2", methods=['POST'])
@@ -125,8 +127,8 @@ def invite_user_to_channel():
     data = request.get_json()
     ## get user's token
     user_token = data['token']
-    channel_id = int(data['channel_id'])
-    u_id = int(data['u_id'])
+    channel_id = data['channel_id']
+    u_id = data['u_id']
     return dumps(channel_invite_v1(user_token, channel_id, u_id))
 
 @APP.route("/channel/messages/v2", methods=['GET'])
@@ -142,7 +144,7 @@ def channel_leave():
     data = request.get_json()
     ## get user's token
     user_token = data['token']
-    channel_id = int(data['channel_id'])
+    channel_id = data['channel_id']
 
     return dumps(channel_leave_v1(user_token, channel_id))
 
@@ -151,13 +153,8 @@ def add_owner_to_channel():
     data = request.get_json()
     ## get user's token
     user_token = data['token']
-    channel_id = 0
-    u_id = 0
-    try:
-        channel_id = int(data['channel_id'])
-        u_id = int(data['u_id'])
-    except:
-        InputError(description='Invalid arguments')
+    channel_id = data['channel_id']
+    u_id = data['u_id']
     return dumps(channel_addowner_v1(user_token, channel_id, u_id))
 
 @APP.route("/channel/removeowner/v1", methods=['POST'])
@@ -165,13 +162,8 @@ def remove_owner_from_channel():
     data = request.get_json()
     ## get user's token
     user_token = data['token']
-    channel_id = 0
-    u_id = 0
-    try:
-        channel_id = int(data['channel_id'])
-        u_id = int(data['u_id'])
-    except:
-        InputError(description='Invalid arguments')
+    channel_id = data['channel_id']
+    u_id = data['u_id']
     return dumps(channel_removeowner_v1(user_token, channel_id, u_id))
 
 @APP.route("/dm/create/v1", methods=['POST'])
@@ -208,7 +200,7 @@ def dm_remove():
     data = request.get_json()
     ## get token of user to be removed from DM
     user_token = data['token']
-    dm_id = int(data['dm_id'])
+    dm_id = data['dm_id']
 
     return dumps(dm_remove_v1(user_token, dm_id))
 
@@ -225,7 +217,7 @@ def dm_leave():
     data = request.get_json()
     ## get token of user leaving the DM
     user_token = data['token']
-    dm_id = int(data['dm_id'])
+    dm_id = data['dm_id']
 
     return dumps(dm_leave_v1(user_token, dm_id))
 
@@ -234,7 +226,7 @@ def message_send():
     data = request.get_json()
     ## get user's token and channel that the message will be sent to
     user_token = data['token']
-    channel_id = int(data['channel_id'])
+    channel_id = data['channel_id']
 
     message = data['message']
 
@@ -245,7 +237,7 @@ def message_edit():
     data = request.get_json()
     ## get user's token and channel that the message will edited in
     user_token = data['token']
-    message_id = int(data['message_id'])
+    message_id = data['message_id']
     message = data['message']
 
     return dumps(message_edit_v1(user_token, message_id, message))
@@ -255,7 +247,7 @@ def message_remove():
     data = request.get_json()
     ## get user's token and channel that the message will edited in
     user_token = data['token']
-    message_id = int(data['message_id'])
+    message_id = data['message_id']
 
     return dumps(message_remove_v1(user_token, message_id))
 
@@ -264,7 +256,7 @@ def message_send_dm():
     data = request.get_json()
     ## get user's token and DM that the message will be sent to
     user_token = data['token']
-    dm_id = int(data['dm_id'])
+    dm_id = data['dm_id']
 
     message = data['message']
 
@@ -349,8 +341,20 @@ def clear_data_store():
     clear_v1()
     return dumps({})
 
+def init_store():
+    global worker
+    worker = threading.Thread(target=data_dump)
+    worker.daemon = True    ## get thread to end with the python program
+    worker.start()          ## start the thread
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
+
+    ## commence the persistent storage
+    data_restore()  ## load the data_store
+    init_store()    ## run the persistent storage thread
+
+    ## run the flask app
     APP.run(port=config.port) # Do not edit this port
