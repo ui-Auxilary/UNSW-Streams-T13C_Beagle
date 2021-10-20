@@ -89,11 +89,12 @@ def test_only_owner_leaves(clear_data, create_users, create_channel):
     channel_id = create_channel
 
     leave_channel = requests.post(config.url + 'channel/leave/v1', json={ 
-                                                                              'token': token_1,
-                                                                              'channel_id': channel_id,                                                                
-                                                                            })
+                                                                          'token': token_1,
+                                                                          'channel_id': channel_id,                                                                
+                                                                        })
     
     assert leave_channel.status_code == 200
+    
     channel_details = requests.get(config.url + 'channel/details/v2', params={ 
                                                                               'token': token_2,
                                                                               'channel_id': channel_id,                                                                
@@ -197,9 +198,9 @@ def test_invalid_channel(clear_data, create_users, create_channel):
     create_channel
 
     leave_channel = requests.post(config.url + 'channel/leave/v1', json={ 
-                                                                              'token': token_2,
-                                                                              'channel_id': 1221,                                                                
-                                                                            })
+                                                                          'token': token_2,
+                                                                          'channel_id': 1221,                                                                
+                                                                        })
     
     assert leave_channel.status_code == 400
 
