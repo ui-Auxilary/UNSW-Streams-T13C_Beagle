@@ -48,28 +48,28 @@ def create_data():
 
 def test_register_multiple_login(clear_data, create_data):
     # register a user and log them in
-    register_user_data = requests.post(config.url + 'auth/register/v2', json={'email': 'yourdad@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={'email': 'yourdad@mycompany.com',
                                                          'password': 'anotherpassword',
                                                          'name_first': 'Firstname',
                                                          'name_last': 'Lastname'
                                                          })
 
     # register a user and log them in
-    register_user_data = requests.post(config.url + 'auth/register/v2', json={'email': 'yourmum@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={'email': 'yourmum@mycompany.com',
                                                          'password': 'anotherpassword',
                                                          'name_first': 'Firstname',
                                                          'name_last': 'Lastname'
                                                          })
 
     # register a user and log them in
-    register_user_data = requests.post(config.url + 'auth/register/v2', json={'email': 'yournan@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={'email': 'yournan@mycompany.com',
                                                          'password': 'anotherpassword',
                                                          'name_first': 'Firstname',
                                                          'name_last': 'Lastname'
                                                          })
     
     # register a user and log them in
-    register_user_data = requests.post(config.url + 'auth/register/v2', json={'email': 'yourson@mycompany.com',
+    requests.post(config.url + 'auth/register/v2', json={'email': 'yourson@mycompany.com',
                                                          'password': 'anotherpassword',
                                                          'name_first': 'Firstname',
                                                          'name_last': 'Lastname'
