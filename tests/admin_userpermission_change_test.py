@@ -157,9 +157,8 @@ def test_simple_case(clear_data, create_users, create_channel):
     ## check that user_1 is no longer a channel owner
     assert any(('u_id', user_id_1) in owner.items() for owner in channel_owners) == False
 
-def test_promote_then_demote_global_owner(clear_data, create_users, create_channel):
+def test_promote_then_demote_global_owner(clear_data, create_users):
     token_1, user_id_1, token_2, user_id_2 = create_users
-    channel_id_1, _ = create_channel
 
     ## register another user
     register_user_3 = requests.post(config.url + 'auth/register/v2', json = { 
@@ -220,9 +219,8 @@ def test_promote_then_demote_global_owner(clear_data, create_users, create_chann
 
     assert remove_channel_owner.status_code == 403
 
-def test_demote_user_to_user(clear_data, create_users, create_channel):
-    token_1, user_id_1, token_2, user_id_2 = create_users
-    channel_id_1, _ = create_channel
+def test_demote_user_to_user(clear_data, create_users):
+    token_1, user_id_1, _, _ = create_users
 
     ## register another user
     register_user_3 = requests.post(config.url + 'auth/register/v2', json = { 
