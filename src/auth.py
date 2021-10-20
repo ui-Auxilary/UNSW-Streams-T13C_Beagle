@@ -81,20 +81,20 @@ def auth_login_v1(email, password):
     Return Value:
         { auth_user_id (int): unique user_id for user }
     '''
-
-    ## Check if email belongs to user
-    if email not in get_user_emails():
-        raise InputError('Email entered does not belong to a user')
-
+    
     ## Get user ID from email in data
     for person in get_user_ids():
         if get_user(person)['email_address'] == email:
             user_id = person
             break
 
+    ## Check if email belongs to user
+    if email not in get_user_emails():
+        raise InputError(description='Email entered does not belong to a user')
+
     ## Check if password is correct
     if get_user(user_id)['password'] != hashlib.sha256(password.encode()).hexdigest():
-        raise InputError('Password is not correct')
+        raise InputError(description='Password is not correct')
 
     ## add token to session
     user_token = encode_token(user_id)
@@ -131,23 +131,23 @@ def auth_register_v1(email, password, name_first, name_last):
     ## check whether email valid
     pattern = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
     if not re.match(pattern, email):
-        raise InputError('Invalid email address')
+        raise InputError(description='Invalid email address')
 
     ## check that email is unique
     if email in get_user_emails():
-        raise InputError('Email already taken')
+        raise InputError(description='Email already taken')
 
     ## check whether password valid (password must be >= 6 chars)
     if len(password) < 6:
-        raise InputError('Password too short')
+        raise InputError(description='Password too short')
 
     ## check whether name_first and name_last between 1 and 50 chars inclusive
     name_first_len = len(name_first)
     name_last_len = len(name_last)
     if name_first_len < 1 or name_first_len > 50:
-        raise InputError('First name not valid size')
+        raise InputError(description='First name not valid size')
     if name_last_len < 1 or name_last_len > 50:
-        raise InputError('Last name not valid size')
+        raise InputError(description='Last name not valid size')
 
     ## get a unique user_handle
     user_handle = generate_user_handle(name_first, name_last)

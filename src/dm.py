@@ -13,7 +13,8 @@ from src.data_operations import (
     get_message_ids,
     get_messages_by_dm,
     get_user,
-    get_user_ids
+    get_user_ids,
+    remove_member_from_dm
 )
 
 def dm_create_v1(token, u_ids):
@@ -166,7 +167,7 @@ def dm_leave_v1(token, dm_id):
         dm_owner.remove(auth_user_id)
 
     ## remove user from members in the DM
-    dm_members.remove(auth_user_id)
+    remove_member_from_dm(dm_id, auth_user_id)
 
     return {}
 
@@ -190,7 +191,7 @@ def dm_messages_v1(token, dm_id, start):
 
     ## checks that start does not exceed total messages
     if start > len(message_id_list):
-        raise InputError('Start number exceeds total messages')
+        raise InputError(description="Start number exceeds total messages")
 
     result_arr = []
     for message_pos, message_id in enumerate(message_id_list):

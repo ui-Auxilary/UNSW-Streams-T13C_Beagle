@@ -12,7 +12,6 @@ import jwt
 from src.data_operations import (
     get_user_ids,
     reset_data_store_to_default,
-    get_user_from_token,
     get_all_valid_tokens,
     add_session_token
 )

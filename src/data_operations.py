@@ -221,7 +221,7 @@ def edit_user_permissions(user_id, permission_id):
     if permission_id == 1:
         data_source['user_data'][user_id]['global_owner'] = True
         data_source['global_owners'].append(user_id)
-    elif permission_id == 2:
+    if permission_id == 2:
         data_source['user_data'][user_id]['global_owner'] = False
         if user_id in data_source['global_owners']:
             data_source['global_owners'].remove(user_id)
@@ -451,6 +451,7 @@ def add_dm(dm_id, dm_name, auth_user_id):
 
     # add dm to dm_ids list
     data_source['dm_ids'].append(dm_id)
+    data_source['dm_data'][dm_id]['owner'].append(auth_user_id)
     data_source['user_data'][auth_user_id]['in_dms'].append(dm_id)
 
 def get_dm(dm_id):
@@ -528,7 +529,7 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
     # add message to the channel's message list
     if is_channel:
         data_source['channel_data'][channel_id]['message_ids'].append(message_id)
-    elif not is_channel:
+    else:
         data_source['dm_data'][channel_id]['message_ids'].append(message_id)
 
     # add unique message id to message_ids list
@@ -554,7 +555,7 @@ def edit_message(is_channel, channel_id, message_id, message):
     if not message:
         remove_message(is_channel, channel_id, message_id)
     elif message == 'Removed user':
-        data_source['message_data'][message_id]['content'] = message
+        data_source['message_data'][message_id]['content'] = 'Removed user'
     else:
         data_source['message_data'][message_id]['content'] = message
 
@@ -676,20 +677,6 @@ def remove_session_token(token):
     data_source = data_store.get()
     del data_source['token'][token]
 
-def get_user_from_token(token):
-    '''
-    retrieves a user_id for a particular token
-
-    Arguments:
-        token   (str): the token for the session
-
-    Return Value:
-        user_id (int): user's user_id
-    '''
-
-    data_source = data_store.get()
-    return data_source['token'][token]
-
 def get_all_valid_tokens():
     '''
     retrieves a set of all currently valid tokens
@@ -731,7 +718,7 @@ def remove_owner_from_channel(user_id, channel_id):
     '''
 
     data_source = data_store.get()
-    ## adds a user to the owner list of the channel
+    ## removes a user from the owner list of the channel
     data_source['channel_data'][channel_id]['owner'].remove(user_id)
 
 def data_dump():
