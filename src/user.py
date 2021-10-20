@@ -41,6 +41,7 @@ def user_profile(token, user_id):
 def user_profile_setname(token, first_name, last_name):
     ## check if valid token and decode it
     user_id = decode_token(token)
+    
     check_user_exists(user_id)
 
     ## check that new handle is valid length and alphanumeric

@@ -104,7 +104,7 @@ def channels_create_v1(token, name, is_public):
 
     ## check channel name between 1 and 20 characters
     if not 1 <= len(name) <= 20:
-        raise InputError('Invalid channel name size')
+        raise InputError(description='Invalid channel name size')
 
     ## get a new id for the channel and add channel to system
     new_channel_id = len(get_channel_ids()) + 1

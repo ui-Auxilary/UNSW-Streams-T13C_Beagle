@@ -157,6 +157,97 @@ def test_simple_case(clear_data, create_users, create_channel):
     ## check that user_1 is no longer a channel owner
     assert any(('u_id', user_id_1) in owner.items() for owner in channel_owners) == False
 
+def test_promote_then_demote_global_owner(clear_data, create_users):
+    token_1, user_id_1, token_2, user_id_2 = create_users
+
+    ## register another user
+    register_user_3 = requests.post(config.url + 'auth/register/v2', json = { 
+                                                                                'email': 'pood@gmail.com',
+                                                                                'password': 'qwertyuiop',
+                                                                                'name_first': 'lawrence',
+                                                                                'name_last': 'lee'
+                                                                              })
+
+    token_3 = json.loads(register_user_3.text)['token']
+    user_id_3 = json.loads(register_user_3.text)['auth_user_id']
+
+    ## change permissions of user_2 and user_3 to be global owner
+    permission_change = requests.post(config.url + 'admin/userpermission/change/v1', json = {
+                                                                         'token': token_1,
+                                                                         'u_id': user_id_2,
+                                                                         'permission_id': 1
+                                                                        })
+    assert permission_change.status_code == 200
+
+    permission_change = requests.post(config.url + 'admin/userpermission/change/v1', json = {
+                                                                         'token': token_1,
+                                                                         'u_id': user_id_3,
+                                                                         'permission_id': 1
+                                                                        })
+    
+    assert permission_change.status_code == 200
+
+    ## change permissions of user_2 and user_1 to be stream member
+    permission_change = requests.post(config.url + 'admin/userpermission/change/v1', json = {
+                                                                         'token': token_3,
+                                                                         'u_id': user_id_2,
+                                                                         'permission_id': 2
+                                                                        })
+
+    assert permission_change.status_code == 200
+
+    permission_change = requests.post(config.url + 'admin/userpermission/change/v1', json = {
+                                                                         'token': token_3,
+                                                                         'u_id': user_id_1,
+                                                                         'permission_id': 2
+                                                                        })
+    
+    assert permission_change.status_code == 200
+
+    ## check that user_2 and user_1 has no perms
+    remove_channel_owner = requests.delete(config.url + 'admin/user/remove/v1', json={
+                                                                                    'token': token_2,
+                                                                                    'u_id': user_id_3
+                                                                                   })
+
+    assert remove_channel_owner.status_code == 403
+
+    remove_channel_owner = requests.delete(config.url + 'admin/user/remove/v1', json={
+                                                                                    'token': token_1,
+                                                                                    'u_id': user_id_3
+                                                                                   })
+
+    assert remove_channel_owner.status_code == 403
+
+def test_demote_user_to_user(clear_data, create_users):
+    token_1, user_id_1, _, _ = create_users
+
+    ## register another user
+    register_user_3 = requests.post(config.url + 'auth/register/v2', json = { 
+                                                                                'email': 'pood@gmail.com',
+                                                                                'password': 'qwertyuiop',
+                                                                                'name_first': 'lawrence',
+                                                                                'name_last': 'lee'
+                                                                              })
+
+    token_3 = json.loads(register_user_3.text)['token']
+    user_id_3 = json.loads(register_user_3.text)['auth_user_id']
+
+    ## change permissions of user_3 to stream member
+    permission_change = requests.post(config.url + 'admin/userpermission/change/v1', json = {
+                                                                                             'token': token_1,
+                                                                                             'u_id': user_id_3,
+                                                                                             'permission_id': 2
+                                                                                            })
+    assert permission_change.status_code == 200
+    
+    ## check that user_3 has no perms
+    remove_channel_owner = requests.delete(config.url + 'admin/user/remove/v1', json={
+                                                                                      'token': token_3,
+                                                                                      'u_id': user_id_1
+                                                                                     })
+    assert remove_channel_owner.status_code == 403
+
 def test_owner_demotes_owner(clear_data, create_users, create_channel):
     token_1, user_id_1, token_2, user_id_2 = create_users
     channel_id_1, _ = create_channel
