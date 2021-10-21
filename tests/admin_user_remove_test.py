@@ -133,9 +133,6 @@ def test_removed_user_using_command(clear_data, create_users):
     assert get_user_profile.status_code == 403
 
 
-# def test_send_edit_remove_user(clear_data, create_users, create_channel):
-
-
 def test_member_of_dm(clear_data, create_users, create_dms):
     token_1, _, token_2, user_id_2 = create_users
     dm_id, message_id = create_dms
@@ -437,3 +434,49 @@ def test_invalid_token(clear_data, create_users):
         'u_id': user_id_2
     })
     assert remove_user.status_code == 403
+
+
+@pytest.mark.skip("Whitebox testing")
+def test_send_edit_message_then_remove_user(clear_data, create_users, create_dms):
+    token_1, _, token_2, user_id_2 = create_users
+    dm_id, message_id = create_dms
+
+    requests.post(config.url + 'message/senddm/v1', json={
+        'token': token_2,
+        'dm_id': dm_id,
+        'message': 'another message'
+    })
+
+    create_message = requests.post(config.url + 'message/senddm/v1', json={
+        'token': token_1,
+        'dm_id': dm_id,
+        'message': 'one more message'
+    })
+
+    message_id_2 = json.loads(create_message.text)['message_id']
+
+    requests.post(config.url + 'message/senddm/v1', json={
+        'token': token_1,
+        'dm_id': dm_id,
+        'message': 'one more message'
+    })
+
+    # user_2 edits message_2
+    requests.put(config.url + 'message/edit/v1', json={
+        'token': token_1,
+        'message_id': message_id_2,
+        'message': "Sponegebob squarepants"
+    })
+
+    requests.delete(config.url + 'admin/user/remove/v1', json={
+        'token': token_1,
+        'u_id': user_id_2
+    })
+
+    check_message = requests.get(config.url + 'dm/messages/v1', params={
+        'token': token_1,
+        'dm_id': dm_id,
+        'start': 0
+    })
+
+    messages = json.loads(check_message.text)['messages']

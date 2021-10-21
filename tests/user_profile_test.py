@@ -22,10 +22,10 @@ def clear_data():
 def create_data(clear_data):
     # register user, log them in and get their user_id
     register_data = requests.post(config.url + 'auth/register/v2', json={'email': 'hello@mycompany.com',
-                                                                           'password': 'mypassword',
-                                                                           'name_first': 'Firstname',
-                                                                           'name_last': 'Lastname'
-                                                                           })
+                                                                         'password': 'mypassword',
+                                                                         'name_first': 'Firstname',
+                                                                         'name_last': 'Lastname'
+                                                                         })
     # gets user_id
     print(register_data.text)
     user_id = json.loads(register_data.text)['auth_user_id']
@@ -38,12 +38,13 @@ def create_data(clear_data):
 
     return token, user_0, user_id
 
+
 def test_simple_case(clear_data, create_data):
     token, user_0, user_id = create_data
 
     resp = requests.get(config.url + 'user/profile/v1',
                         params={'token': token, 'u_id': user_id})
-    print(json.loads(resp.text))
+
     assert json.loads(resp.text)['user'] == user_0
 
 
