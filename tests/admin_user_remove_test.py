@@ -439,7 +439,7 @@ def test_invalid_token(clear_data, create_users):
 @pytest.mark.skip("Whitebox testing")
 def test_send_edit_message_then_remove_user(clear_data, create_users, create_dms):
     token_1, _, token_2, user_id_2 = create_users
-    dm_id, message_id = create_dms
+    dm_id, _ = create_dms
 
     requests.post(config.url + 'message/senddm/v1', json={
         'token': token_2,
@@ -479,4 +479,5 @@ def test_send_edit_message_then_remove_user(clear_data, create_users, create_dms
         'start': 0
     })
 
-    messages = json.loads(check_message.text)['messages']
+    json.loads(check_message.text)['messages']
+    pass

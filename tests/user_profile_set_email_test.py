@@ -56,7 +56,7 @@ def test_simple_case(clear_data, create_data):
 
 
 def test_cannot_login_old_email(clear_data, create_data):
-    token_1, user_data = create_data
+    token_1, _ = create_data
 
     update_email = requests.put(config.url + 'user/profile/setemail/v1', json={'token': token_1,
                                                                                'email': 'newemail@gmail.com'})

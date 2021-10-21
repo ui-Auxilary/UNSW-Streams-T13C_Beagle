@@ -83,7 +83,7 @@ def test_simple_case(clear_data, create_data):
 
 
 def test_profile_all_with_removed_user(clear_data, create_data):
-    token, user_id_1, user_id_2, users_all = create_data
+    token, user_id_1, _, _ = create_data
 
     # remove user_id_1
     requests.delete(config.url + 'admin/user/remove/v1', json={
