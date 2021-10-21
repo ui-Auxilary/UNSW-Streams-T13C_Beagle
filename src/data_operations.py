@@ -37,6 +37,7 @@ from src.data_store import data_store
 import json
 import time
 
+
 def reset_data_store_to_default():
     '''
     Clears the contents of data_store
@@ -45,26 +46,27 @@ def reset_data_store_to_default():
         None
     '''
 
-    ## reset values in data_store
+    # reset values in data_store
     store = data_store.get()
 
     store = {
-        'user_data'    : {},
-        'user_handles' : [],
-        'user_emails'  : [],
-        'user_ids'     : [],
-        'channel_data' : {},
-        'channel_ids'  : [],
-        'dm_data'      : {},
-        'dm_ids'       : [],
+        'user_data': {},
+        'user_handles': [],
+        'user_emails': [],
+        'user_ids': [],
+        'channel_data': {},
+        'channel_ids': [],
+        'dm_data': {},
+        'dm_ids': [],
         'global_owners': [],
-        'message_data' : {},
-        'message_ids'  : [],
-        'token'        : {}
+        'message_data': {},
+        'message_ids': [],
+        'token': {}
     }
 
-    ## update data_store
+    # update data_store
     data_store.set(store)
+
 
 def add_user(user_id, user_details, password, user_handle, is_owner):
     '''
@@ -98,18 +100,19 @@ def add_user(user_id, user_details, password, user_handle, is_owner):
 
     # add the user data to the database
     data_source['user_data'][user_id] = {
-        'first_name'   : name_first,
-        'last_name'    : name_last,
+        'first_name': name_first,
+        'last_name': name_last,
         'email_address': email,
-        'password'     : password,
-        'user_handle'  : user_handle,
-        'global_owner' : is_owner,
-        'in_channels'  : [],
-        'in_dms'       : [],
+        'password': password,
+        'user_handle': user_handle,
+        'global_owner': is_owner,
+        'in_channels': [],
+        'in_dms': [],
     }
 
     if is_owner:
         data_source['global_owners'].append(user_id)
+
 
 def remove_user_details(user_id):
     '''
@@ -121,22 +124,23 @@ def remove_user_details(user_id):
     Return Value:
         None
     '''
-    
+
     data_source = data_store.get()
 
-    ## get user_handle and email
+    # get user_handle and email
     user_handle = data_source['user_data'][user_id]['user_handle']
     user_email = data_source['user_data'][user_id]['email_address']
 
-    ## set user_handle and email to blank
+    # set user_handle and email to blank
     data_source['user_data'][user_id]['user_handle'] = ''
     data_source['user_data'][user_id]['email_address'] = ''
 
-    ## remove them from the list of emails and user_handles
+    # remove them from the list of emails and user_handles
     data_source['user_handles'].remove(user_handle)
     data_source['user_emails'].remove(user_email)
 
     data_source['user_ids'].remove(user_id)
+
 
 def get_user_channels(user_id):
     '''
@@ -153,6 +157,7 @@ def get_user_channels(user_id):
 
     return data_source['user_data'][user_id]['in_channels']
 
+
 def get_user_dms(user_id):
     '''
     Gets the list of channels the user is currently in
@@ -167,6 +172,7 @@ def get_user_dms(user_id):
     data_source = data_store.get()
 
     return data_source['user_data'][user_id]['in_dms']
+
 
 def get_user(user_id):
     '''
@@ -187,6 +193,7 @@ def get_user(user_id):
     data_source = data_store.get()
     return data_source['user_data'][user_id]
 
+
 def edit_user(user_id, key, new_value):
     # get the data store
     data_source = data_store.get()
@@ -203,6 +210,7 @@ def edit_user(user_id, key, new_value):
 
     # edit the property
     data_source['user_data'][user_id][key] = new_value
+
 
 def edit_user_permissions(user_id, permission_id):
     '''
@@ -225,20 +233,22 @@ def edit_user_permissions(user_id, permission_id):
         data_source['user_data'][user_id]['global_owner'] = False
         if user_id in data_source['global_owners']:
             data_source['global_owners'].remove(user_id)
-    
+
+
 def get_user_handles():
     '''
     Gets the handles of all users from the database
 
     Arguments:
         None
-        
+
     Return Value:
         user_handles (list): list of all users' handles
     '''
 
     data_source = data_store.get()
     return data_source['user_handles']
+
 
 def get_user_emails():
     '''
@@ -254,6 +264,7 @@ def get_user_emails():
     data_source = data_store.get()
     return data_source['user_emails']
 
+
 def get_user_ids():
     '''
     Gets the id's of all users from the database
@@ -268,6 +279,7 @@ def get_user_ids():
     data_source = data_store.get()
     return data_source['user_ids']
 
+
 def get_complete_user_ids():
     '''
     Gets the id's of all users from the database
@@ -281,6 +293,7 @@ def get_complete_user_ids():
 
     data_source = data_store.get()
     return data_source['user_data'].keys()
+
 
 def add_member_to_channel(channel_id, user_id):
     '''
@@ -298,6 +311,7 @@ def add_member_to_channel(channel_id, user_id):
 
     data_source['channel_data'][channel_id]['members'].append(user_id)
     data_source['user_data'][user_id]['in_channels'].append(channel_id)
+
 
 def remove_member_from_channel(channel_id, user_id):
     '''
@@ -317,6 +331,7 @@ def remove_member_from_channel(channel_id, user_id):
     data_source['channel_data'][channel_id]['members'].remove(user_id)
     data_source['user_data'][user_id]['in_channels'].remove(channel_id)
 
+
 def add_channel(channel_id, channel_name, user_id, is_public):
     '''
     adds channel data to the database
@@ -335,16 +350,17 @@ def add_channel(channel_id, channel_name, user_id, is_public):
 
     # create channel and add channel data
     data_source['channel_data'][channel_id] = {
-        'name'       : channel_name,
-        'owner'      : [user_id],
-        'is_public'  : is_public,
-        'members'    : [user_id],
+        'name': channel_name,
+        'owner': [user_id],
+        'is_public': is_public,
+        'members': [user_id],
         'message_ids': []
     }
 
     # add channel to channel_ids list and channel to users' list of channels
     data_source['channel_ids'].append(channel_id)
     data_source['user_data'][user_id]['in_channels'].append(channel_id)
+
 
 def get_channel(channel_id):
     '''
@@ -364,6 +380,7 @@ def get_channel(channel_id):
     data_source = data_store.get()
     return data_source['channel_data'][channel_id]
 
+
 def get_channel_messages(channel_id):
     '''
     Gets a list of all the channel messages from the database
@@ -378,6 +395,7 @@ def get_channel_messages(channel_id):
     data_source = data_store.get()
     return data_source['channel_data'][channel_id]['message_ids']
 
+
 def get_channel_ids():
     '''
     Gets a list of all the channel ids from the database
@@ -391,6 +409,7 @@ def get_channel_ids():
 
     data_source = data_store.get()
     return data_source['channel_ids']
+
 
 def remove_member_from_dm(dm_id, user_id):
     '''
@@ -410,6 +429,7 @@ def remove_member_from_dm(dm_id, user_id):
     data_source['dm_data'][dm_id]['members'].remove(user_id)
     data_source['user_data'][user_id]['in_dms'].remove(dm_id)
 
+
 def add_user_to_dm(dm_id, user_id):
     '''
     adds user to a dm
@@ -425,6 +445,7 @@ def add_user_to_dm(dm_id, user_id):
     data_source = data_store.get()
     data_source['dm_data'][dm_id]['members'].append(user_id)
     data_source['user_data'][user_id]['in_dms'].append(dm_id)
+
 
 def add_dm(dm_id, dm_name, auth_user_id):
     '''
@@ -443,9 +464,9 @@ def add_dm(dm_id, dm_name, auth_user_id):
 
     # create dm and add dm data
     data_source['dm_data'][dm_id] = {
-        'name'       : dm_name,
-        'owner'      : [auth_user_id],
-        'members'    : [],
+        'name': dm_name,
+        'owner': [auth_user_id],
+        'members': [],
         'message_ids': []
     }
 
@@ -453,6 +474,7 @@ def add_dm(dm_id, dm_name, auth_user_id):
     data_source['dm_ids'].append(dm_id)
     data_source['dm_data'][dm_id]['owner'].append(auth_user_id)
     data_source['user_data'][auth_user_id]['in_dms'].append(dm_id)
+
 
 def get_dm(dm_id):
     '''
@@ -470,6 +492,7 @@ def get_dm(dm_id):
     data_source = data_store.get()
     return data_source['dm_data'][dm_id]
 
+
 def get_dm_ids():
     '''
     Gets a list of all the dm ids from the database
@@ -484,6 +507,7 @@ def get_dm_ids():
     data_source = data_store.get()
     return data_source['dm_ids']
 
+
 def get_global_owners():
     '''
     Gets a list of all the global owners from the database
@@ -497,6 +521,7 @@ def get_global_owners():
 
     data_source = data_store.get()
     return data_source['global_owners']
+
 
 def add_message(is_channel, user_id, channel_id, message_id, content, time_created):
     '''
@@ -515,25 +540,27 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
     '''
 
     data_source = data_store.get()
-    
+
     # create message and add message data
     data_source['message_data'][message_id] = {
-        'author'          : user_id,
-        'content'         : content,
-        'time_created'    : time_created,
-        'message_id'      : message_id,
-        'channel_created' : channel_id,
-        'is_channel'      : is_channel
+        'author': user_id,
+        'content': content,
+        'time_created': time_created,
+        'message_id': message_id,
+        'channel_created': channel_id,
+        'is_channel': is_channel
     }
 
     # add message to the channel's message list
     if is_channel:
-        data_source['channel_data'][channel_id]['message_ids'].append(message_id)
+        data_source['channel_data'][channel_id]['message_ids'].append(
+            message_id)
     else:
         data_source['dm_data'][channel_id]['message_ids'].append(message_id)
 
     # add unique message id to message_ids list
     data_source['message_ids'].append(message_id)
+
 
 def edit_message(is_channel, channel_id, message_id, message):
     '''
@@ -550,7 +577,7 @@ def edit_message(is_channel, channel_id, message_id, message):
     '''
 
     data_source = data_store.get()
-    
+
     # check if message is empty and edit the message
     if not message:
         remove_message(is_channel, channel_id, message_id)
@@ -559,14 +586,6 @@ def edit_message(is_channel, channel_id, message_id, message):
     else:
         data_source['message_data'][message_id]['content'] = message
 
-        # add message to the channel's message list
-        if is_channel:
-            data_source['channel_data'][channel_id]['message_ids'].append(message_id)
-        else:
-            data_source['dm_data'][channel_id]['message_ids'].append(message_id)
-
-        # add unique message id to message_ids list
-        data_source['message_ids'].append(message_id)
 
 def remove_message(is_channel, channel_id, message_id):
     '''
@@ -575,7 +594,7 @@ def remove_message(is_channel, channel_id, message_id):
     Arguments:
         is_channel  (bool): bool of whether the message is from a channel
         message_id   (int): id of message being added to the database
-        
+
     Return Value:
         None
     '''
@@ -583,12 +602,14 @@ def remove_message(is_channel, channel_id, message_id):
     data_source = data_store.get()
 
     if is_channel:
-        data_source['channel_data'][channel_id]['message_ids'].remove(message_id)
+        data_source['channel_data'][channel_id]['message_ids'].remove(
+            message_id)
     else:
         data_source['dm_data'][channel_id]['message_ids'].remove(message_id)
 
     data_source['message_ids'].remove(message_id)
     del data_source['message_data'][message_id]
+
 
 def get_message_ids():
     '''
@@ -603,6 +624,7 @@ def get_message_ids():
 
     data_source = data_store.get()
     return data_source['message_ids']
+
 
 def get_message_by_id(message_id):
     '''
@@ -620,6 +642,7 @@ def get_message_by_id(message_id):
     data_source = data_store.get()
     return data_source['message_data'][message_id]
 
+
 def get_messages_by_channel(channel_id):
     '''
     gets all the message ids from a specified channel id
@@ -633,6 +656,7 @@ def get_messages_by_channel(channel_id):
 
     data_source = data_store.get()
     return data_source['channel_data'][channel_id]['message_ids']
+
 
 def get_messages_by_dm(dm_id):
     '''
@@ -648,6 +672,7 @@ def get_messages_by_dm(dm_id):
     data_source = data_store.get()
     return data_source['dm_data'][dm_id]['message_ids']
 
+
 def add_session_token(token, user_id):
     '''
     adds a user token to the sessions storage
@@ -662,7 +687,8 @@ def add_session_token(token, user_id):
 
     data_source = data_store.get()
     data_source['token'][token] = user_id
-    
+
+
 def remove_session_token(token):
     '''
     removes a user token to the sessions storage
@@ -677,6 +703,7 @@ def remove_session_token(token):
     data_source = data_store.get()
     del data_source['token'][token]
 
+
 def get_all_valid_tokens():
     '''
     retrieves a set of all currently valid tokens
@@ -687,6 +714,7 @@ def get_all_valid_tokens():
 
     data_source = data_store.get()
     return set(data_source['token'].keys())
+
 
 def add_owner_to_channel(user_id, channel_id):
     '''
@@ -701,7 +729,7 @@ def add_owner_to_channel(user_id, channel_id):
     '''
 
     data_source = data_store.get()
-    ## adds a user to the owner list of the channel
+    # adds a user to the owner list of the channel
     data_source['channel_data'][channel_id]['owner'].append(user_id)
 
 
@@ -718,8 +746,9 @@ def remove_owner_from_channel(user_id, channel_id):
     '''
 
     data_source = data_store.get()
-    ## removes a user from the owner list of the channel
+    # removes a user from the owner list of the channel
     data_source['channel_data'][channel_id]['owner'].remove(user_id)
+
 
 def data_dump():
     while True:
@@ -728,6 +757,7 @@ def data_dump():
             json.dump(data_source, data_file)
 
         time.sleep(1)
+
 
 def data_restore():
     data_source = data_store.get()
@@ -738,6 +768,6 @@ def data_restore():
     except:
         pass
 
-    ## save it back purely for pylint unused global data_source
+    # save it back purely for pylint unused global data_source
     with open('data_store.json', 'w') as data_file:
         json.dump(data_source, data_file)
