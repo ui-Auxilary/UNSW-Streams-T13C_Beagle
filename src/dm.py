@@ -199,17 +199,6 @@ def dm_messages_v1(token, dm_id, start):
         if start <= message_pos < end - 1:
             message_info = get_message_by_id(message_id)
             
-            is_channel = False
-            ## add a message to the database
-            add_message(
-                is_channel,
-                message_info['author'],
-                dm_id, 
-                message_id,
-                message_info['content'],
-                message_info['time_created']
-            )
-            
             result_arr.append({
                 'message_id': message_id,
                 'u_id': message_info['author'],
@@ -252,7 +241,7 @@ def message_senddm_v1(token, dm_id, message):
     is_channel = False
 
     ## time created
-    dt = datetime(2015, 10, 19)
+    dt = datetime.now()
     time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
 
     ## add message to datastore
