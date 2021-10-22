@@ -52,7 +52,7 @@ def message_send_v1(token, channel_id, message):
     message_id = len(get_message_ids()) + 1
 
     # time created
-    dt = datetime(2015, 10, 19)
+    dt = datetime.now()
     time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
 
     add_message(True, int(auth_user_id), int(channel_id),
