@@ -5,6 +5,7 @@ import pytest
 import json
 import requests
 from src import config
+from src.data_operations import get_user
 
 '''
 InputError when any of:
@@ -74,6 +75,27 @@ def create_channel(create_users):
 
 
 @pytest.fixture
+def create_private_channels(create_users):
+    token_1, _, token_2, _ = create_users
+    create_channel = requests.post(config.url + 'channels/create/v2', json={
+        'token': token_1,
+        'name': 'Global_owner_channel',
+        'is_public': False
+    })
+
+    channel_id = json.loads(create_channel.text)['channel_id']
+
+    create_channel_2 = requests.post(config.url + 'channels/create/v2', json={
+        'token': token_2,
+        'name': 'random',
+        'is_public': False
+    })
+    channel_id_2 = json.loads(create_channel_2.text)['channel_id']
+
+    return channel_id, channel_id_2
+
+
+@pytest.fixture
 def create_dms(create_users):
     token_1, _, token_2, user_id_2 = create_users
     create_dm = requests.post(config.url + 'dm/create/v1', json={
@@ -94,12 +116,20 @@ def create_dms(create_users):
 
 
 def test_simple_case(clear_data, create_users):
-    token_1, _, _, user_id_2 = create_users
+    token_1, _, token_2, user_id_2 = create_users
 
     requests.delete(config.url + 'admin/user/remove/v1', json={
         'token': token_1,
         'u_id': user_id_2
     })
+
+    # check user can't get their own token
+    get_user_profile = requests.get(config.url + 'user/profile/v1', params={
+        'token': token_2,
+        'u_id': user_id_2
+    })
+
+    assert get_user_profile.status_code == 403
 
     get_user_profile = requests.get(config.url + 'user/profile/v1', params={
         'token': token_1,
@@ -115,6 +145,93 @@ def test_simple_case(clear_data, create_users):
         'email': '',
         'handle_str': ''
     }
+
+
+def test_removed_user_in_private_channel(clear_data, create_users, create_private_channels):
+    token_1, user_id_1, token_2, user_id_2 = create_users
+    channel_id, _ = create_private_channels
+
+    # user_1 invites user_2 to the channel
+    requests.post(config.url + 'channel/invite/v2', json={
+        'token': token_1,
+        'channel_id': channel_id,
+        'u_id': user_id_2
+    })
+
+    create_message_0 = requests.post(config.url + 'message/send/v1', json={
+        'token': token_1,
+        'channel_id': channel_id,
+        'message': 'first message'
+    })
+
+    create_message = requests.post(config.url + 'message/send/v1', json={
+        'token': token_2,
+        'channel_id': channel_id,
+        'message': 'one more message'
+    })
+
+    assert create_message.status_code == 200
+    message_id = json.loads(create_message_0.text)['message_id']
+    message_id_2 = json.loads(create_message.text)['message_id']
+
+    requests.post(config.url + 'message/send/v1', json={
+        'token': token_1,
+        'channel_id': channel_id,
+        'message': 'one more message'
+    })
+
+    requests.delete(config.url + 'admin/user/remove/v1', json={
+        'token': token_1,
+        'u_id': user_id_2
+    })
+
+    check_message = requests.get(config.url + 'channel/messages/v2', params={
+        'token': token_1,
+        'channel_id': channel_id,
+        'start': 0
+    })
+
+    messages = json.loads(check_message.text)['messages']
+
+    time_created = json.loads(check_message.text)[
+        'messages'][len(messages) - message_id]['time_created']
+    time_created_2 = json.loads(check_message.text)[
+        'messages'][len(messages) - message_id_2]['time_created']
+
+    message_data = {
+        'message_id': message_id,
+        'u_id': user_id_1,
+        'message': 'first message',
+        'time_created': time_created
+    }
+
+    message_data_2 = {
+        'message_id': message_id_2,
+        'u_id': user_id_2,
+        'message': 'Removed user',
+        'time_created': time_created_2
+    }
+
+    assert message_data in messages
+    assert message_data_2 in messages
+
+    # get the user data
+    user_profile_data = requests.get(config.url + 'user/profile/v1', params={
+        'token': token_1,
+        'u_id': user_id_2
+    })
+    # get channel details and check that user 2 is not in it
+    user_2_profile = json.loads(user_profile_data.text)['user']
+
+    # get information about the channel
+    channel_detail_data = requests.get(config.url + 'channel/details/v2', params={
+        'token': token_1,
+        'channel_id': channel_id
+    })
+
+    channel_members = json.loads(channel_detail_data.text)['all_members']
+
+    assert user_2_profile not in channel_members
 
 
 def test_removed_user_using_command(clear_data, create_users):
@@ -172,9 +289,9 @@ def test_member_of_dm(clear_data, create_users, create_dms):
     print(messages)
 
     time_created = json.loads(check_message.text)[
-        'messages'][0]['time_created']
+        'messages'][len(messages) - message_id]['time_created']
     time_created_2 = json.loads(check_message.text)[
-        'messages'][1]['time_created']
+        'messages'][len(messages) - message_id_2]['time_created']
 
     message_data = {
         'message_id': message_id,
@@ -240,9 +357,9 @@ def test_member_of_channel(clear_data, create_users, create_channel):
     messages = json.loads(check_message.text)['messages']
 
     time_created = json.loads(check_message.text)[
-        'messages'][0]['time_created']
+        'messages'][len(messages) - message_id]['time_created']
     time_created_2 = json.loads(check_message.text)[
-        'messages'][1]['time_created']
+        'messages'][len(messages) - message_id_2]['time_created']
 
     message_data = {
         'message_id': message_id,
@@ -261,6 +378,61 @@ def test_member_of_channel(clear_data, create_users, create_channel):
     assert message_data in messages
     assert message_data_2 in messages
 
+def test_create_multiple_dms(clear_data, create_users):
+    token_1, user_id_1, token_2, user_id_2 = create_users
+
+    ## create 2 dms, and send messages in both
+    create_dm = requests.post(config.url + 'dm/create/v1', json={
+        'token': token_1,
+        'u_ids': [user_id_2]
+    })
+
+    dm_id = json.loads(create_dm.text)['dm_id']
+
+    create_message = requests.post(config.url + 'message/senddm/v1', json={
+        'token': token_2,
+        'dm_id': dm_id,
+        'message': 'wee woo haha'
+    })
+
+    message_id = json.loads(create_message.text)['message_id']
+
+    create_dm_2 = requests.post(config.url + 'dm/create/v1', json={
+        'token': token_2,
+        'u_ids': [user_id_1]
+    })
+
+    dm_id_2 = json.loads(create_dm_2.text)['dm_id']
+    
+    ## get the profile of user_2
+    resp = requests.get(config.url + 'user/profile/v1',
+                        params={'token': token_1, 'u_id': user_id_2})
+
+
+    user_2_profile = json.loads(resp.text)['user']
+
+    ## remove user 2
+    requests.delete(config.url + 'admin/user/remove/v1', json={
+        'token': token_1,
+        'u_id': user_id_2
+    })
+
+    ## check that user doesn't show up in dm_members
+    dm_details = requests.get(config.url + 'dm/details/v1', params={
+                                                       'token': token_1,
+                                                       'dm_id': dm_id
+                                                      })
+
+    dm_details_2 = requests.get(config.url + 'dm/details/v1', params={
+                                                       'token': token_1,
+                                                       'dm_id': dm_id_2
+                                                      })
+
+    dm_members = json.loads(dm_details.text)['members']
+    dm_members_2 = json.loads(dm_details_2.text)['members']
+
+    assert user_2_profile not in dm_members
+    assert user_2_profile not in dm_members_2
 
 def test_channel_owner(clear_data, create_users, create_channel):
     token_1, user_id_1, token_2, user_id_2 = create_users
@@ -321,7 +493,7 @@ def test_channel_owner(clear_data, create_users, create_channel):
 
     assert user_owner in channel_owners
     assert user_owner in channel_members
-    assert user_profile in channel_members
+    assert user_profile not in channel_members
 
     # Check that removed user has the right profile details
     all_users = requests.get(config.url + 'users/all/v1', params={
