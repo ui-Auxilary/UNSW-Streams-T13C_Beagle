@@ -287,23 +287,23 @@ def channel_leave_v1(token, channel_id):
     ## checks auth_user_id exists
     check_user_exists(auth_user_id)
 
-    ## Invalid dm_id
+    ## Invalid channel
     if channel_id not in get_channel_ids():
         raise InputError(description="Not a valid channel id")
 
-    ## Get list of owners and members in the dm
+    ## Get list of owners and members in the channel
     channel_owner = get_channel(channel_id)['owner']
     channel_members = get_channel(channel_id)['members']
 
-    ## check if user exists in DM membes
+    ## check if user exists in channel members
     if auth_user_id not in channel_members:
         raise AccessError(description="User is not a member of the DM")
 
-    ## check if user is the owner of the DM
+    ## check if user is the owner of the channel
     if auth_user_id in channel_owner:
         channel_owner.remove(auth_user_id)
 
-    ## remove user from members in the DM
+    ## remove user from members in the channel
     remove_member_from_channel(channel_id, auth_user_id)
 
     return {}

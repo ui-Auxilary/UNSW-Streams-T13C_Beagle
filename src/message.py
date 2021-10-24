@@ -104,11 +104,6 @@ def message_edit_v1(token, message_id, message):
     channel_id = get_message_by_id(message_id)['channel_created']
     is_channel = get_message_by_id(message_id)['is_channel']
 
-    if is_channel:
-        channel_owner = get_channel(channel_id)['owner']
-    else:
-        channel_owner = get_dm(channel_id)['owner']
-
     message_length = len(message)
 
     # assert the length of the message
@@ -117,11 +112,22 @@ def message_edit_v1(token, message_id, message):
 
     message_author = get_message_by_id(message_id)['author']
 
-    if message_author != auth_user_id and auth_user_id not in channel_owner and not get_user(auth_user_id)['global_owner']:
-        raise AccessError(
-            description="User does not have permissions to edit selected message")
+    if is_channel:
+        channel_owner = get_channel(channel_id)['owner']
+
+        if message_author != auth_user_id and auth_user_id not in channel_owner and not get_user(auth_user_id)['global_owner']:
+            raise AccessError(
+                description="User does not have permissions to edit selected message")
+    else:
+        dm_owner = get_dm(channel_id)['owner']
+
+        # global owners do not have dm_owner perms unless they are the creator
+        if message_author != auth_user_id and auth_user_id not in dm_owner:
+            raise AccessError(
+                description="User does not have permissions to edit message")
 
     edit_message(is_channel, channel_id, message_id, message)
+
 
     return {}
 
@@ -162,13 +168,19 @@ def message_remove_v1(token, message_id):
 
     if is_channel:
         channel_owner = get_channel(channel_id)['owner']
-    else:
-        channel_owner = get_dm(channel_id)['owner']
 
-    if message_author != auth_user_id and auth_user_id not in channel_owner and not get_user(auth_user_id)['global_owner']:
-        raise AccessError(
-            description="User does not have permissions to remove message")
+        if message_author != auth_user_id and auth_user_id not in channel_owner and not get_user(auth_user_id)['global_owner']:
+            raise AccessError(
+                description="User does not have permissions to remove message")
+    else:
+        dm_owner = get_dm(channel_id)['owner']
+
+        # global owners do not have dm_owner perms unless they are the creator
+        if message_author != auth_user_id and auth_user_id not in dm_owner:
+            raise AccessError(
+                description="User does not have permissions to remove message")
 
     remove_message(is_channel, channel_id, message_id)
+
 
     return {}

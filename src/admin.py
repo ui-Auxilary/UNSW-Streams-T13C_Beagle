@@ -7,13 +7,16 @@ from src.data_operations import (
     get_messages_by_dm,
     get_user_dms,
     get_user_ids,
+    get_all_valid_tokens,
     remove_member_from_channel,
     remove_member_from_dm,
     get_global_owners,
     get_user_channels,
+    remove_session_token,
     remove_user_details,
     edit_user
 )
+
 from src.other import decode_token, check_user_exists
 
 def admin_user_remove_v1(token, u_id):
@@ -59,8 +62,6 @@ def admin_user_remove_v1(token, u_id):
     channels_list = get_user_channels(u_id)
     dm_list = get_user_dms(u_id)
 
-    print(channels_list, dm_list)
-
     # edit channel messages
     for channel_id in channels_list:
         for message_id in get_channel_messages(channel_id):
@@ -76,14 +77,19 @@ def admin_user_remove_v1(token, u_id):
                 edit_message(False, dm_id, message_id, 'Removed user')
 
     # remove user from every channel and dm
-    for channel_id in channels_list:
+    for channel_id in reversed(channels_list):
         remove_member_from_channel(channel_id, u_id)
 
-    for dm_id in dm_list:
+    for dm_id in reversed(dm_list):
         remove_member_from_dm(dm_id, u_id)
 
     # Remove user so data is reuseable
     remove_user_details(u_id)
+
+    # Remove all user sessions
+    for token in get_all_valid_tokens():
+        if decode_token(token) == u_id:
+            remove_session_token(token)
 
     return {}
 
