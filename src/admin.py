@@ -78,8 +78,7 @@ def admin_user_remove_v1(token, u_id):
 
     # remove user from every channel and dm
     for channel_id in reversed(channels_list):
-        if u_id in get_channel(channel_id)['members']:
-            remove_member_from_channel(channel_id, u_id)
+        remove_member_from_channel(channel_id, u_id)
 
     for dm_id in reversed(dm_list):
         if u_id in get_dm(dm_id)['members']:
