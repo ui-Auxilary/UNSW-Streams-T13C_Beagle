@@ -13,14 +13,32 @@ from src.data_operations import (
     get_complete_user_ids,
     get_user_emails
 )
-from src.other import check_user_exists
 
 from src.other import decode_token
 
 def user_profile(token, user_id):
+    '''
+    Update a user's first and last name
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        name_first   (str): first name of user
+        name_last    (str): last name of user
+
+    Exceptions:
+        InputError: Occurs when:
+                        - length of name_first is less than 1 character
+                        - length of name_first is over 1000 characters
+                        - length of name_last is less than 1 character
+                        - length of name_last is over 1000 characters
+        AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
     ## check if valid token and decode it
-    auth_user_id = decode_token(token)
-    check_user_exists(auth_user_id)
+    decode_token(token)
 
     ## check that user_id is valid
     if user_id not in get_complete_user_ids():
@@ -39,11 +57,26 @@ def user_profile(token, user_id):
 
 
 def user_profile_setname(token, first_name, last_name):
+    '''
+    Update a user's email address
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        email        (str): email of user
+
+    Exceptions:
+        InputError: Occurs when:
+                        - invalid email entered
+                        - email already in use
+        AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
     ## check if valid token and decode it
     user_id = decode_token(token)
     
-    check_user_exists(user_id)
-
     ## check that new handle is valid length and alphanumeric
     if not 1 <= len(first_name) <= 50:
         raise InputError(description='first name must be between 1 and 50 characters')
@@ -55,6 +88,26 @@ def user_profile_setname(token, first_name, last_name):
     edit_user(user_id, 'last_name', last_name)
 
 def user_profile_setemail(token, email):
+    '''
+    Update a user's handle
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        user_handle  (str): unique alphanumeric handle for user
+
+    Exceptions:
+        InputError: Occurs when:
+                        - length of user_handle is under 3 characters
+                        - length of user_handle is over 20 characters
+                        - user_handle contains non-alphanumeric characters
+                        - user_handle already in use
+        AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {}
+
+    '''
     ## check if valid token and decode it
     user_id = decode_token(token)
 
@@ -72,7 +125,6 @@ def user_profile_setemail(token, email):
 def user_profile_sethandle(token, handle_str):
     ## check if valid token and decode it
     user_id = decode_token(token)
-    check_user_exists(user_id)
 
     ## check that new handle is valid length and alphanumeric
     if not 3 <= len(handle_str) <= 20:

@@ -1,6 +1,6 @@
 from src import auth
 from src.error import InputError, AccessError
-from src.other import check_user_exists, decode_token
+from src.other import decode_token
 from datetime import timezone, datetime
 
 from datetime import datetime
@@ -21,22 +21,26 @@ from src.data_operations import (
 
 def message_send_v1(token, channel_id, message):
     '''
-    Send a message from the authorised user to the channel specified by channel_id. 
-    Note: Each message should have its own unique ID, i.e. no messages should share an ID with another message, even if that other message is in a different channel.
+    Sends a message into the channel
 
-    InputError when:
+    Arguments:
+        token        (str): an encoded token containing a users id
+        channel_id   (int): id of the selected channel
+        message      (str): content being sent into the channel
 
-        channel_id does not refer to a valid channel
-        length of message is less than 1 or over 1000 characters
+    Exceptions:
+        InputError: Occurs when:
+                        - channel does not exist
+                        - message length is less than 1 character
+                        - message length is over 1000 characters
+        AccessError: Occurs when:
+                        - user is not a channel member
+                        - invalid auth_id
 
-        AccessError when:
-
-        channel_id is valid and the authorised user is not a member of the channel
+    Return Value:
+        {message_id  (int): unique message_id for the content}
     '''
     auth_user_id = decode_token(token)
-
-    # checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     if channel_id not in get_channel_ids():
         raise InputError(description="Invalid channel id")
@@ -64,10 +68,27 @@ def message_send_v1(token, channel_id, message):
 
 
 def message_edit_v1(token, message_id, message):
-    auth_user_id = decode_token(token)
+    '''
+    Edits a pre-existing message
 
-    # checks auth_user_id exists
-    check_user_exists(auth_user_id)
+    Arguments:
+        token        (str): an encoded token containing a users id
+        message_id   (int): unique message_id for the content
+        message      (str): content being sent into the channel
+
+    Exceptions:
+        InputError: Occurs when:
+                        - message length is over 1000 characters
+                        - message_id does not exist in the channel/dm that the user has joined
+        AccessError: Occurs when:
+                        - message was not sent by the authorised user
+                        - message is not being edited by the channel/DM owner
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
+    auth_user_id = decode_token(token)
 
     # check message_id is valid
     if message_id not in get_message_ids():
@@ -76,11 +97,6 @@ def message_edit_v1(token, message_id, message):
     # find the channel where the message is located
     channel_id = get_message_by_id(message_id)['channel_created']
     is_channel = get_message_by_id(message_id)['is_channel']
-
-    if is_channel:
-        channel_owner = get_channel(channel_id)['owner']
-    else:
-        channel_owner = get_dm(channel_id)['owner']
 
     message_length = len(message)
 
@@ -90,20 +106,47 @@ def message_edit_v1(token, message_id, message):
 
     message_author = get_message_by_id(message_id)['author']
 
-    if message_author != auth_user_id and auth_user_id not in channel_owner and not get_user(auth_user_id)['global_owner']:
-        raise AccessError(
-            description="User does not have permissions to edit selected message")
+    if is_channel:
+        channel_owner = get_channel(channel_id)['owner']
+
+        if message_author != auth_user_id and auth_user_id not in channel_owner and not get_user(auth_user_id)['global_owner']:
+            raise AccessError(
+                description="User does not have permissions to edit selected message")
+    else:
+        dm_owner = get_dm(channel_id)['owner']
+
+        # global owners do not have dm_owner perms unless they are the creator
+        if message_author != auth_user_id and auth_user_id not in dm_owner:
+            raise AccessError(
+                description="User does not have permissions to edit message")
 
     edit_message(is_channel, channel_id, message_id, message)
+
 
     return {}
 
 
 def message_remove_v1(token, message_id):
-    auth_user_id = decode_token(token)
+    '''
+    Removes message from the channel/DM it was sent from
 
-    # checks auth_user_id exists
-    check_user_exists(auth_user_id)
+    Arguments:
+        token        (str): an encoded token containing a users id
+        message_id   (int): unique message_id for the content
+
+    Exceptions:
+        InputError: Occurs when:
+                        - message_id does not exist in the channel/dm that the user has joined                       
+        AccessError: Occurs when:
+                        - message was not sent by the authorised user
+                        - message is not being edited by the channel/DM owner
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
+    # check the token
+    auth_user_id = decode_token(token)
 
     # check message_id is valid
     if message_id not in get_message_ids():
@@ -117,13 +160,19 @@ def message_remove_v1(token, message_id):
 
     if is_channel:
         channel_owner = get_channel(channel_id)['owner']
-    else:
-        channel_owner = get_dm(channel_id)['owner']
 
-    if message_author != auth_user_id and auth_user_id not in channel_owner and not get_user(auth_user_id)['global_owner']:
-        raise AccessError(
-            description="User does not have permissions to remove message")
+        if message_author != auth_user_id and auth_user_id not in channel_owner and not get_user(auth_user_id)['global_owner']:
+            raise AccessError(
+                description="User does not have permissions to remove message")
+    else:
+        dm_owner = get_dm(channel_id)['owner']
+
+        # global owners do not have dm_owner perms unless they are the creator
+        if message_author != auth_user_id and auth_user_id not in dm_owner:
+            raise AccessError(
+                description="User does not have permissions to remove message")
 
     remove_message(is_channel, channel_id, message_id)
+
 
     return {}

@@ -17,168 +17,214 @@ AccessError when:
   Return Type:{}
 '''
 
+
 @pytest.fixture
 def clear_data():
     requests.delete(config.url + 'clear/v1')
 
+
 @pytest.fixture
 def create_data():
-    ## register users and extract their token and user id
-    register_user_1 = requests.post(config.url + 'auth/register/v2', json = { 'email': 'asd@gmail.com',
-                                                                                'password': 'qwertyuiop',
-                                                                                'name_first': 'lawrence',
-                                                                                'name_last': 'lee'
-                                                                              })
-                                                        
+    # register users and extract their token and user id
+    register_user_1 = requests.post(config.url + 'auth/register/v2', json={'email': 'asd@gmail.com',
+                                                                           'password': 'qwertyuiop',
+                                                                           'name_first': 'lawrence',
+                                                                           'name_last': 'lee'
+                                                                           })
+
     token_1 = json.loads(register_user_1.text)['token']
     user_id_1 = json.loads(register_user_1.text)['auth_user_id']
 
-    register_user_2 = requests.post(config.url + 'auth/register/v2', json = { 'email': 'email2@gmail.com',
-                                                                                'password': 'zxcvbnm',
-                                                                                'name_first': 'christian',
-                                                                                'name_last': 'lam'
-                                                                              })
-                                       
+    register_user_2 = requests.post(config.url + 'auth/register/v2', json={'email': 'email2@gmail.com',
+                                                                           'password': 'zxcvbnm',
+                                                                           'name_first': 'christian',
+                                                                           'name_last': 'lam'
+                                                                           })
+
     token_2 = json.loads(register_user_2.text)['token']
     user_id_2 = json.loads(register_user_2.text)['auth_user_id']
 
-    register_user_3 = requests.post(config.url + 'auth/register/v2', json = { 'email': 'email3@gmail.com',
-                                                                                'password': 'something',
-                                                                                'name_first': 'john',
-                                                                                'name_last': 'doe'
-                                                                              })
-                                       
+    register_user_3 = requests.post(config.url + 'auth/register/v2', json={'email': 'email3@gmail.com',
+                                                                           'password': 'something',
+                                                                           'name_first': 'john',
+                                                                           'name_last': 'doe'
+                                                                           })
+
     token_3 = json.loads(register_user_3.text)['token']
     user_id_3 = json.loads(register_user_3.text)['auth_user_id']
 
     return token_1, user_id_1, token_2, user_id_2, token_3, user_id_3
 
-def test_simple_case(clear_data, create_data):
-    token_1, _, _, user_id_2, _, _ = create_data 
 
-    ## create a dm with one other user
-    create_dm = requests.post(config.url + 'dm/create/v1', json = { 'token': token_1,
-                                                                      'u_ids': [user_id_2]
-                                                                    })
-    
+def test_simple_case(clear_data, create_data):
+    token_1, _, _, user_id_2, _, _ = create_data
+
+    # create a dm with one other user
+    create_dm = requests.post(config.url + 'dm/create/v1', json={'token': token_1,
+                                                                 'u_ids': [user_id_2]
+                                                                 })
+
     dm_id = json.loads(create_dm.text)['dm_id']
 
-    ## remove user from dm
-    remove_dm = requests.delete(config.url + 'dm/remove/v1', json = { 'token': token_1,
-                                                                        'dm_id': dm_id
-                                                                        })
+    # remove dm
+    remove_dm = requests.delete(config.url + 'dm/remove/v1', json={'token': token_1,
+                                                                   'dm_id': dm_id
+                                                                   })
 
     assert remove_dm.status_code == 200
 
-    ## check that the list of dm's the user is in is empty
-    list_dms = requests.get(config.url + 'dm/list/v1', params = { 'token': token_1 })
+    # check that the list of dm's the user is in is empty
+    list_dms = requests.get(config.url + 'dm/list/v1',
+                            params={'token': token_1})
 
     get_list = json.loads(list_dms.text)['dms']
     assert get_list == []
-    
+
+
+def test_dm_removed_for_all_users(clear_data, create_data):
+    token_1, _, token_2, user_id_2, token_3, user_id_3 = create_data
+
+    # create a dm with all other users
+    create_dm = requests.post(config.url + 'dm/create/v1', json={
+        'token': token_1,
+        'u_ids': [user_id_2, user_id_3]
+    })
+
+    dm_id = json.loads(create_dm.text)['dm_id']
+
+    # remove dm_id
+    requests.delete(config.url + 'dm/remove/v1', json={
+        'token': token_1,
+        'dm_id': dm_id
+    })
+
+    # dm_list of all the users
+    get_list = requests.get(config.url + 'dm/list/v1', params={'token': token_1
+                                                               })
+    dm_list_1 = json.loads(get_list.text)['dms']
+
+    get_list_2 = requests.get(config.url + 'dm/list/v1', params={'token': token_2
+                                                                 })
+    dm_list_2 = json.loads(get_list_2.text)['dms']
+
+    get_list_3 = requests.get(config.url + 'dm/list/v1', params={'token': token_3
+                                                                 })
+    dm_list_3 = json.loads(get_list_3.text)['dms']
+
+    assert dm_list_1 == []
+    assert dm_list_2 == []
+    assert dm_list_3 == []
+
+
 def test_non_creator(clear_data, create_data):
     token_1, _, token_2, user_id_2, _, _ = create_data
 
-    create_dm = requests.post(config.url + 'dm/create/v1', json = { 'token': token_1,
-                                                                      'u_ids': [user_id_2]
-                                                                    })
-    
+    create_dm = requests.post(config.url + 'dm/create/v1', json={'token': token_1,
+                                                                 'u_ids': [user_id_2]
+                                                                 })
+
     dm_id = json.loads(create_dm.text)['dm_id']
 
-    remove_dm = requests.delete(config.url + 'dm/remove/v1', json = { 'token': token_2,
-                                                                        'dm_id': dm_id
-                                                                      })
+    remove_dm = requests.delete(config.url + 'dm/remove/v1', json={'token': token_2,
+                                                                   'dm_id': dm_id
+                                                                   })
     assert (remove_dm.status_code == 403)
+
 
 def test_invalid_dm_id(clear_data, create_data):
     token_1, _, _, user_id_2, _, _ = create_data
 
-    create_dm = requests.post(config.url + 'dm/create/v1', json = { 'token': token_1,
-                                                                      'u_ids': [user_id_2]
-                                                                    })
+    create_dm = requests.post(config.url + 'dm/create/v1', json={'token': token_1,
+                                                                 'u_ids': [user_id_2]
+                                                                 })
     json.loads(create_dm.text)['dm_id']
 
-    remove_dm = requests.delete(config.url + 'dm/remove/v1', json = { 'token': token_1,
-                                                            'dm_id': 12213
-                                                            })
+    remove_dm = requests.delete(config.url + 'dm/remove/v1', json={'token': token_1,
+                                                                   'dm_id': 12213
+                                                                   })
     assert (remove_dm.status_code == 400)
 
-def test_multiple_dms(clear_data, create_data):
-    token_1, _, _, user_id_2, _, user_id_3 = create_data 
 
-    create_dm_1 = requests.post(config.url + 'dm/create/v1', json = { 'token': token_1,
-                                                                      'u_ids': [user_id_2]
-                                                                    })
-    
+def test_multiple_dms(clear_data, create_data):
+    token_1, _, _, user_id_2, _, user_id_3 = create_data
+
+    create_dm_1 = requests.post(config.url + 'dm/create/v1', json={'token': token_1,
+                                                                   'u_ids': [user_id_2]
+                                                                   })
+
     dm_id_1 = json.loads(create_dm_1.text)['dm_id']
 
-    create_dm_2 = requests.post(config.url + 'dm/create/v1', json = { 'token': token_1,
-                                                                      'u_ids': [user_id_3]
-                                                                    })
-    
+    create_dm_2 = requests.post(config.url + 'dm/create/v1', json={'token': token_1,
+                                                                   'u_ids': [user_id_3]
+                                                                   })
+
     dm_id_2 = json.loads(create_dm_2.text)['dm_id']
 
-    list_dms = requests.get(config.url + 'dm/list/v1', params = { 'token': token_1
-                                                                  })
+    list_dms = requests.get(config.url + 'dm/list/v1', params={'token': token_1
+                                                               })
     get_list = json.loads(list_dms.text)['dms']
-    
-    assert get_list == [{ 'dm_id': dm_id_1, 'name': 'christianlam, lawrencelee'},
-                        { 'dm_id': dm_id_2, 'name': 'johndoe, lawrencelee'}]
 
-    remove_dm = requests.delete(config.url + 'dm/remove/v1', json = { 'token': token_1,
-                                                            'dm_id': dm_id_2
-                                                            })
+    assert get_list == [{'dm_id': dm_id_1, 'name': 'christianlam, lawrencelee'},
+                        {'dm_id': dm_id_2, 'name': 'johndoe, lawrencelee'}]
+
+    remove_dm = requests.delete(config.url + 'dm/remove/v1', json={'token': token_1,
+                                                                   'dm_id': dm_id_2
+                                                                   })
     assert (remove_dm.status_code == 200)
 
-    list_dms = requests.get(config.url + 'dm/list/v1', params = { 'token': token_1
-                                                                  })
+    list_dms = requests.get(config.url + 'dm/list/v1', params={'token': token_1
+                                                               })
     get_list = json.loads(list_dms.text)['dms']
-    assert get_list == [{'dm_id': dm_id_1, 'name': 'christianlam, lawrencelee'}]
+    assert get_list == [
+        {'dm_id': dm_id_1, 'name': 'christianlam, lawrencelee'}]
 
-    remove_dm = requests.delete(config.url + 'dm/remove/v1', json = { 'token': token_1,
-                                                            'dm_id': dm_id_1
-                                                            })
+    remove_dm = requests.delete(config.url + 'dm/remove/v1', json={'token': token_1,
+                                                                   'dm_id': dm_id_1
+                                                                   })
     assert (remove_dm.status_code == 200)
-    
-    list_dms = requests.get(config.url + 'dm/list/v1', params = { 'token': token_1
-                                                                  })
+
+    list_dms = requests.get(config.url + 'dm/list/v1', params={'token': token_1
+                                                               })
     get_list = json.loads(list_dms.text)['dms']
     assert get_list == []
 
-def test_invalid_token(clear_data, create_data):
-    token_1, _, _, user_id_2, _, _ = create_data 
 
-    create_dm = requests.post(config.url + 'dm/create/v1', json = { 'token': token_1,
-                                                                      'u_ids': [user_id_2]
-                                                                    })
-    
+def test_invalid_token(clear_data, create_data):
+    token_1, _, _, user_id_2, _, _ = create_data
+
+    create_dm = requests.post(config.url + 'dm/create/v1', json={'token': token_1,
+                                                                 'u_ids': [user_id_2]
+                                                                 })
+
     dm_id = json.loads(create_dm.text)['dm_id']
 
-    remove_dm = requests.delete(config.url + 'dm/remove/v1', json = { 'token': 'token_1',
-                                                            'dm_id': dm_id
-                                                            })
+    remove_dm = requests.delete(config.url + 'dm/remove/v1', json={'token': 'token_1',
+                                                                   'dm_id': dm_id
+                                                                   })
 
     assert (remove_dm.status_code == 403)
 
-def test_group_dm(clear_data, create_data):
-    token_1, _, _, user_id_2, _, user_id_3 = create_data 
 
-    create_dm = requests.post(config.url + 'dm/create/v1', json = { 'token': token_1,
-                                                                      'u_ids': [user_id_2, user_id_3]
-                                                                    })
-    
+def test_group_dm(clear_data, create_data):
+    token_1, _, _, user_id_2, _, user_id_3 = create_data
+
+    create_dm = requests.post(config.url + 'dm/create/v1', json={'token': token_1,
+                                                                 'u_ids': [user_id_2, user_id_3]
+                                                                 })
+
     dm_id = json.loads(create_dm.text)['dm_id']
 
-    list_dms = requests.get(config.url + 'dm/list/v1', params = { 'token': token_1
-                                                                  })
+    list_dms = requests.get(config.url + 'dm/list/v1', params={'token': token_1
+                                                               })
     get_list = json.loads(list_dms.text)['dms']
-    assert get_list == [{'dm_id': dm_id, 'name': 'christianlam, johndoe, lawrencelee'}]
+    assert get_list == [
+        {'dm_id': dm_id, 'name': 'christianlam, johndoe, lawrencelee'}]
 
-    remove_dm = requests.delete(config.url + 'dm/remove/v1', json = { 'token': token_1,
-                                                            'dm_id': dm_id
-                                                            })
+    remove_dm = requests.delete(config.url + 'dm/remove/v1', json={'token': token_1,
+                                                                   'dm_id': dm_id
+                                                                   })
     assert (remove_dm.status_code == 200)
-    list_dms = requests.get(config.url + 'dm/list/v1', params = { 'token': token_1
-                                                                  })
+    list_dms = requests.get(config.url + 'dm/list/v1', params={'token': token_1
+                                                               })
     get_list = json.loads(list_dms.text)['dms']
     assert get_list == []

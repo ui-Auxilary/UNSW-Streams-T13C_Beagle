@@ -142,6 +142,17 @@ def test_login_second_user(clear_data):
 
     assert user_id_1 == user_id_2
 
+def test_tampered_token(clear_data):
+    # register a user and log them in
+    requests.post(config.url + 'auth/register/v2', json={'email': 'hello@mycompany.com',
+                                                         'password': 'mypassword',
+                                                         'name_first': 'Firstname',
+                                                         'name_last': 'Lastname'
+                                                         })
+    
+    get_user_data = requests.get(config.url + 'users/all/v1', params={'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyLCJzZXNzaW9uX3N0YXJ0IjoiMjIwNDUxIiwicmFuZG9tIjo1MjMxMDV9.22FSUdohmqv9KLz71C7ZTG8PkquP2YiczTfyyZpSXqo'})
+    
+    assert get_user_data.status_code == 403
 
 def test_user_double_session(clear_data, create_data):
     _, token = create_data

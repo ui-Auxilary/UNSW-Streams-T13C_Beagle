@@ -9,7 +9,7 @@ Functions:
 '''
 
 from src.error import InputError, AccessError
-from src.other import check_user_exists, decode_token
+from src.other import decode_token
 from src.data_operations import (
     get_message_ids,
     get_user_ids,
@@ -47,9 +47,6 @@ def channel_invite_v1(token, channel_id, u_id):
     '''
 
     auth_user_id = decode_token(token)
-
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     ## check whether channel exists
     if channel_id not in get_channel_ids():
@@ -97,9 +94,6 @@ def channel_details_v1(token, channel_id):
     '''
 
     auth_user_id = decode_token(token)
-
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     # check if channel_id is valid
     if channel_id not in get_channel_ids():
@@ -172,9 +166,6 @@ def channel_messages_v1(token, channel_id, start):
     '''
     auth_user_id = decode_token(token)
 
-    ## checks auth_user _id exists
-    check_user_exists(auth_user_id)
-
     ## checks for invalid channel_id
     if channel_id not in get_channel_ids():
         raise InputError(description='Channel_id does not exist')
@@ -194,7 +185,7 @@ def channel_messages_v1(token, channel_id, start):
 
     for message_pos, message_id in enumerate(message_id_list):
         ## if message in given range
-        if start <= message_pos < end - 1:
+        if start <= message_pos < end:
             message_info = get_message_by_id(message_id)
 
             ## add message to message_list
@@ -206,7 +197,7 @@ def channel_messages_v1(token, channel_id, start):
             })
 
         ## if past 50 messages, then exit
-        if message_pos == end:
+        if message_pos == end - 1:
             break
 
     ## checks if 50 messages are displayed
@@ -241,9 +232,6 @@ def channel_join_v1(token, channel_id):
 
     auth_user_id = decode_token(token)
 
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
-
     ## check whether channel exists
     if channel_id not in get_channel_ids():
         raise InputError(description='Channel does not exist')
@@ -265,37 +253,69 @@ def channel_join_v1(token, channel_id):
     }
 
 def channel_leave_v1(token, channel_id):
+    '''
+    Removes a member from the channel
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        channel_id   (int): id of the selected channel
+
+    Exceptions:
+        InputError: Occurs when:
+                        - channel does not exist
+        AccessError: Occurs when:
+                        - user is not already channel member
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
     auth_user_id = decode_token(token)
 
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
-
-    ## Invalid dm_id
+    ## Invalid channel
     if channel_id not in get_channel_ids():
         raise InputError(description="Not a valid channel id")
 
-    ## Get list of owners and members in the dm
+    ## Get list of owners and members in the channel
     channel_owner = get_channel(channel_id)['owner']
     channel_members = get_channel(channel_id)['members']
 
-    ## check if user exists in DM membes
+    ## check if user exists in channel members
     if auth_user_id not in channel_members:
         raise AccessError(description="User is not a member of the DM")
 
-    ## check if user is the owner of the DM
+    ## check if user is the owner of the channel
     if auth_user_id in channel_owner:
         channel_owner.remove(auth_user_id)
 
-    ## remove user from members in the DM
+    ## remove user from members in the channel
     remove_member_from_channel(channel_id, auth_user_id)
 
     return {}
 
 def channel_addowner_v1(token, channel_id, u_id):
-    auth_user_id = decode_token(token)
+    '''
+    Promotes a channel member to owner
 
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
+    Arguments:
+        token        (str): an encoded token containing a users id
+        channel_id   (int): id of the selected channel
+        u_id         (int): user id of the user being made owner
+
+    Exceptions:
+        InputError: Occurs when:
+                        - channel does not exist
+                        - user does not exist
+                        - user is a non-member
+                        - user is already owner
+        AccessError: Occurs when:
+                        - authorised user is not channel owner
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
+    auth_user_id = decode_token(token)
 
     ## check whether channel exists
     if channel_id not in get_channel_ids():
@@ -320,10 +340,29 @@ def channel_addowner_v1(token, channel_id, u_id):
     return {}
 
 def channel_removeowner_v1(token, channel_id, u_id):
-    auth_user_id = decode_token(token)
+    '''
+    Removes user as channel owner
 
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
+    Arguments:
+        token        (str): an encoded token containing a users id
+        channel_id   (int): id of the selected channel
+        u_id         (int): user id of the user being removed as owner
+
+    Exceptions:
+        InputError: Occurs when:
+                        - channel does not exist
+                        - user does not exist
+                        - user is not already owner
+                        - user is the sole channel owner
+        AccessError: Occurs when:
+                        - authorised user is not channel owner
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
+    ## check for valid token
+    auth_user_id = decode_token(token)
 
     ## check whether channel exists
     if channel_id not in get_channel_ids():
