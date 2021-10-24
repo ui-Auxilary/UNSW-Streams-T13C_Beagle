@@ -18,6 +18,26 @@ from src.other import check_user_exists
 from src.other import decode_token
 
 def user_profile(token, user_id):
+    '''
+    Update a user's first and last name
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        name_first   (str): first name of user
+        name_last    (str): last name of user
+
+    Exceptions:
+        InputError: Occurs when:
+                        - length of name_first is less than 1 character
+                        - length of name_first is over 1000 characters
+                        - length of name_last is less than 1 character
+                        - length of name_last is over 1000 characters
+        AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
     ## check if valid token and decode it
     auth_user_id = decode_token(token)
     check_user_exists(auth_user_id)
@@ -39,6 +59,23 @@ def user_profile(token, user_id):
 
 
 def user_profile_setname(token, first_name, last_name):
+    '''
+    Update a user's email address
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        email        (str): email of user
+
+    Exceptions:
+        InputError: Occurs when:
+                        - invalid email entered
+                        - email already in use
+        AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
     ## check if valid token and decode it
     user_id = decode_token(token)
     
@@ -55,6 +92,26 @@ def user_profile_setname(token, first_name, last_name):
     edit_user(user_id, 'last_name', last_name)
 
 def user_profile_setemail(token, email):
+    '''
+    Update a user's handle
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        user_handle  (str): unique alphanumeric handle for user
+
+    Exceptions:
+        InputError: Occurs when:
+                        - length of user_handle is under 3 characters
+                        - length of user_handle is over 20 characters
+                        - user_handle contains non-alphanumeric characters
+                        - user_handle already in use
+        AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {}
+
+    '''
     ## check if valid token and decode it
     user_id = decode_token(token)
 

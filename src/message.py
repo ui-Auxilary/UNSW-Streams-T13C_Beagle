@@ -21,17 +21,24 @@ from src.data_operations import (
 
 def message_send_v1(token, channel_id, message):
     '''
-    Send a message from the authorised user to the channel specified by channel_id. 
-    Note: Each message should have its own unique ID, i.e. no messages should share an ID with another message, even if that other message is in a different channel.
+    Sends a message into the channel
 
-    InputError when:
+    Arguments:
+        token        (str): an encoded token containing a users id
+        channel_id   (int): id of the selected channel
+        message      (str): content being sent into the channel
 
-        channel_id does not refer to a valid channel
-        length of message is less than 1 or over 1000 characters
+    Exceptions:
+        InputError: Occurs when:
+                        - channel does not exist
+                        - message length is less than 1 character
+                        - message length is over 1000 characters
+        AccessError: Occurs when:
+                        - user is not a channel member
+                        - invalid auth_id
 
-        AccessError when:
-
-        channel_id is valid and the authorised user is not a member of the channel
+    Return Value:
+        {message_id  (int): unique message_id for the content}
     '''
     auth_user_id = decode_token(token)
 
@@ -64,6 +71,26 @@ def message_send_v1(token, channel_id, message):
 
 
 def message_edit_v1(token, message_id, message):
+    '''
+    Edits a pre-existing message
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        message_id   (int): unique message_id for the content
+        message      (str): content being sent into the channel
+
+    Exceptions:
+        InputError: Occurs when:
+                        - message length is over 1000 characters
+                        - message_id does not exist in the channel/dm that the user has joined
+        AccessError: Occurs when:
+                        - message was not sent by the authorised user
+                        - message is not being edited by the channel/DM owner
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
     auth_user_id = decode_token(token)
 
     # checks auth_user_id exists
@@ -100,6 +127,24 @@ def message_edit_v1(token, message_id, message):
 
 
 def message_remove_v1(token, message_id):
+    '''
+    Removes message from the channel/DM it was sent from
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        message_id   (int): unique message_id for the content
+
+    Exceptions:
+        InputError: Occurs when:
+                        - message_id does not exist in the channel/dm that the user has joined                       
+        AccessError: Occurs when:
+                        - message was not sent by the authorised user
+                        - message is not being edited by the channel/DM owner
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
     auth_user_id = decode_token(token)
 
     # checks auth_user_id exists

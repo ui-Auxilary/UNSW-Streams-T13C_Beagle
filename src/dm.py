@@ -18,6 +18,21 @@ from src.data_operations import (
 )
 
 def dm_create_v1(token, u_ids):
+    '''
+    Creates a new dm
+
+    Arguments:
+        token        (str): an encoded token of the creator's user id
+        u_ids       (list): all other members of the dm
+
+    InputError: Occurs when:
+                        - invalid u_id in u_ids
+    AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {dm_id       (int): unique dm_id for the dm} 
+    '''
     auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
@@ -60,6 +75,18 @@ def dm_create_v1(token, u_ids):
     }
 
 def dm_list_v1(token):
+    '''
+    Returns the list of DMs that the user is part of.
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+
+    AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {dms         (list): list of dms}  
+    '''
     auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
@@ -82,6 +109,22 @@ def dm_list_v1(token):
     }
 
 def dm_remove_v1(token, dm_id):
+    '''
+    Removes an existing dm and its members
+
+    Arguments:
+        token        (str): an encoded token of the creator's user id
+        dm_id        (int): id of the selected dm
+
+    InputError: Occurs when:
+                        - dm does not exist
+    AccessError: Occurs when:
+                        - auth_id is not the DMs creator 
+                        - invalid auth_id
+
+    Return Value:
+        {}  
+    '''
     auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
@@ -109,6 +152,31 @@ def dm_remove_v1(token, dm_id):
     return {}
 
 def dm_details_v1(token, dm_id):
+    '''
+    Returns the details dm such as the creator's name, each of the member's user ids, emails,
+    first name, last name and user handle.
+
+    Arguments:
+        token        (str): an encoded token of the creator's user id
+        dm_id        (int): id of the selected dm
+
+    InputError: Occurs when:
+                        - dm does not exist
+    AccessError: Occurs when:
+                        - auth_id is not the DMs creator 
+                        - invalid auth_id
+
+    Return Value:
+        { name                  (str): an encoded token of the creator's user id
+          members              (list): dict of information on each member
+                { u_id          (int): unique u_id for each user
+                  email         (str): email of user
+                  name_first    (str): first name of user
+                  name_last     (str): last name of user
+                  user_handle   (str): unique alphanumeric handle for user  
+                }
+        }  
+    '''
     auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
@@ -145,6 +213,22 @@ def dm_details_v1(token, dm_id):
     }
 
 def dm_leave_v1(token, dm_id):
+    '''
+    Removes a user from a dm
+
+    Arguments:
+        token        (str): an encoded token of user id
+        dm_id        (int): id of the selected dm
+
+    InputError: Occurs when:
+                        - dm does not exist
+    AccessError: Occurs when:
+                        - user is not a member of the dm
+                        - invalid auth_id
+
+    Return Value:
+        {} 
+    '''
     auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
@@ -172,6 +256,28 @@ def dm_leave_v1(token, dm_id):
     return {}
 
 def dm_messages_v1(token, dm_id, start):
+    '''
+    Retrieves data of up to 50 sent messages for pagination
+
+    Arguments:
+        token        (str): an encoded token containing a user's id
+        dm_id        (int): id of the selected dm
+        start        (int): location of where messages start from to be viewed
+
+    Exceptions:
+        InputError: Occurs when:
+                        - dm does not exist
+                        - start exceeds number of total messages
+        AccessError: Occurs when:
+                        - user is not a member of the dm
+                        - invalid auth_id
+
+    Return Value:
+        { messages (list): list of dicts with up to 50 past message details
+          start     (int): index measuring how recent to search for messages
+          end       (int): index of final message retrieved (-1 if final message) }
+
+    '''
     auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
@@ -220,6 +326,26 @@ def dm_messages_v1(token, dm_id, start):
     
 
 def message_senddm_v1(token, dm_id, message):
+    '''
+    Sends a message into a dm
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        dm_id        (int): id of the selected dm
+        message      (str): content being sent into the channel
+
+    Exceptions:
+        InputError: Occurs when:
+                        - dm does not exist
+                        - message length is less than 1 character
+                        - message length is over 1000 characters
+        AccessError: Occurs when:
+                        - user is not a member of the dm
+                        - invalid auth_id
+
+    Return Value:
+        {message_id  (int): unique message_id for the content}
+    '''
     auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists

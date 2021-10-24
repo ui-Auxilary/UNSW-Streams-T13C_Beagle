@@ -265,6 +265,23 @@ def channel_join_v1(token, channel_id):
     }
 
 def channel_leave_v1(token, channel_id):
+    '''
+    Removes a member from the channel
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        channel_id   (int): id of the selected channel
+
+    Exceptions:
+        InputError: Occurs when:
+                        - channel does not exist
+        AccessError: Occurs when:
+                        - user is not already channel member
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
     auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
@@ -292,6 +309,27 @@ def channel_leave_v1(token, channel_id):
     return {}
 
 def channel_addowner_v1(token, channel_id, u_id):
+    '''
+    Promotes a channel member to owner
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        channel_id   (int): id of the selected channel
+        u_id         (int): user id of the user being made owner
+
+    Exceptions:
+        InputError: Occurs when:
+                        - channel does not exist
+                        - user does not exist
+                        - user is a non-member
+                        - user is already owner
+        AccessError: Occurs when:
+                        - authorised user is not channel owner
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
     auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists
@@ -320,6 +358,27 @@ def channel_addowner_v1(token, channel_id, u_id):
     return {}
 
 def channel_removeowner_v1(token, channel_id, u_id):
+    '''
+    Removes user as channel owner
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        channel_id   (int): id of the selected channel
+        u_id         (int): user id of the user being removed as owner
+
+    Exceptions:
+        InputError: Occurs when:
+                        - channel does not exist
+                        - user does not exist
+                        - user is not already owner
+                        - user is the sole channel owner
+        AccessError: Occurs when:
+                        - authorised user is not channel owner
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
     auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists

@@ -17,6 +17,25 @@ from src.data_operations import (
 from src.other import decode_token, check_user_exists
 
 def admin_user_remove_v1(token, u_id):
+    '''
+    Removes a user from Streams, including all channels and dms. Their messages
+    are replaced with 'Removed user'
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        u_id         (int): id of the selected user
+
+    Exceptions:
+        InputError: Occurs when:
+                        - u_id does not refer to a valid user
+                        - u_id refers to a global owner 
+        AccessError: Occurs when:
+                        - auth_id is not a global owner
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
     auth_user_id = decode_token(token)
 
     # checks auth_user_id exists
@@ -69,6 +88,27 @@ def admin_user_remove_v1(token, u_id):
     return {}
 
 def admin_userpermission_change_v1(token, u_id, permission_id):
+    '''
+    Removes a user from Streams, including all channels and dms. Their messages
+    are replaced with 'Removed user'
+
+    Arguments:
+        token           (str): an encoded token containing a users id
+        u_id            (int): id of the selected user
+        permission_id   (int): indicates if user is global owner
+
+    Exceptions:
+        InputError: Occurs when:
+                        - u_id does not refer to a valid user
+                        - u_id refers to the sole global owner 
+                        - invalid permission_id
+        AccessError: Occurs when:
+                        - auth_id is not a global owner
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
     auth_user_id = decode_token(token)
 
     ## checks auth_user_id exists

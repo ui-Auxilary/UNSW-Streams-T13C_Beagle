@@ -15,6 +15,29 @@ from src.data_operations import (
 from src.other import decode_token, check_user_exists
 
 def users_all(token):
+    '''
+    Returns a list of all users, including user ids, emails, first name, 
+    last name and user handle.
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+
+    Exceptions:
+        InputError: Occurs when:
+                        - auth_id does not refer to a valid user
+        AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {user             (list): contains dictionary of information of each user
+            {u_id          (int): unique u_id for each user
+             email         (str): email of user
+             name_first    (str): first name of user
+             name_last     (str): last name of user
+             user_handle   (str): unique alphanumeric handle for user
+            }
+        }
+    '''
     user_id = decode_token(token)
     check_user_exists(user_id)
 
