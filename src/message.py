@@ -1,6 +1,6 @@
 from src import auth
 from src.error import InputError, AccessError
-from src.other import check_user_exists, decode_token
+from src.other import decode_token
 from datetime import timezone, datetime
 
 from datetime import datetime
@@ -41,9 +41,6 @@ def message_send_v1(token, channel_id, message):
         {message_id  (int): unique message_id for the content}
     '''
     auth_user_id = decode_token(token)
-
-    # checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     if channel_id not in get_channel_ids():
         raise InputError(description="Invalid channel id")

@@ -9,7 +9,7 @@ Functions:
 '''
 
 from src.error import InputError, AccessError
-from src.other import check_user_exists, decode_token
+from src.other import decode_token
 from src.data_operations import (
     get_message_ids,
     get_user_ids,
@@ -47,9 +47,6 @@ def channel_invite_v1(token, channel_id, u_id):
     '''
 
     auth_user_id = decode_token(token)
-
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     ## check whether channel exists
     if channel_id not in get_channel_ids():
@@ -97,9 +94,6 @@ def channel_details_v1(token, channel_id):
     '''
 
     auth_user_id = decode_token(token)
-
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     # check if channel_id is valid
     if channel_id not in get_channel_ids():
@@ -172,9 +166,6 @@ def channel_messages_v1(token, channel_id, start):
     '''
     auth_user_id = decode_token(token)
 
-    ## checks auth_user _id exists
-    check_user_exists(auth_user_id)
-
     ## checks for invalid channel_id
     if channel_id not in get_channel_ids():
         raise InputError(description='Channel_id does not exist')
@@ -193,7 +184,6 @@ def channel_messages_v1(token, channel_id, start):
         raise InputError(description='Start number exceeds total messages')
 
     for message_pos, message_id in enumerate(message_id_list):
-        print(message_pos, message_id)
         ## if message in given range
         if start <= message_pos < end:
             message_info = get_message_by_id(message_id)
@@ -242,9 +232,6 @@ def channel_join_v1(token, channel_id):
 
     auth_user_id = decode_token(token)
 
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
-
     ## check whether channel exists
     if channel_id not in get_channel_ids():
         raise InputError(description='Channel does not exist')
@@ -284,9 +271,6 @@ def channel_leave_v1(token, channel_id):
         {}
     '''
     auth_user_id = decode_token(token)
-
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     ## Invalid channel
     if channel_id not in get_channel_ids():
@@ -332,9 +316,6 @@ def channel_addowner_v1(token, channel_id, u_id):
         {}
     '''
     auth_user_id = decode_token(token)
-
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     ## check whether channel exists
     if channel_id not in get_channel_ids():

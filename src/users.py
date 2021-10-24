@@ -12,7 +12,7 @@ from src.data_operations import (
     get_user,
     get_user_ids
 )
-from src.other import decode_token, check_user_exists
+from src.other import decode_token
 
 def users_all(token):
     '''

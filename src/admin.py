@@ -17,7 +17,7 @@ from src.data_operations import (
     edit_user
 )
 
-from src.other import decode_token, check_user_exists
+from src.other import decode_token
 
 def admin_user_remove_v1(token, u_id):
     '''
@@ -40,9 +40,6 @@ def admin_user_remove_v1(token, u_id):
         {}
     '''
     auth_user_id = decode_token(token)
-
-    # checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     # check auth_user is a global owner
     if auth_user_id not in get_global_owners():
@@ -116,9 +113,6 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
         {}
     '''
     auth_user_id = decode_token(token)
-
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     ## check auth_user is a global owner
     if auth_user_id not in get_global_owners():

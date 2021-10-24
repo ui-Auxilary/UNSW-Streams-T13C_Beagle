@@ -1,6 +1,6 @@
 from src import user
 from src.error import InputError, AccessError
-from src.other import check_user_exists, decode_token
+from src.other import decode_token
 from datetime import timezone, datetime
 
 from src.data_operations import (
@@ -34,9 +34,6 @@ def dm_create_v1(token, u_ids):
         {dm_id       (int): unique dm_id for the dm} 
     '''
     auth_user_id = decode_token(token)
-
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
     
     ## create a list of users and handles
     user_list = []
@@ -89,9 +86,6 @@ def dm_list_v1(token):
     '''
     auth_user_id = decode_token(token)
 
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
-
     dms_list = []
     
     ## Check each dm id from all dm ids in the database
@@ -127,9 +121,6 @@ def dm_remove_v1(token, dm_id):
     '''
     auth_user_id = decode_token(token)
 
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
-    
     # invalid dm_id
     if dm_id not in get_dm_ids():
         raise InputError(description="Not a valid DM id")
@@ -180,9 +171,6 @@ def dm_details_v1(token, dm_id):
     '''
     auth_user_id = decode_token(token)
 
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
-
     ## invalid dm_id
     if dm_id not in get_dm_ids():
         raise InputError(description="Not a valid DM id")
@@ -232,9 +220,6 @@ def dm_leave_v1(token, dm_id):
     '''
     auth_user_id = decode_token(token)
 
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
-
     ## Invalid dm_id
     if dm_id not in get_dm_ids():
         raise InputError(description="Not a valid DM id")
@@ -280,9 +265,6 @@ def dm_messages_v1(token, dm_id, start):
 
     '''
     auth_user_id = decode_token(token)
-
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     ## invalid dm_id
     if dm_id not in get_dm_ids():
@@ -350,9 +332,6 @@ def message_senddm_v1(token, dm_id, message):
         {message_id  (int): unique message_id for the content}
     '''
     auth_user_id = decode_token(token)
-
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     ## invalid dm_id
     if dm_id not in get_dm_ids():

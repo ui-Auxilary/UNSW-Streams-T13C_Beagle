@@ -88,6 +88,29 @@ def test_simple_case(clear_data, create_data):
     assert len(dm_messages) == 50
     assert dm_end == 50
 
+def test_irregular_start_integer(clear_data, create_data):
+    token, _, dm_id = create_data
+    start = 44
+
+    for i in range(0, 50):
+        requests.post(config.url + 'message/senddm/v1', json={
+            'token': token,
+            'dm_id': dm_id,
+            'message': f"{i}"
+        })
+
+    dm_data = requests.get(config.url + 'dm/messages/v1', params={
+        'token': token,
+        'dm_id': dm_id,
+        'start': start
+    })
+
+    dm_messages = json.loads(dm_data.text)['messages']
+    dm_end = json.loads(dm_data.text)['end']
+
+    assert len(dm_messages) == 6
+    assert dm_end == -1
+
 def test_non_zero_start(clear_data, create_data):
     token, _, dm_id = create_data
     start = 0

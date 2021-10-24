@@ -13,7 +13,6 @@ from src.data_operations import (
     get_complete_user_ids,
     get_user_emails
 )
-from src.other import check_user_exists
 
 from src.other import decode_token
 
@@ -39,7 +38,7 @@ def user_profile(token, user_id):
         {}
     '''
     ## check if valid token and decode it
-    auth_user_id = decode_token(token)
+    decode_token(token)
 
     ## check that user_id is valid
     if user_id not in get_complete_user_ids():
@@ -78,8 +77,6 @@ def user_profile_setname(token, first_name, last_name):
     ## check if valid token and decode it
     user_id = decode_token(token)
     
-    check_user_exists(user_id)
-
     ## check that new handle is valid length and alphanumeric
     if not 1 <= len(first_name) <= 50:
         raise InputError(description='first name must be between 1 and 50 characters')
@@ -128,7 +125,6 @@ def user_profile_setemail(token, email):
 def user_profile_sethandle(token, handle_str):
     ## check if valid token and decode it
     user_id = decode_token(token)
-    check_user_exists(user_id)
 
     ## check that new handle is valid length and alphanumeric
     if not 3 <= len(handle_str) <= 20:

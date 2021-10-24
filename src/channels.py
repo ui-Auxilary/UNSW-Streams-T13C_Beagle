@@ -8,7 +8,7 @@ Functions:
 '''
 
 from src.data_operations import get_channel_ids, get_channel, add_channel
-from src.other import check_user_exists, decode_token
+from src.other import decode_token
 from src.error import InputError
 
 def channels_list_v1(token):
@@ -58,9 +58,6 @@ def channels_listall_v1(token):
     '''
 
     auth_user_id = decode_token(token)
-
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     all_channels = []
     ## get all channel ids
