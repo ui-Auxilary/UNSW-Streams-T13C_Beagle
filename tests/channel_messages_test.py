@@ -62,18 +62,17 @@ def test_channel_messages_simple_case(clear_data, create_user_and_channel):
             'message': f"{i}"
         })
 
-    dm_data = requests.get(config.url + 'channel/messages/v2', params={
+    channel_data = requests.get(config.url + 'channel/messages/v2', params={
         'token': token,
         'channel_id': channel_id,
         'start': start
     })
 
-    channel_messages = json.loads(dm_data.text)['messages']
-    dm_end = json.loads(dm_data.text)['end']
+    channel_messages = json.loads(channel_data.text)['messages']
+    channel_end = json.loads(channel_data.text)['end']
 
-    assert len(channel_messages) == 49
-    assert dm_end == 50
-
+    assert len(channel_messages) == 50
+    assert channel_end == 50
 
 def test_irregular_start_integer(clear_data, create_user_and_channel):
     _, token, channel_id = create_user_and_channel
@@ -86,17 +85,17 @@ def test_irregular_start_integer(clear_data, create_user_and_channel):
             'message': f"{i}"
         })
 
-    dm_data = requests.get(config.url + 'channel/messages/v2', params={
+    channel_data = requests.get(config.url + 'channel/messages/v2', params={
         'token': token,
         'channel_id': channel_id,
         'start': start
     })
 
-    dm_messages = json.loads(dm_data.text)['messages']
-    dm_end = json.loads(dm_data.text)['end']
+    channel_messages = json.loads(channel_data.text)['messages']
+    channel_end = json.loads(channel_data.text)['end']
 
-    assert len(dm_messages) == 6
-    assert dm_end == -1
+    assert len(channel_messages) == 6
+    assert channel_end == -1
 
 
 def test_auth_user_id_exists(clear_data, create_user_and_channel):

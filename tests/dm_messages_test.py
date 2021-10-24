@@ -85,7 +85,7 @@ def test_simple_case(clear_data, create_data):
     dm_messages = json.loads(dm_data.text)['messages']
     dm_end = json.loads(dm_data.text)['end']
 
-    assert len(dm_messages) == 49
+    assert len(dm_messages) == 50
     assert dm_end == 50
 
 def test_non_zero_start(clear_data, create_data):
@@ -107,7 +107,7 @@ def test_non_zero_start(clear_data, create_data):
     dm_messages = json.loads(dm_data.text)['messages']
     dm_end = json.loads(dm_data.text)['end']
 
-    assert len(dm_messages) == 49
+    assert len(dm_messages) == 50
     assert dm_end == -1
 
 def test_no_messages(clear_data, create_data):
