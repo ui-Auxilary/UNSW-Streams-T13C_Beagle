@@ -389,7 +389,7 @@ def test_create_multiple_dms(clear_data, create_users):
 
     dm_id = json.loads(create_dm.text)['dm_id']
 
-    create_message = requests.post(config.url + 'message/senddm/v1', json={
+    requests.post(config.url + 'message/senddm/v1', json={
         'token': token_2,
         'dm_id': dm_id,
         'message': 'wee woo haha'

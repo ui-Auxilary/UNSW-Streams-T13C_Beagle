@@ -57,7 +57,7 @@ def channels_listall_v1(token):
         { channels (list): list of all channel dicts a given user is member of }
     '''
 
-    auth_user_id = decode_token(token)
+    decode_token(token)
 
     all_channels = []
     ## get all channel ids

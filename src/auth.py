@@ -186,7 +186,7 @@ def auth_logout_v1(token):
     Return Value:
         {}
     '''
-    auth_user_id = decode_token(token)
+    decode_token(token)
 
     remove_session_token(token)
 
