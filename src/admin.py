@@ -14,10 +14,13 @@ from src.data_operations import (
     get_user_channels,
     remove_session_token,
     remove_user_details,
-    edit_user
+    edit_user,
+    get_channel,
+    get_dm
 )
 
 from src.other import decode_token
+
 
 def admin_user_remove_v1(token, u_id):
     '''
@@ -75,10 +78,12 @@ def admin_user_remove_v1(token, u_id):
 
     # remove user from every channel and dm
     for channel_id in reversed(channels_list):
-        remove_member_from_channel(channel_id, u_id)
+        if u_id in get_channel(channel_id)['members']:
+            remove_member_from_channel(channel_id, u_id)
 
     for dm_id in reversed(dm_list):
-        remove_member_from_dm(dm_id, u_id)
+        if u_id in get_dm(dm_id)['members']:
+            remove_member_from_dm(dm_id, u_id)
 
     # Remove user so data is reuseable
     remove_user_details(u_id)
@@ -89,6 +94,7 @@ def admin_user_remove_v1(token, u_id):
             remove_session_token(token)
 
     return {}
+
 
 def admin_userpermission_change_v1(token, u_id, permission_id):
     '''
@@ -114,19 +120,19 @@ def admin_userpermission_change_v1(token, u_id, permission_id):
     '''
     auth_user_id = decode_token(token)
 
-    ## check auth_user is a global owner
+    # check auth_user is a global owner
     if auth_user_id not in get_global_owners():
         raise AccessError(description='Not an authorised global owner')
 
-    ## check u_id is valid and not the only global owner
+    # check u_id is valid and not the only global owner
     if u_id not in get_user_ids():
         raise InputError(description='Specified user does not exist')
     if u_id in get_global_owners() and len(get_global_owners()) == 1 and permission_id == 2:
         raise InputError(description='Cannot demote the only global owner')
 
-    valid_permission = [1,2]
+    valid_permission = [1, 2]
 
-    ## check the specified permission_id is valid
+    # check the specified permission_id is valid
     if permission_id not in valid_permission:
         raise InputError(description='Permission does not exist')
 
