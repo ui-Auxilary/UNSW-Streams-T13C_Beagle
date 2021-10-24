@@ -303,7 +303,7 @@ def dm_messages_v1(token, dm_id, start):
     result_arr = []
     for message_pos, message_id in enumerate(message_id_list):
         ## if message in given range
-        if start <= message_pos < end - 1:
+        if start <= message_pos < end:
             message_info = get_message_by_id(message_id)
             
             result_arr.append({
@@ -312,7 +312,9 @@ def dm_messages_v1(token, dm_id, start):
                 'message': message_info['content'],
                 'time_created': message_info['time_created']
             })
-        else:
+        
+        ## if past 50 messages, then exit
+        if message_pos == end - 1:
             break
         
     ## checks if 50 messages are displayed

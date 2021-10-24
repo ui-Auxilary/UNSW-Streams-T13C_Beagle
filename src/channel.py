@@ -193,8 +193,9 @@ def channel_messages_v1(token, channel_id, start):
         raise InputError(description='Start number exceeds total messages')
 
     for message_pos, message_id in enumerate(message_id_list):
+        print(message_pos, message_id)
         ## if message in given range
-        if start <= message_pos < end - 1:
+        if start <= message_pos < end:
             message_info = get_message_by_id(message_id)
 
             ## add message to message_list
@@ -206,7 +207,7 @@ def channel_messages_v1(token, channel_id, start):
             })
 
         ## if past 50 messages, then exit
-        if message_pos == end:
+        if message_pos == end - 1:
             break
 
     ## checks if 50 messages are displayed
@@ -379,10 +380,8 @@ def channel_removeowner_v1(token, channel_id, u_id):
     Return Value:
         {}
     '''
+    ## check for valid token
     auth_user_id = decode_token(token)
-
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     ## check whether channel exists
     if channel_id not in get_channel_ids():

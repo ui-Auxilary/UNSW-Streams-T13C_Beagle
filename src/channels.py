@@ -29,9 +29,6 @@ def channels_list_v1(token):
 
     auth_user_id = decode_token(token)
 
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
-
     channel_list = []
     ## get channel id
     for channel in get_channel_ids():
@@ -98,9 +95,6 @@ def channels_create_v1(token, name, is_public):
     '''
 
     auth_user_id = decode_token(token)
-
-    ## checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     ## check channel name between 1 and 20 characters
     if not 1 <= len(name) <= 20:

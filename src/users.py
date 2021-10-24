@@ -39,8 +39,7 @@ def users_all(token):
         }
     '''
     user_id = decode_token(token)
-    check_user_exists(user_id)
-
+    
     users = {'users': []}
 
     for user_id in get_user_ids():

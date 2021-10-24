@@ -40,7 +40,6 @@ def user_profile(token, user_id):
     '''
     ## check if valid token and decode it
     auth_user_id = decode_token(token)
-    check_user_exists(auth_user_id)
 
     ## check that user_id is valid
     if user_id not in get_complete_user_ids():

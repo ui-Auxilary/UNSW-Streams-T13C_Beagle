@@ -93,9 +93,6 @@ def message_edit_v1(token, message_id, message):
     '''
     auth_user_id = decode_token(token)
 
-    # checks auth_user_id exists
-    check_user_exists(auth_user_id)
-
     # check message_id is valid
     if message_id not in get_message_ids():
         raise InputError(description="Invalid message id")
@@ -151,10 +148,8 @@ def message_remove_v1(token, message_id):
     Return Value:
         {}
     '''
+    # check the token
     auth_user_id = decode_token(token)
-
-    # checks auth_user_id exists
-    check_user_exists(auth_user_id)
 
     # check message_id is valid
     if message_id not in get_message_ids():
