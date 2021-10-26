@@ -161,7 +161,7 @@ def test_globalowner_nonmember_cant_add_public_channelowner(clear_data, create_u
 
 
 def test_globalowner_nonmember_cant_add_private_channelower(clear_data, create_users, create_channel):
-    token_1, user_id_1, token_2, user_id_2 = create_users
+    token_1, _, token_2, _ = create_users
 
     # user_2 creates a public channel and get the id
     create_channel = requests.post(config.url + 'channels/create/v2', json={
@@ -180,7 +180,6 @@ def test_globalowner_nonmember_cant_add_private_channelower(clear_data, create_u
         'name_last': 'mama'
     })
 
-    token_3 = json.loads(register_user_3.text)['token']
     user_id_3 = json.loads(register_user_3.text)['auth_user_id']
 
     # user_3 is invited and joins the private channel as a member
