@@ -81,6 +81,33 @@ def test_simple_case(clear_data, create_data):
     assert get_list == []
 
 
+def test_double_remove_dm(clear_data, create_data):
+    token_1, _, _, user_id_2, _, user_id_3 = create_data
+
+    # create a dm with all other users
+    create_dm = requests.post(config.url + 'dm/create/v1', json={
+        'token': token_1,
+        'u_ids': [user_id_2, user_id_3]
+    })
+
+    dm_id = json.loads(create_dm.text)['dm_id']
+
+    # remove dm_id
+    remove_dm = requests.delete(config.url + 'dm/remove/v1', json={
+        'token': token_1,
+        'dm_id': dm_id
+    })
+
+    assert remove_dm.status_code == 200
+
+    # remove dm_id
+    remove_dm_again = requests.delete(config.url + 'dm/remove/v1', json={
+        'token': token_1,
+        'dm_id': dm_id
+    })
+
+    assert remove_dm_again.status_code == 400
+    
 def test_dm_removed_for_all_users(clear_data, create_data):
     token_1, _, token_2, user_id_2, token_3, user_id_3 = create_data
 
