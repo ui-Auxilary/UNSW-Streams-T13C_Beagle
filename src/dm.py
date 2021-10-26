@@ -14,8 +14,10 @@ from src.data_operations import (
     get_messages_by_dm,
     get_user,
     get_user_ids,
-    remove_member_from_dm
+    remove_member_from_dm,
+    remove_dm
 )
+
 
 def dm_create_v1(token, u_ids):
     '''
@@ -34,12 +36,12 @@ def dm_create_v1(token, u_ids):
         {dm_id       (int): unique dm_id for the dm} 
     '''
     auth_user_id = decode_token(token)
-    
-    ## create a list of users and handles
+
+    # create a list of users and handles
     user_list = []
     user_handle_list = []
 
-    ## add owner as a member of the dm and handle
+    # add owner as a member of the dm and handle
     user_list.append(auth_user_id)
     user_handle = get_user(auth_user_id)['user_handle']
     user_handle_list.append(user_handle)
@@ -55,21 +57,22 @@ def dm_create_v1(token, u_ids):
             user_handle = get_user(user_id)['user_handle']
             user_handle_list.append(user_handle)
 
-    ## generate dm name
+    # generate dm name
     dm_name = ', '.join(sorted(user_handle_list))
 
-    ## get a new id for the dm and add DM to system
+    # get a new id for the dm and add DM to system
     new_dm_id = len(get_dm_ids()) + 1
     add_dm(new_dm_id, dm_name, auth_user_id)
 
-    ## add each user to the DM
-    
+    # add each user to the DM
+
     for u_id in user_list:
         add_user_to_dm(new_dm_id, u_id)
 
     return {
         'dm_id': new_dm_id
     }
+
 
 def dm_list_v1(token):
     '''
@@ -87,11 +90,11 @@ def dm_list_v1(token):
     auth_user_id = decode_token(token)
 
     dms_list = []
-    
-    ## Check each dm id from all dm ids in the database
+
+    # Check each dm id from all dm ids in the database
     for dm_id in get_dm_ids():
-        
-        ## Check if user id is a member of the dm
+
+        # Check if user id is a member of the dm
         if auth_user_id in get_dm(dm_id)['members']:
             dms_list.append({
                 'dm_id': dm_id,
@@ -101,6 +104,7 @@ def dm_list_v1(token):
     return {
         'dms': dms_list
     }
+
 
 def dm_remove_v1(token, dm_id):
     '''
@@ -140,8 +144,11 @@ def dm_remove_v1(token, dm_id):
     # remove owner from owners in the DM
     dm_owner.remove(auth_user_id)
 
+    # remove dm_id from list
+    remove_dm(dm_id)
 
     return {}
+
 
 def dm_details_v1(token, dm_id):
     '''
@@ -171,27 +178,27 @@ def dm_details_v1(token, dm_id):
     '''
     auth_user_id = decode_token(token)
 
-    ## invalid dm_id
+    # invalid dm_id
     if dm_id not in get_dm_ids():
         raise InputError(description="Not a valid DM id")
-    
-    ## get list of owners and members in the dm
-    dm_members = get_dm(dm_id)['members']
-    dm_name = get_dm(dm_id)['name']    
 
-    ## check if user exists in DM membes
+    # get list of owners and members in the dm
+    dm_members = get_dm(dm_id)['members']
+    dm_name = get_dm(dm_id)['name']
+
+    # check if user exists in DM membes
     if auth_user_id not in dm_members:
-        raise AccessError(description="User is not a member of the DM")    
-    
+        raise AccessError(description="User is not a member of the DM")
+
     # create list of dictionaries with member info
     member_info = []
     for member in dm_members:
         user_profile = get_user(member)
         member_dict = {
-            'u_id'      : member,
-            'email'     : user_profile['email_address'],
+            'u_id': member,
+            'email': user_profile['email_address'],
             'name_first': user_profile['first_name'],
-            'name_last' : user_profile['last_name'],
+            'name_last': user_profile['last_name'],
             'handle_str': user_profile['user_handle']
         }
         member_info.append(member_dict)
@@ -200,6 +207,7 @@ def dm_details_v1(token, dm_id):
         'name': dm_name,
         'members': member_info
     }
+
 
 def dm_leave_v1(token, dm_id):
     '''
@@ -220,26 +228,27 @@ def dm_leave_v1(token, dm_id):
     '''
     auth_user_id = decode_token(token)
 
-    ## Invalid dm_id
+    # Invalid dm_id
     if dm_id not in get_dm_ids():
         raise InputError(description="Not a valid DM id")
 
-    ## Get list of owners and members in the dm
+    # Get list of owners and members in the dm
     dm_owner = get_dm(dm_id)['owner']
     dm_members = get_dm(dm_id)['members']
 
-    ## check if user exists in DM membes
+    # check if user exists in DM membes
     if auth_user_id not in dm_members:
         raise AccessError(description="User is not a member of the DM")
 
-    ## check if user is the owner of the DM
+    # check if user is the owner of the DM
     if auth_user_id in dm_owner:
         dm_owner.remove(auth_user_id)
 
-    ## remove user from members in the DM
+    # remove user from members in the DM
     remove_member_from_dm(dm_id, auth_user_id)
 
     return {}
+
 
 def dm_messages_v1(token, dm_id, start):
     '''
@@ -266,49 +275,49 @@ def dm_messages_v1(token, dm_id, start):
     '''
     auth_user_id = decode_token(token)
 
-    ## invalid dm_id
+    # invalid dm_id
     if dm_id not in get_dm_ids():
         raise InputError(description="Not a valid DM id")
 
-    ## check if user exists in DM membes
+    # check if user exists in DM membes
     if auth_user_id not in get_dm(dm_id)['members']:
-        raise AccessError(description="User is not a member of the DM") 
+        raise AccessError(description="User is not a member of the DM")
 
-    ## Gets all the messages in the channel sorted from recent to old
+    # Gets all the messages in the channel sorted from recent to old
     message_id_list = list(reversed(get_messages_by_dm(dm_id)))
     end = start + 50
 
-    ## checks that start does not exceed total messages
+    # checks that start does not exceed total messages
     if start > len(message_id_list):
         raise InputError(description="Start number exceeds total messages")
 
     result_arr = []
     for message_pos, message_id in enumerate(message_id_list):
-        ## if message in given range
+        # if message in given range
         if start <= message_pos < end:
             message_info = get_message_by_id(message_id)
-            
+
             result_arr.append({
                 'message_id': message_id,
                 'u_id': message_info['author'],
                 'message': message_info['content'],
                 'time_created': message_info['time_created']
             })
-        
-        ## if past 50 messages, then exit
+
+        # if past 50 messages, then exit
         if message_pos == end - 1:
             break
-        
-    ## checks if 50 messages are displayed
+
+    # checks if 50 messages are displayed
     if end > len(message_id_list) - 1:
         end = -1
 
     return {
         'messages': result_arr,
-        'start'   : start,
-        'end'     : end,
+        'start': start,
+        'end': end,
     }
-    
+
 
 def message_senddm_v1(token, dm_id, message):
     '''
@@ -333,27 +342,29 @@ def message_senddm_v1(token, dm_id, message):
     '''
     auth_user_id = decode_token(token)
 
-    ## invalid dm_id
+    # invalid dm_id
     if dm_id not in get_dm_ids():
         raise InputError(description="Not a valid DM id")
 
-    ## check if user exists in DM membes
+    # check if user exists in DM membes
     if auth_user_id not in get_dm(dm_id)['members']:
-        raise AccessError(description="User is not a member of the DM")     
-    
-    if not 1 <= len(message) <= 1000:
-        raise InputError(description="Invalid message length. Upgrade to nitro")
+        raise AccessError(description="User is not a member of the DM")
 
-    ## get length of message_ids
+    if not 1 <= len(message) <= 1000:
+        raise InputError(
+            description="Invalid message length. Upgrade to nitro")
+
+    # get length of message_ids
     new_message_id = len(get_message_ids()) + 1
     is_channel = False
 
-    ## time created
+    # time created
     dt = datetime.now()
     time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
 
-    ## add message to datastore
-    add_message(is_channel, auth_user_id, dm_id, new_message_id, message, time_created)
+    # add message to datastore
+    add_message(is_channel, auth_user_id, dm_id,
+                new_message_id, message, time_created)
 
     return {
         'message_id': new_message_id

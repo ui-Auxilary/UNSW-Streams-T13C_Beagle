@@ -24,6 +24,7 @@ from src.data_operations import (
     remove_member_from_channel,
 )
 
+
 def channel_invite_v1(token, channel_id, u_id):
     '''
     A user invites another user and gives access to a channel and adds them to the channel
@@ -48,27 +49,29 @@ def channel_invite_v1(token, channel_id, u_id):
 
     auth_user_id = decode_token(token)
 
-    ## check whether channel exists
+    # check whether channel exists
     if channel_id not in get_channel_ids():
         raise InputError(description='Channel does not exist')
 
-    ## checks auth_user is a member of the channel
+    # checks auth_user is a member of the channel
     if auth_user_id not in get_channel(channel_id)['members']:
-        raise AccessError(description='User is not authorised to invite new members')
+        raise AccessError(
+            description='User is not authorised to invite new members')
 
-    ## checks u_id is valid
+    # checks u_id is valid
     if u_id not in get_user_ids():
         raise InputError(description='User does not exist')
 
-    ## check whether user is already member
+    # check whether user is already member
     if u_id in get_channel(channel_id)['members']:
         raise InputError(description='New user is already existing member')
 
-    ## adds the new user to the channel
+    # adds the new user to the channel
     add_member_to_channel(channel_id, u_id)
 
     return {
     }
+
 
 def channel_details_v1(token, channel_id):
     '''
@@ -111,10 +114,10 @@ def channel_details_v1(token, channel_id):
     for owner_id in get_channel(channel_id)['owner']:
         owner_details = get_user(owner_id)
         owner_dict = {
-            'u_id'      : owner_id,
-            'email'     : owner_details['email_address'],
+            'u_id': owner_id,
+            'email': owner_details['email_address'],
             'name_first': owner_details['first_name'],
-            'name_last' : owner_details['last_name'],
+            'name_last': owner_details['last_name'],
             'handle_str': owner_details['user_handle'],
         }
         owners.append(owner_dict)
@@ -125,22 +128,23 @@ def channel_details_v1(token, channel_id):
         member_details = get_user(member)
 
         member_dict = {
-            'u_id'      : member,
-            'email'     : member_details['email_address'],
+            'u_id': member,
+            'email': member_details['email_address'],
             'name_first': member_details['first_name'],
-            'name_last' : member_details['last_name'],
+            'name_last': member_details['last_name'],
             'handle_str': member_details['user_handle']
         }
         member_info.append(member_dict)
 
     return_dict = {
-        'name'         : channel_info['name'],
+        'name': channel_info['name'],
         'owner_members': owners,
-        'all_members'  : member_info,
-        'is_public'    : channel_info['is_public']
+        'all_members': member_info,
+        'is_public': channel_info['is_public']
     }
 
     return return_dict
+
 
 def channel_messages_v1(token, channel_id, start):
     '''
@@ -166,29 +170,29 @@ def channel_messages_v1(token, channel_id, start):
     '''
     auth_user_id = decode_token(token)
 
-    ## checks for invalid channel_id
+    # checks for invalid channel_id
     if channel_id not in get_channel_ids():
         raise InputError(description='Channel_id does not exist')
 
-    ## checks if auth_user_id is a channel member
+    # checks if auth_user_id is a channel member
     if auth_user_id not in get_channel(channel_id)['members']:
         raise AccessError(description='User is not channel member')
 
     result_arr = []
-    ## Gets all the messages in the channel sorted from recent to old
+    # Gets all the messages in the channel sorted from recent to old
     message_id_list = list(reversed(get_messages_by_channel(channel_id)))
     end = start + 50
 
-    ## checks that start does not exceed total messages
+    # checks that start does not exceed total messages
     if start > len(message_id_list):
         raise InputError(description='Start number exceeds total messages')
 
     for message_pos, message_id in enumerate(message_id_list):
-        ## if message in given range
+        # if message in given range
         if start <= message_pos < end:
             message_info = get_message_by_id(message_id)
 
-            ## add message to message_list
+            # add message to message_list
             result_arr.append({
                 'message_id': message_id,
                 'u_id': message_info['author'],
@@ -196,19 +200,20 @@ def channel_messages_v1(token, channel_id, start):
                 'time_created': message_info['time_created']
             })
 
-        ## if past 50 messages, then exit
+        # if past 50 messages, then exit
         if message_pos == end - 1:
             break
 
-    ## checks if 50 messages are displayed
+    # checks if 50 messages are displayed
     if end > len(message_id_list) - 1:
         end = -1
 
     return {
         'messages': result_arr,
-        'start'   : start,
-        'end'     : end,
+        'start': start,
+        'end': end,
     }
+
 
 def channel_join_v1(token, channel_id):
     '''
@@ -232,25 +237,26 @@ def channel_join_v1(token, channel_id):
 
     auth_user_id = decode_token(token)
 
-    ## check whether channel exists
+    # check whether channel exists
     if channel_id not in get_channel_ids():
         raise InputError(description='Channel does not exist')
 
-    ## check whether user already member
+    # check whether user already member
     if auth_user_id in get_channel(channel_id)['members']:
         raise InputError(description='User is existing member')
 
-    ## check whether user has sufficient permissions to join
+    # check whether user has sufficient permissions to join
     if not get_channel(channel_id)['is_public']:
         print(get_user(auth_user_id)['global_owner'])
         if not get_user(auth_user_id)['global_owner']:
             raise AccessError(description='User cannot join private channel')
 
-    ## add them to channel
+    # add them to channel
     add_member_to_channel(channel_id, auth_user_id)
 
     return {
     }
+
 
 def channel_leave_v1(token, channel_id):
     '''
@@ -272,26 +278,27 @@ def channel_leave_v1(token, channel_id):
     '''
     auth_user_id = decode_token(token)
 
-    ## Invalid channel
+    # Invalid channel
     if channel_id not in get_channel_ids():
         raise InputError(description="Not a valid channel id")
 
-    ## Get list of owners and members in the channel
+    # Get list of owners and members in the channel
     channel_owner = get_channel(channel_id)['owner']
     channel_members = get_channel(channel_id)['members']
 
-    ## check if user exists in channel members
+    # check if user exists in channel members
     if auth_user_id not in channel_members:
         raise AccessError(description="User is not a member of the DM")
 
-    ## check if user is the owner of the channel
+    # check if user is the owner of the channel
     if auth_user_id in channel_owner:
         channel_owner.remove(auth_user_id)
 
-    ## remove user from members in the channel
+    # remove user from members in the channel
     remove_member_from_channel(channel_id, auth_user_id)
 
     return {}
+
 
 def channel_addowner_v1(token, channel_id, u_id):
     '''
@@ -317,27 +324,34 @@ def channel_addowner_v1(token, channel_id, u_id):
     '''
     auth_user_id = decode_token(token)
 
-    ## check whether channel exists
+    # check whether channel exists
     if channel_id not in get_channel_ids():
         raise InputError(description='Channel does not exist')
 
     if auth_user_id not in get_channel(channel_id)['owner'] and not get_user(auth_user_id)['global_owner']:
-        raise AccessError(description='Not sufficient permissions to add new owner')
+        raise AccessError(
+            description='Not sufficient permissions to add new owner')
+
+    # check whether authorised user is a member of the channel
+    if auth_user_id not in get_channel(channel_id)['members']:
+        raise AccessError(
+            description='User does not have owner permissions in the channel')
 
     if u_id not in get_user_ids():
         raise InputError(description='u_id does not exist')
 
-    ## check whether user not a member of the channel
+    # check whether user not a member of the channel
     if u_id not in get_channel(channel_id)['members']:
         raise InputError(description='User is not a member of channel')
 
-    ## check whether user already owner
+    # check whether user already owner
     if u_id in get_channel(channel_id)['owner']:
         raise InputError(description='User is already owner of channel')
 
     add_owner_to_channel(u_id, channel_id)
 
     return {}
+
 
 def channel_removeowner_v1(token, channel_id, u_id):
     '''
@@ -361,20 +375,26 @@ def channel_removeowner_v1(token, channel_id, u_id):
     Return Value:
         {}
     '''
-    ## check for valid token
+    # check for valid token
     auth_user_id = decode_token(token)
 
-    ## check whether channel exists
+    # check whether channel exists
     if channel_id not in get_channel_ids():
         raise InputError(description='Channel does not exist')
 
     if auth_user_id not in get_channel(channel_id)['owner'] and not get_user(auth_user_id)['global_owner']:
-        raise AccessError(description='Not sufficient permissions to remove an owner')
+        raise AccessError(
+            description='Not sufficient permissions to remove an owner')
+
+    # check whether authorised user is a member of the channel
+    if auth_user_id not in get_channel(channel_id)['members']:
+        raise AccessError(
+            description='User does not have owner permissions in the channel')
 
     if u_id not in get_user_ids():
         raise InputError(description='u_id does not exist')
 
-    ## check whether user already owner
+    # check whether user already owner
     if u_id not in get_channel(channel_id)['owner']:
         raise InputError(description='User is not an owner of channel')
 

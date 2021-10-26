@@ -20,7 +20,9 @@ Functions:
     get_channel_messages() -> list 
     get_channel_ids() -> list
     remove_member_from_dm(dm_id: int, user_id: int)
+    get_dm(dm_id: int) -> dict
     get_dm_ids() -> list
+    dm_remove(dm_id: int)
     get_global_owners() -> list
     add_message(user_id: int, channel_id: int, message_id: int,
                 content: str, time_created: int)
@@ -506,6 +508,21 @@ def get_dm_ids():
 
     data_source = data_store.get()
     return data_source['dm_ids']
+
+
+def remove_dm(dm_id):
+    '''
+    Removes a dm, from the database list of DMs
+
+    Arguments:
+        dm_id (int): id of dm being removed
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+    data_source['dm_ids'].remove(dm_id)
 
 
 def get_global_owners():
