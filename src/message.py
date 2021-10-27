@@ -1,4 +1,3 @@
-from src import auth
 from src.error import InputError, AccessError
 from src.other import decode_token
 from datetime import timezone, datetime
@@ -122,7 +121,6 @@ def message_edit_v1(token, message_id, message):
 
     edit_message(is_channel, channel_id, message_id, message)
 
-
     return {}
 
 
@@ -173,6 +171,5 @@ def message_remove_v1(token, message_id):
                 description="User does not have permissions to remove message")
 
     remove_message(is_channel, channel_id, message_id)
-
 
     return {}
