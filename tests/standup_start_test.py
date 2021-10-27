@@ -234,7 +234,7 @@ def test_empty_startup(clear_data, user_and_channel_data):
     auth_token, _, channel_1, _, _ = user_and_channel_data
 
     # user 1 starts a standup
-    standup_start_data = requests.post(config.url + 'standup/start/v1', json={
+    requests.post(config.url + 'standup/start/v1', json={
         'token': auth_token,
         'channel_id': channel_1,
         'length': 0
