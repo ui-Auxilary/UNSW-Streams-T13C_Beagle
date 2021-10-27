@@ -92,7 +92,7 @@ def user_and_channel_data(register_user_data):
 def test_simple_case_public_channel(clear_data, user_and_channel_data):
     auth_token, _, channel_1, _, _ = user_and_channel_data
 
-    standup_start_data = requests.post(config.url + 'standup/start/v1', json={
+    requests.post(config.url + 'standup/start/v1', json={
         'token': auth_token,
         'channel_id': channel_1,
         'length': 20
@@ -113,7 +113,7 @@ def test_simple_case_private_channel(clear_data, user_and_channel_data):
     _, user_token_2, _, _, channel_3 = user_and_channel_data
 
     ## start an active startup
-    standup_start_data = requests.post(config.url + 'standup/start/v1', json={
+    requests.post(config.url + 'standup/start/v1', json={
         'token': user_token_2,
         'channel_id': channel_3,
         'length': 10
