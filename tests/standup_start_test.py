@@ -103,35 +103,37 @@ def test_simple_case_public_channel(clear_data, user_and_channel_data):
         'length': 60
     })
 
-    standup_duration = json.loads(standup_start_data.text)['length']
+    standup_duration = json.loads(standup_start_data.text)['time_finish']
 
-    assert standup_duration == 60
+    assert type(standup_duration) == int
 
 
 def test_simple_case_private_channel(clear_data, user_and_channel_data):
-    auth_token, _, _, _, channel_3 = user_and_channel_data
+    _, token_2, _, _, channel_3 = user_and_channel_data
 
     standup_start_data = requests.post(config.url + 'standup/start/v1', json={
-        'token': auth_token,
+        'token': token_2,
         'channel_id': channel_3,
         'length': 60
     })
 
-    standup_duration = json.loads(standup_start_data.text)['length']
+    standup_duration = json.loads(standup_start_data.text)['time_finish']
 
-    assert standup_duration == 60
+    assert type(standup_duration) == int
 
 
 def test_startup_duration_zero(clear_data, user_and_channel_data):
-    auth_token, _, _, channel_2, _ = user_and_channel_data
+    _, token_2, _, channel_2, _ = user_and_channel_data
 
     standup_start_data = requests.post(config.url + 'standup/start/v1', json={
-        'token': auth_token,
+        'token': token_2,
         'channel_id': channel_2,
         'length': 0
     })
 
-    assert standup_start_data.status_code == 400
+    standup_duration = json.loads(standup_start_data.text)['time_finish']
+
+    assert type(standup_duration) == int
 
 # ___COMPLEX TEST CASES - DEPENDANT FUNCTIONS___ #
 
@@ -148,7 +150,7 @@ def test_non_owner_starts_channel_standup(clear_data, user_and_channel_data):
     standup_start_data = requests.post(config.url + 'standup/start/v1', json={
         'token': auth_token,
         'channel_id': channel_1,
-        'length': 10
+        'length': 60
     })
 
     time_finish = json.loads(standup_start_data.text)['time_finish']
@@ -166,7 +168,7 @@ def test_non_owner_starts_channel_standup(clear_data, user_and_channel_data):
     assert standup_duration == time_finish
 
 
-def test_start_multiple_standups_different_channels():
+def test_start_multiple_standups_different_channels(clear_data, user_and_channel_data):
     auth_token, user_token_2, channel_1, channel_2, channel_3 = user_and_channel_data
 
     # user 1 starts a standup
@@ -180,7 +182,7 @@ def test_start_multiple_standups_different_channels():
 
     # user 2 starts two standups
     standup_start_2_data = requests.post(config.url + 'standup/start/v1', json={
-        'token': auth_token,
+        'token': user_token_2,
         'channel_id': channel_2,
         'length': 60
     })
@@ -188,7 +190,7 @@ def test_start_multiple_standups_different_channels():
     time_finish_2 = json.loads(standup_start_2_data.text)['time_finish']
 
     standup_start_3_data = requests.post(config.url + 'standup/start/v1', json={
-        'token': auth_token,
+        'token': user_token_2,
         'channel_id': channel_3,
         'length': 300
     })
@@ -285,16 +287,22 @@ def test_existing_active_standup_in_channel(clear_data, user_and_channel_data):
     standup_start_data = requests.post(config.url + 'standup/start/v1', json={
         'token': auth_token,
         'channel_id': channel_1,
-        'length': 60
+        'length': 120
     })
 
     assert standup_start_data.status_code == 200
+
+    # user_2 joins channel_1
+    requests.post(config.url + 'channel/join/v2', json={
+        'token': token_2,
+        'channel_id': channel_1
+    })
 
     # user_2 attempts to start another standup in the same channel
     standup_start_2_data = requests.post(config.url + 'standup/start/v1', json={
         'token': token_2,
         'channel_id': channel_1,
-        'length': 10
+        'length': 20
     })
 
     assert standup_start_2_data.status_code == 400

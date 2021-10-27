@@ -95,21 +95,21 @@ def create_startup_data(clear_data, user_and_channel_data):
     standup_start_data = requests.post(config.url + 'standup/start/v1', json={
         'token': auth_token,
         'channel_id': channel_1,
-        'length': 60
+        'length': 20
     })
 
     # user_2 creates a startup in channel_2
     standup_start_data_2 = requests.post(config.url + 'standup/start/v1', json={
         'token': user_token_2,
         'channel_id': channel_2,
-        'length': 120
+        'length': 30
     })
 
     # user_2 creates a startup in channel_3
     standup_start_data_3 = requests.post(config.url + 'standup/start/v1', json={
         'token': user_token_2,
         'channel_id': channel_3,
-        'length': 300
+        'length': 40
     })
 
     # collect the time_finish for each startup
@@ -135,7 +135,7 @@ def test_simple_case_public_channel(clear_data, register_user_data, create_start
     })
 
     # check the request is valid
-    assert standup_send_data == 200
+    assert standup_send_data.status_code == 200
 
 
 def test_simple_case_private_channel(clear_data, register_user_data, create_startup_data):
@@ -151,13 +151,13 @@ def test_simple_case_private_channel(clear_data, register_user_data, create_star
     })
     # check the request is valid
 
-    assert standup_send_data == 200
+    assert standup_send_data.status_code == 200
 
 
 # ___COMPLEX TEST CASES - DEPENDANT FUNCTIONS___ #
 
 def test_send_multiple_messages_active_standup(clear_data, register_user_data, create_startup_data):
-    auth_user_id, auth_token, user_id_2, user_token_2 = register_user_data
+    auth_user_id, auth_token, _, _ = register_user_data
     channel_1, _, _, _, _, _ = create_startup_data
 
     # send a few messages to the startup
@@ -180,7 +180,7 @@ def test_send_multiple_messages_active_standup(clear_data, register_user_data, c
     })
 
     # check the request is valid
-    assert standup_send_data == 200
+    assert standup_send_data.status_code == 200
 
     # get the profile of the user who sent the messages
     user_profile_data = requests.get(config.url + 'user/profile/v1', params={
@@ -189,6 +189,9 @@ def test_send_multiple_messages_active_standup(clear_data, register_user_data, c
     })
 
     user_handle = json.loads(user_profile_data.text)['user']['handle_str']
+
+    # Simulate waiting for the standup to be over
+    time.sleep(8)
 
     # get the messages in the channel
     channel_message_data = requests.get(config.url + 'channel/messages/v2', params={
@@ -200,8 +203,9 @@ def test_send_multiple_messages_active_standup(clear_data, register_user_data, c
     channel_messages = json.loads(channel_message_data.text)['messages']
     channel_end = json.loads(channel_message_data.text)['end']
 
+    print(channel_messages)
     assert channel_messages[0]['u_id'] == auth_user_id
-    assert channel_messages[0]['message'] == f"{user_handle}: Hello there!\n {user_handle}: Hello again!\n{user_handle}: Bye there!\n"
+    assert channel_messages[0]['message'] == f"{user_handle}: Hello there!\n{user_handle}: Hello again!\n{user_handle}: Bye there!"
     assert channel_end == -1
 
 
@@ -216,11 +220,14 @@ def test_multiple_users_send_multiple_messages_standup(clear_data, register_user
     })
 
     # both users send a few messages to the startup
-    requests.post(config.url + 'standup/send/v1', json={
+    standup_send_data = requests.post(config.url + 'standup/send/v1', json={
         'token': user_token_2,
         'channel_id': channel_1,
         'message': "a"
     })
+
+    # check the request is valid
+    assert standup_send_data.status_code == 200
 
     standup_send_data = requests.post(config.url + 'standup/send/v1', json={
         'token': auth_token,
@@ -241,7 +248,7 @@ def test_multiple_users_send_multiple_messages_standup(clear_data, register_user
     })
 
     # check the request is valid
-    assert standup_send_data == 200
+    assert standup_send_data.status_code == 200
 
     # get the profile of both users
     user_profile_data = requests.get(config.url + 'user/profile/v1', params={
@@ -257,6 +264,9 @@ def test_multiple_users_send_multiple_messages_standup(clear_data, register_user
     user_handle = json.loads(user_profile_data.text)['user']['handle_str']
     user_handle_2 = json.loads(user_profile_data_2.text)['user']['handle_str']
 
+    # Simulate waiting for the standup to be over
+    time.sleep(12)
+
     # get the messages in the channel
     channel_message_data = requests.get(config.url + 'channel/messages/v2', params={
         'token': auth_token,
@@ -267,8 +277,9 @@ def test_multiple_users_send_multiple_messages_standup(clear_data, register_user
     channel_messages = json.loads(channel_message_data.text)['messages']
     channel_end = json.loads(channel_message_data.text)['end']
 
-    assert channel_messages[0]['u_id'] == user_id_2
-    assert channel_messages[0]['message'] == f"{user_handle_2}: a\n {user_handle}: b\n{user_handle_2}:c\n{user_handle}:d\n"
+    print(channel_messages)
+    assert channel_messages[0]['u_id'] == auth_user_id
+    assert channel_messages[0]['message'] == f"{user_handle_2}: a\n{user_handle}: b\n{user_handle_2}: c\n{user_handle}: d"
     assert channel_end == -1
 
 # ___TEST VALID INPUT___ #
