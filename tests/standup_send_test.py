@@ -156,9 +156,16 @@ def test_simple_case_private_channel(clear_data, register_user_data, create_star
 
 # ___COMPLEX TEST CASES - DEPENDANT FUNCTIONS___ #
 
-def test_send_multiple_messages_active_standup(clear_data, register_user_data, create_startup_data):
-    auth_user_id, auth_token, _, _ = register_user_data
-    channel_1, _, _, _, _, _ = create_startup_data
+def test_send_multiple_messages_active_standup(clear_data, register_user_data, user_and_channel_data):
+    auth_user_id, _, _, _ = register_user_data
+    auth_token, _, channel_1, _, _ = user_and_channel_data
+
+    # auth_user creates a startup in channel_1
+    requests.post(config.url + 'standup/start/v1', json={
+        'token': auth_token,
+        'channel_id': channel_1,
+        'length': 20
+    })
 
     # send a few messages to the startup
     requests.post(config.url + 'standup/send/v1', json={
@@ -208,14 +215,21 @@ def test_send_multiple_messages_active_standup(clear_data, register_user_data, c
     assert channel_end == -1
 
 
-def test_multiple_users_send_multiple_messages_standup(clear_data, register_user_data, create_startup_data):
-    auth_user_id, auth_token, user_id_2, user_token_2 = register_user_data
-    channel_1, _, _, _, _, _ = create_startup_data
+def test_multiple_users_send_multiple_messages_standup(clear_data, register_user_data, user_and_channel_data):
+    auth_user_id, _, user_id_2, _ = register_user_data
+    auth_token, user_token_2, channel_1, _, _ = user_and_channel_data
 
     # user_2 joins channel_1 and starts a standup
     requests.post(config.url + 'channel/join/v2', json={
         'token': user_token_2,
         'channel_id': channel_1
+    })
+
+    # auth_user creates a startup in channel_1
+    requests.post(config.url + 'standup/start/v1', json={
+        'token': auth_token,
+        'channel_id': channel_1,
+        'length': 20
     })
 
     # both users send a few messages to the startup
@@ -276,8 +290,8 @@ def test_multiple_users_send_multiple_messages_standup(clear_data, register_user
     channel_messages = json.loads(channel_message_data.text)['messages']
     channel_end = json.loads(channel_message_data.text)['end']
 
-    assert channel_messages[2]['u_id'] == auth_user_id
-    assert channel_messages[2]['message'] == f"{user_handle_2}: a\n{user_handle}: b\n{user_handle_2}: c\n{user_handle}: d"
+    assert channel_messages[0]['u_id'] == auth_user_id
+    assert channel_messages[0]['message'] == f"{user_handle_2}: a\n{user_handle}: b\n{user_handle_2}: c\n{user_handle}: d"
     assert channel_end == -1
 
 # ___TEST VALID INPUT___ #
