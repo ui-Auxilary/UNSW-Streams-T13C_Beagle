@@ -86,48 +86,19 @@ def user_and_channel_data(register_user_data):
 
     return user_token, user_token_2, channel_id, channel_id_2, channel_id_3
 
+# ___SIMPLE TEST CASES - NO DEPENDANT FUNCTIONS___ #
 
-@pytest.fixture
-def create_startup_data(clear_data, user_and_channel_data):
-    auth_token, user_token_2, channel_1, channel_2, channel_3 = user_and_channel_data
 
-    # auth_user creates a startup in channel_1
+def test_simple_case_public_channel(clear_data, user_and_channel_data):
+    auth_token, _, channel_1, _, _ = user_and_channel_data
+
     standup_start_data = requests.post(config.url + 'standup/start/v1', json={
         'token': auth_token,
         'channel_id': channel_1,
         'length': 20
     })
 
-    # user_2 creates a startup in channel_2
-    standup_start_data_2 = requests.post(config.url + 'standup/start/v1', json={
-        'token': user_token_2,
-        'channel_id': channel_2,
-        'length': 30
-    })
-
-    # user_2 creates a startup in channel_3
-    standup_start_data_3 = requests.post(config.url + 'standup/start/v1', json={
-        'token': user_token_2,
-        'channel_id': channel_3,
-        'length': 40
-    })
-
-    # collect the time_finish for each startup
-    time_finish_1 = json.loads(standup_start_data.text)['time_finish']
-    time_finish_2 = json.loads(standup_start_data_2.text)['time_finish']
-    time_finish_3 = json.loads(standup_start_data_3.text)['time_finish']
-
-    return channel_1, time_finish_1, channel_2, time_finish_2, channel_3, time_finish_3
-
-# ___SIMPLE TEST CASES - NO DEPENDANT FUNCTIONS___ #
-
-
-def test_simple_case_public_channel(clear_data, register_user_data, create_startup_data):
-    _, auth_token, _, _ = register_user_data
-    channel_1, _, _, _, _, _ = create_startup_data
-
     # send a message to the startup
-
     standup_send_data = requests.post(config.url + 'standup/send/v1', json={
         'token': auth_token,
         'channel_id': channel_1,
@@ -138,12 +109,17 @@ def test_simple_case_public_channel(clear_data, register_user_data, create_start
     assert standup_send_data.status_code == 200
 
 
-def test_simple_case_private_channel(clear_data, register_user_data, create_startup_data):
-    _, _, _, user_token_2 = register_user_data
-    _, _, _, _, channel_3, _ = create_startup_data
+def test_simple_case_private_channel(clear_data, user_and_channel_data):
+    _, user_token_2, _, _, channel_3 = user_and_channel_data
+
+    ## start an active startup
+    standup_start_data = requests.post(config.url + 'standup/start/v1', json={
+        'token': user_token_2,
+        'channel_id': channel_3,
+        'length': 10
+    })
 
     # send a message to the startup
-
     standup_send_data = requests.post(config.url + 'standup/send/v1', json={
         'token': user_token_2,
         'channel_id': channel_3,
@@ -157,32 +133,32 @@ def test_simple_case_private_channel(clear_data, register_user_data, create_star
 # ___COMPLEX TEST CASES - DEPENDANT FUNCTIONS___ #
 
 def test_send_multiple_messages_active_standup(clear_data, register_user_data, user_and_channel_data):
-    auth_user_id, _, _, _ = register_user_data
-    auth_token, _, channel_1, _, _ = user_and_channel_data
+    _, _, user_2_id, _ = register_user_data
+    auth_token, user_2_token, _, channel_2, _ = user_and_channel_data
 
     # auth_user creates a startup in channel_1
     requests.post(config.url + 'standup/start/v1', json={
-        'token': auth_token,
-        'channel_id': channel_1,
+        'token': user_2_token,
+        'channel_id': channel_2,
         'length': 20
     })
 
     # send a few messages to the startup
     requests.post(config.url + 'standup/send/v1', json={
-        'token': auth_token,
-        'channel_id': channel_1,
+        'token': user_2_token,
+        'channel_id': channel_2,
         'message': "Hello there!"
     })
 
     requests.post(config.url + 'standup/send/v1', json={
-        'token': auth_token,
-        'channel_id': channel_1,
+        'token': user_2_token,
+        'channel_id': channel_2,
         'message': "Hello again!"
     })
 
     standup_send_data = requests.post(config.url + 'standup/send/v1', json={
-        'token': auth_token,
-        'channel_id': channel_1,
+        'token': user_2_token,
+        'channel_id': channel_2,
         'message': "Bye there!"
     })
 
@@ -192,7 +168,7 @@ def test_send_multiple_messages_active_standup(clear_data, register_user_data, u
     # get the profile of the user who sent the messages
     user_profile_data = requests.get(config.url + 'user/profile/v1', params={
         'token': auth_token,
-        'u_id': auth_user_id
+        'u_id': user_2_id
     })
 
     user_handle = json.loads(user_profile_data.text)['user']['handle_str']
@@ -202,8 +178,8 @@ def test_send_multiple_messages_active_standup(clear_data, register_user_data, u
 
     # get the messages in the channel
     channel_message_data = requests.get(config.url + 'channel/messages/v2', params={
-        'token': auth_token,
-        'channel_id': channel_1,
+        'token': user_2_token,
+        'channel_id': channel_2,
         'start': 0
     })
 
@@ -211,7 +187,7 @@ def test_send_multiple_messages_active_standup(clear_data, register_user_data, u
     channel_end = json.loads(channel_message_data.text)['end']
 
     print(channel_messages)
-    assert channel_messages[0]['u_id'] == auth_user_id
+    assert channel_messages[0]['u_id'] == user_2_id
     assert channel_messages[0]['message'] == f"{user_handle}: Hello there!\n{user_handle}: Hello again!\n{user_handle}: Bye there!"
     assert channel_end == -1
 
