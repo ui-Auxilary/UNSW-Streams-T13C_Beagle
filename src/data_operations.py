@@ -7,7 +7,7 @@ Functions:
              password: str, user_handle: str, is_owner: bool)
     remove_user_details(user_id: int)
     get_user(user_id: int) -> dict
-    edit_user(user_id: int, key: str, new_value: str) 
+    edit_user(user_id: int, key: str, new_value: str)
     edit_user_permissions(user_id: int, permission_id: int)
     get_user_handles() -> list
     get_user_emails() -> list
@@ -17,7 +17,7 @@ Functions:
     add_channel(channel_id: int, channel_name: str, user_id: int,
                 is_public: bool)
     get_channel(channel_id: int) -> dict
-    get_channel_messages() -> list 
+    get_channel_messages() -> list
     get_channel_ids() -> list
     remove_member_from_dm(dm_id: int, user_id: int)
     get_dm(dm_id: int) -> dict
@@ -26,10 +26,13 @@ Functions:
     get_global_owners() -> list
     add_message(user_id: int, channel_id: int, message_id: int,
                 content: str, time_created: int)
+    add_standup_message(channel_id: int, content: str)
+    clear_message_pack(channel_id: int)
     edit_message(is_channel: bool, channel_id: int, message_id: int, message: str):
     remove_message(is_channel: bool, channel_id: int, message_id: int, message: str):
     get_message_by_id(message_id: int) -> dict
     get_messages_by_channel(channel_id: int) -> list
+    set_active_standup(channel_id: int)
     add_session_token(token: str, user_id: int)
     remove_session_token(token: str)
     get_user_from_token(token: str) -> int
@@ -356,6 +359,11 @@ def add_channel(channel_id, channel_name, user_id, is_public):
         'owner': [user_id],
         'is_public': is_public,
         'members': [user_id],
+        'standup_data': {
+            'is_active': False,
+            'time_finish': None,
+            'message_package': []
+        },
         'message_ids': []
     }
 
@@ -579,6 +587,39 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
     data_source['message_ids'].append(message_id)
 
 
+def add_standup_message(channel_id, content):
+    '''
+    Adds a message to the database from a user
+
+    Arguments:
+        is_channel  (bool): bool of whether the message is from a channel
+        content      (str): contents of the message
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+    data_source['channel_data'][channel_id]['standup_data']['message_package'].append(
+        content)
+
+
+def clear_message_pack(channel_id):
+    '''
+    Clears the message pack in a standup in a channel
+
+    Arguments:
+        channel_id   (int): id of channel's messagepack being cleared
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+
+    data_source['channel_data'][channel_id]['standup_data']['message_package'].clear()
+
+
 def edit_message(is_channel, channel_id, message_id, message):
     '''
     Edits a message in the datastore
@@ -688,6 +729,28 @@ def get_messages_by_dm(dm_id):
 
     data_source = data_store.get()
     return data_source['dm_data'][dm_id]['message_ids']
+
+
+def set_active_standup(set_active, channel_id, time_finished):
+    '''
+    Sets a channel's active_standup value to True
+
+    Arguments:
+        set_active      (bool): set the standup to be active or inactive
+        channel_id       (int): id of channel that message was created
+        time_finished    (int): time that the standup is set to finish
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+
+    if set_active:
+        data_source['channel_data'][channel_id]['standup_data']['is_active'] = True
+        data_source['channel_data'][channel_id]['standup_data']['time_finish'] = time_finished
+    else:
+        data_source['channel_data'][channel_id]['standup_data']['is_active'] = False
 
 
 def add_session_token(token, user_id):

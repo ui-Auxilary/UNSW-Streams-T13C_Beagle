@@ -1,4 +1,3 @@
-from src import user
 from src.error import InputError, AccessError
 from src.other import decode_token
 from datetime import timezone, datetime
