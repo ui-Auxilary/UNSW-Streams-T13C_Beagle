@@ -191,7 +191,7 @@ def test_send_multiple_messages_active_standup(clear_data, register_user_data, c
     user_handle = json.loads(user_profile_data.text)['user']['handle_str']
 
     # Simulate waiting for the standup to be over
-    time.sleep(8)
+    time.sleep(12)
 
     # get the messages in the channel
     channel_message_data = requests.get(config.url + 'channel/messages/v2', params={
