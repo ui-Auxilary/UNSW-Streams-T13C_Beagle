@@ -121,7 +121,7 @@ def create_startup_data(clear_data, user_and_channel_data):
 
 def test_active_startup_public_channel(clear_data, register_user_data, create_startup_data):
     _, auth_token, _, _ = register_user_data
-    channel_1, time_finish_1, _, _, _, _ = create_startup_data
+    channel_1, _, _, _, _, _ = create_startup_data
 
     standup_active_data = requests.get(config.url + 'standup/active/v1', params={
         'token': auth_token,
@@ -129,18 +129,16 @@ def test_active_startup_public_channel(clear_data, register_user_data, create_st
     })
 
     standup_is_active = json.loads(standup_active_data.text)['is_active']
-    standup_duration = json.loads(standup_active_data.text)['time_finish']
 
     assert standup_is_active == True
-    assert standup_duration == time_finish_1
 
 
 def test_inactive_startup_public_channel(clear_data, user_and_channel_data):
     _, token_2, _, channel_2, _ = user_and_channel_data
 
-    standup_active_data = requests.post(config.url + 'standup/start/v1', json={
+    standup_active_data = requests.get(config.url + 'standup/active/v1', params={
         'token': token_2,
-        'channel_id': channel_2
+        'channel_id': channel_2,
     })
 
     standup_is_active = json.loads(standup_active_data.text)['is_active']
@@ -152,7 +150,7 @@ def test_inactive_startup_public_channel(clear_data, user_and_channel_data):
 
 def test_active_startup_private_channel(clear_data, register_user_data, create_startup_data):
     _, _, _, user_token_2 = register_user_data
-    _, _, _, _, channel_3, time_finish_3 = create_startup_data
+    _, _, _, _, channel_3, _ = create_startup_data
 
     standup_active_data = requests.get(config.url + 'standup/active/v1', params={
         'token': user_token_2,
@@ -160,16 +158,14 @@ def test_active_startup_private_channel(clear_data, register_user_data, create_s
     })
 
     standup_is_active = json.loads(standup_active_data.text)['is_active']
-    standup_duration = json.loads(standup_active_data.text)['time_finish']
 
     assert standup_is_active == True
-    assert standup_duration == time_finish_3
 
 
 def test_inactive_startup_private_channel(clear_data, user_and_channel_data):
     _, token_2, _, _, channel_3 = user_and_channel_data
 
-    standup_active_data = requests.post(config.url + 'standup/start/v1', json={
+    standup_active_data = requests.get(config.url + 'standup/active/v1', params={
         'token': token_2,
         'channel_id': channel_3
     })
