@@ -210,6 +210,7 @@ def test_send_multiple_messages_active_standup(clear_data, register_user_data, u
     channel_messages = json.loads(channel_message_data.text)['messages']
     channel_end = json.loads(channel_message_data.text)['end']
 
+    print(channel_messages)
     assert channel_messages[0]['u_id'] == auth_user_id
     assert channel_messages[0]['message'] == f"{user_handle}: Hello there!\n{user_handle}: Hello again!\n{user_handle}: Bye there!"
     assert channel_end == -1
@@ -278,7 +279,7 @@ def test_multiple_users_send_multiple_messages_standup(clear_data, register_user
     user_handle_2 = json.loads(user_profile_data_2.text)['user']['handle_str']
 
     # Simulate waiting for the standup to be over
-    time.sleep(12)
+    time.sleep(20)
 
     # get the messages in the channel
     channel_message_data = requests.get(config.url + 'channel/messages/v2', params={
@@ -290,6 +291,7 @@ def test_multiple_users_send_multiple_messages_standup(clear_data, register_user
     channel_messages = json.loads(channel_message_data.text)['messages']
     channel_end = json.loads(channel_message_data.text)['end']
 
+    print(channel_messages)
     assert channel_messages[0]['u_id'] == auth_user_id
     assert channel_messages[0]['message'] == f"{user_handle_2}: a\n{user_handle}: b\n{user_handle_2}: c\n{user_handle}: d"
     assert channel_end == -1
