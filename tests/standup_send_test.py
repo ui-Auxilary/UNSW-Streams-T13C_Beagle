@@ -112,7 +112,7 @@ def test_simple_case_public_channel(clear_data, user_and_channel_data):
 def test_simple_case_private_channel(clear_data, user_and_channel_data):
     _, user_token_2, _, _, channel_3 = user_and_channel_data
 
-    ## start an active startup
+    # start an active startup
     requests.post(config.url + 'standup/start/v1', json={
         'token': user_token_2,
         'channel_id': channel_3,
@@ -140,7 +140,7 @@ def test_send_multiple_messages_active_standup(clear_data, register_user_data, u
     requests.post(config.url + 'standup/start/v1', json={
         'token': user_2_token,
         'channel_id': channel_2,
-        'length': 20
+        'length': 30
     })
 
     # send a few messages to the startup
@@ -174,7 +174,7 @@ def test_send_multiple_messages_active_standup(clear_data, register_user_data, u
     user_handle = json.loads(user_profile_data.text)['user']['handle_str']
 
     # Simulate waiting for the standup to be over
-    time.sleep(20)
+    time.sleep(30)
 
     # get the messages in the channel
     channel_message_data = requests.get(config.url + 'channel/messages/v2', params={
