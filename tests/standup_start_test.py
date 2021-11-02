@@ -100,7 +100,7 @@ def test_simple_case_public_channel(clear_data, user_and_channel_data):
     standup_start_data = requests.post(config.url + 'standup/start/v1', json={
         'token': auth_token,
         'channel_id': channel_1,
-        'length': 60
+        'length': 10
     })
 
     standup_duration = json.loads(standup_start_data.text)['time_finish']
@@ -114,7 +114,7 @@ def test_simple_case_private_channel(clear_data, user_and_channel_data):
     standup_start_data = requests.post(config.url + 'standup/start/v1', json={
         'token': token_2,
         'channel_id': channel_3,
-        'length': 60
+        'length': 20
     })
 
     standup_duration = json.loads(standup_start_data.text)['time_finish']
