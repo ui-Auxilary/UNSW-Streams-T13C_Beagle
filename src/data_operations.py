@@ -28,6 +28,7 @@ Functions:
                 content: str, time_created: int)
     add_standup_message(channel_id: int, content: str)
     clear_message_pack(channel_id: int)
+    clear_active_threads()
     edit_message(is_channel: bool, channel_id: int, message_id: int, message: str):
     remove_message(is_channel: bool, channel_id: int, message_id: int, message: str):
     get_message_by_id(message_id: int) -> dict
@@ -41,6 +42,7 @@ Functions:
 from src.data_store import data_store
 import json
 import time
+import threading
 
 
 def reset_data_store_to_default():
@@ -618,6 +620,12 @@ def clear_message_pack(channel_id):
     data_source = data_store.get()
 
     data_source['channel_data'][channel_id]['standup_data']['message_package'].clear()
+
+
+def clear_active_threads():
+    for thread in threading.enumerate():
+        if isinstance(thread, threading.Timer):
+            thread.cancel()
 
 
 def edit_message(is_channel, channel_id, message_id, message):
