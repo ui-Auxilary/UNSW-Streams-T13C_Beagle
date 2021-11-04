@@ -198,7 +198,8 @@ def dm_details_v1(token, dm_id):
             'email': user_profile['email_address'],
             'name_first': user_profile['first_name'],
             'name_last': user_profile['last_name'],
-            'handle_str': user_profile['user_handle']
+            'handle_str': user_profile['user_handle'],
+            'profile_img_url': user_profile['image_url']
         }
         member_info.append(member_dict)
 

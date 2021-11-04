@@ -95,7 +95,9 @@ def test_simple_case(clear_data, create_users, create_channel):
                        'email': 'asd@gmail.com',
                        'name_first': 'lawrence',
                        'name_last': 'lee',
-                       'handle_str': 'lawrencelee'}]
+                       'handle_str': 'lawrencelee',
+                       'profile_img_url': ''
+                       }]
 
 
 def test_add_channel_owner_already_owner(clear_data, create_users, create_channel):
@@ -376,7 +378,8 @@ def test_remove_original_owner(clear_data, create_users, create_channel):
                        'email': 'email2@gmail.com',
                        'name_first': 'christian',
                        'name_last': 'lam',
-                       'handle_str': 'christianlam'}]
+                       'handle_str': 'christianlam',
+                       'profile_img_url': ''}]
 
 
 def test_channel_does_not_exist(clear_data, create_users, create_channel):

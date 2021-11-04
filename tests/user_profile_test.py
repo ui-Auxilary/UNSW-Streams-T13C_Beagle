@@ -34,7 +34,7 @@ def create_data(clear_data):
     token = json.loads(register_data.text)['token']
 
     user_0 = {'u_id': user_id, 'email': 'hello@mycompany.com', 'name_first': 'Firstname',
-              'name_last': 'Lastname', 'handle_str': 'firstnamelastname'}
+              'name_last': 'Lastname', 'handle_str': 'firstnamelastname', 'profile_img_url': ''}
 
     return token, user_0, user_id
 
