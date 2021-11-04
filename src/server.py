@@ -10,7 +10,7 @@ from src import config
 from src.error import InputError
 from src.users import users_all
 from src.user import user_profile, user_profile_sethandle, user_profile_setname, user_profile_setemail, user_profile_uploadphoto_v1
-from src.auth import auth_register_v1, auth_login_v1, auth_logout_v1
+from src.auth import auth_register_v1, auth_login_v1, auth_logout_v1, auth_passwordreset_request, auth_passwordreset_reset
 from src.message import message_send_v1, message_edit_v1, message_remove_v1
 from src.other import clear_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
@@ -21,6 +21,7 @@ from src.channels import channels_create_v1, channels_list_v1, channels_listall_
 from src.channel import channel_details_v1, channel_join_v1
 from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.data_operations import data_dump, data_restore
+from src.data_store import data_store
 from src.standup import standup_start_v1, standup_active_v1, standup_send_v1
 
 
@@ -321,6 +322,24 @@ def standup_send():
 
     return dumps(standup_send_v1(user_token, channel_id, message))
 
+@APP.route("/auth/passwordreset/request/v1", methods=['POST'])
+def request_password_reset():
+    data = request.get_json()
+    user_email = data['email']
+
+    auth_passwordreset_request(user_email)
+    return dumps({
+    })
+
+@APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
+def password_reset_reset():
+    data = request.get_json()
+    reset_code = data['reset_code']
+    new_password = data['new_password']
+
+    auth_passwordreset_reset(reset_code, new_password)
+    return dumps({
+    })
 
 @APP.route("/users/all/v1", methods=['GET'])
 def get_all_users():
@@ -426,6 +445,11 @@ def admin_userpermission_change():
 def clear_data_store():
     clear_v1()
     return dumps({})
+
+@APP.route("/getdata/v1", methods=['GET'])
+def get_data_store():
+    data_source = data_store.get()
+    return dumps(data_source)
 
 
 def init_store():

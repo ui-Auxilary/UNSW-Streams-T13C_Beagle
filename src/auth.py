@@ -10,18 +10,24 @@ Functions:
 
 import re
 import hashlib
+from email.message import EmailMessage
+from smtplib import SMTP_SSL
+import secrets
 from src.error import InputError
 from src.data_operations import (
     add_user,
+    edit_user,
     get_user_emails,
     get_user_ids,
     get_complete_user_ids,
     get_user_handles,
     get_user,
     add_session_token,
-    remove_session_token
+    remove_session_token,
+    add_passwordreset_key,
+    get_passwordreset_key
 )
-from src.other import encode_token, decode_token
+from src.other import encode_token, decode_token, get_uid_by_email
 
 def generate_user_handle(name_first, name_last):
     '''
@@ -81,16 +87,12 @@ def auth_login_v1(email, password):
     Return Value:
         { auth_user_id (int): unique user_id for user }
     '''
-    
-    ## Get user ID from email in data
-    for person in get_user_ids():
-        if get_user(person)['email_address'] == email:
-            user_id = person
-            break
 
     ## Check if email belongs to user
     if email not in get_user_emails():
         raise InputError(description='Email entered does not belong to a user')
+
+    user_id = get_uid_by_email(email)
 
     ## Check if password is correct
     if get_user(user_id)['password'] != hashlib.sha256(password.encode()).hexdigest():
@@ -189,5 +191,49 @@ def auth_logout_v1(token):
     decode_token(token)
 
     remove_session_token(token)
+
+    return {}
+
+def auth_passwordreset_request(email):
+    ## do not raise any errors if invalid error (for privacy reasons)
+    if email not in get_user_emails():
+        return {}
+
+    ## Get user ID from email in data
+    user_id = get_uid_by_email(email)
+
+    init_reset_key = secrets.randbits(32)
+    add_passwordreset_key(user_id, str(init_reset_key))
+
+    smtp_server = 'smtp.gmail.com'
+    username = 'beaglet13c@gmail.com'
+    password = 'skyuanow'
+    sender = 'beaglet13c@gmail.com'
+    destination = 'dhruv.gravity@gmail.com'
+    subject = 'UNSW Streams Reset Key'
+    content = f'Here is your password reset key: {init_reset_key}'
+
+    msg = EmailMessage()
+    msg.set_content(content)
+
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = destination
+    s = SMTP_SSL(smtp_server)
+    s.login(username, password)
+    s.send_message(msg)
+    s.quit()
+
+def auth_passwordreset_reset(reset_code, new_password):
+    reset_key_exists, user_id = get_passwordreset_key(str(reset_code))
+
+    if not reset_key_exists:
+        raise InputError(description='reset_code is not a valid code')
+
+    if len(new_password) < 6:
+        raise InputError(description='new password must be at least 6 characters')
+
+    p_hash = hashlib.sha256(new_password.encode()).hexdigest()
+    edit_user(user_id, 'password', p_hash)
 
     return {}

@@ -66,21 +66,25 @@ DATA INSIDE:
         key = session_token
         -> dictionary with keys
             - 'u_id'
+    - password_reset_key
+        key = reset_key
+        -> user_id associated with reset_key
 '''
 
 initial_object = {
-    'user_data'    : {},
-    'user_handles' : [],
-    'user_emails'  : [],
-    'user_ids'     : [],
-    'channel_data' : {},
-    'channel_ids'  : [],
-    'dm_data'      : {},
-    'dm_ids'       : [],
-    'global_owners': [],
-    'message_data' : {},
-    'message_ids'  : [],
-    'token'        : {}
+    'user_data'         : {},
+    'user_handles'      : [],
+    'user_emails'       : [],
+    'user_ids'          : [],
+    'channel_data'      : {},
+    'channel_ids'       : [],
+    'dm_data'           : {},
+    'dm_ids'            : [],
+    'global_owners'     : [],
+    'message_data'      : {},
+    'message_ids'       : [],
+    'token'             : {},
+    'password_reset_key': {},
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 

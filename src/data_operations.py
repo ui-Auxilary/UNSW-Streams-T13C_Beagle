@@ -71,7 +71,8 @@ def reset_data_store_to_default():
         'global_owners': [],
         'message_data': {},
         'message_ids': [],
-        'token': {}
+        'token': {},
+        'password_reset_key': {},
     }
 
     # update data_store
@@ -832,6 +833,40 @@ def get_all_valid_tokens():
     data_source = data_store.get()
     return set(data_source['token'].keys())
 
+def add_passwordreset_key(user_id, reset_key):
+    '''
+    adds a unique password reset request key to
+    the data store
+
+    Arguments:
+        user_id   (int): user_id for account requesting reset
+        reset_key (str): unique password reset request key
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+    data_source['password_reset_key'][reset_key] = user_id
+
+def get_passwordreset_key(reset_key):
+    '''
+    gets reset code associated with a user
+
+    Arguments:
+        user_id   (int): user_id for account requesting reset
+
+    Return Value:
+        reset_tuple (tuple):
+            - reset_code_exists (bool): True if reset code exists else False
+            - reset_code_encoded (str): reset code
+    '''
+
+    data_source = data_store.get()
+    if reset_key in data_source['password_reset_key']:
+        return (True, data_source['password_reset_key'][reset_key])
+    else:
+        return (False, 0)
 
 def add_owner_to_channel(user_id, channel_id):
     '''
@@ -880,7 +915,7 @@ def data_restore():
     data_source = data_store.get()
 
     try:
-        with open('data_restore.json') as data_file:
+        with open('data_store.json') as data_file:
             data_source = json.load(data_file)
     except:
         pass
