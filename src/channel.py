@@ -119,6 +119,7 @@ def channel_details_v1(token, channel_id):
             'name_first': owner_details['first_name'],
             'name_last': owner_details['last_name'],
             'handle_str': owner_details['user_handle'],
+            'profile_img_url': owner_details['image_url']
         }
         owners.append(owner_dict)
 
@@ -132,7 +133,8 @@ def channel_details_v1(token, channel_id):
             'email': member_details['email_address'],
             'name_first': member_details['first_name'],
             'name_last': member_details['last_name'],
-            'handle_str': member_details['user_handle']
+            'handle_str': member_details['user_handle'],
+            'profile_img_url': member_details['image_url']
         }
         member_info.append(member_dict)
 

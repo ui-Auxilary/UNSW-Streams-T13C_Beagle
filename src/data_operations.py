@@ -34,12 +34,15 @@ Functions:
     get_message_by_id(message_id: int) -> dict
     get_messages_by_channel(channel_id: int) -> list
     set_active_standup(channel_id: int)
+    add_user_profileimage(user_id: int, cropped_image: img)
     add_session_token(token: str, user_id: int)
     remove_session_token(token: str)
     get_user_from_token(token: str) -> int
 '''
 
 from src.data_store import data_store
+from src import config
+import os
 import json
 import time
 import threading
@@ -113,6 +116,7 @@ def add_user(user_id, user_details, password, user_handle, is_owner):
         'password': password,
         'user_handle': user_handle,
         'global_owner': is_owner,
+        'image_url': '',
         'in_channels': [],
         'in_dms': [],
     }
@@ -759,6 +763,31 @@ def set_active_standup(set_active, channel_id, time_finished):
         data_source['channel_data'][channel_id]['standup_data']['time_finish'] = time_finished
     else:
         data_source['channel_data'][channel_id]['standup_data']['is_active'] = False
+
+
+def add_user_profileimage(user_id, cropped_image):
+    '''
+    saves a copy of a cropped image to a user profilephotos folder and saves the url
+
+    Arguments:
+        user_id (int): user's user_id
+        cropped_image(jpg): cropped image uploaded
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+
+    file_name = str(user_id) + ".jpg"
+    path = os.getcwd() + "/src/static/imgurl/"
+    if not os.path.exists(path):
+        os.makedirs(path)
+    cropped_image.save(path + file_name)
+
+    # add profile_image_url to user
+    data_source['user_data'][user_id]['image_url'] = config.url + \
+        'static/imgurl/' + file_name
 
 
 def add_session_token(token, user_id):

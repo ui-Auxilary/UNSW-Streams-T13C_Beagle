@@ -143,7 +143,8 @@ def test_simple_case(clear_data, create_users):
         'name_first': 'Removed',
         'name_last': 'user',
         'email': '',
-        'handle_str': ''
+        'handle_str': '',
+        'profile_img_url': '',
     }
 
 
@@ -504,7 +505,8 @@ def test_channel_owner(clear_data, create_users, create_channel):
         'name_first': 'Removed',
         'name_last': 'user',
         'email': '',
-        'handle_str': ''
+        'handle_str': '',
+        'profile_img_url': ''        
     }
 
     assert user_owner in users
@@ -562,7 +564,8 @@ def test_remove_sole_channel_owner(clear_data, create_users, create_channel):
         'name_first': 'Removed',
         'name_last': 'user',
         'email': '',
-        'handle_str': ''
+        'handle_str': '',
+        'profile_img_url': '',
     }
 
     assert user_profile not in users

@@ -14,6 +14,7 @@ from src.data_operations import (
 )
 from src.other import decode_token
 
+
 def users_all(token):
     '''
     Returns a list of all users, including user ids, emails, first name, 
@@ -39,7 +40,7 @@ def users_all(token):
         }
     '''
     user_id = decode_token(token)
-    
+
     users = {'users': []}
 
     for user_id in get_user_ids():
@@ -49,8 +50,8 @@ def users_all(token):
             'email': user_info['email_address'],
             'name_first': user_info['first_name'],
             'name_last': user_info['last_name'],
-            'handle_str': user_info['user_handle']
+            'handle_str': user_info['user_handle'],
+            'profile_img_url': user_info['image_url']
         })
 
     return users
-

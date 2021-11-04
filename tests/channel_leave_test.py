@@ -80,7 +80,8 @@ def test_simple_case(clear_data, create_users, create_channel):
                                  'email': 'asd@gmail.com',
                                  'name_first': 'lawrence',
                                  'name_last': 'lee',
-                                 'handle_str': 'lawrencelee'
+                                 'handle_str': 'lawrencelee',
+                                 'profile_img_url': ''
                                 }]
 
 def test_only_owner_leaves(clear_data, create_users, create_channel):
@@ -105,7 +106,8 @@ def test_only_owner_leaves(clear_data, create_users, create_channel):
                                  'email': 'email2@gmail.com',
                                  'name_first': 'christian',
                                  'name_last': 'lam',
-                                 'handle_str': 'christianlam'
+                                 'handle_str': 'christianlam',
+                                 'profile_img_url': ''
                                 }]
 
 def test_messages_remain(clear_data, create_users, create_channel):
@@ -136,7 +138,8 @@ def test_messages_remain(clear_data, create_users, create_channel):
                                  'email': 'asd@gmail.com',
                                  'name_first': 'lawrence',
                                  'name_last': 'lee',
-                                 'handle_str': 'lawrencelee'
+                                 'handle_str': 'lawrencelee',
+                                 'profile_img_url': ''
                                 }]
 
     channel_messages = requests.get(config.url + 'channel/messages/v2', params={ 
@@ -171,7 +174,8 @@ def test_all_users_leave(clear_data, create_users, create_channel):
                                  'email': 'asd@gmail.com',
                                  'name_first': 'lawrence',
                                  'name_last': 'lee',
-                                 'handle_str': 'lawrencelee'
+                                 'handle_str': 'lawrencelee',
+                                 'profile_img_url': ''
                                 }]
 
     leave_channel = requests.post(config.url + 'channel/leave/v1', json={ 

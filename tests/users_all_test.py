@@ -59,13 +59,13 @@ def create_data(clear_data):
     user_id_3 = json.loads(register_user_3.text)['auth_user_id']
 
     user_0 = {'u_id': user_id_0, 'email': 'hello@mycompany.com', 'name_first': 'Firstname',
-              'name_last': 'Lastname', 'handle_str': 'firstnamelastname'}
+              'name_last': 'Lastname', 'handle_str': 'firstnamelastname', 'profile_img_url': ''}
     user_1 = {'u_id': user_id_1, 'email': 'hello@hello.com', 'name_first': 'samantha',
-              'name_last': 'tse', 'handle_str': 'samanthatse'}
+              'name_last': 'tse', 'handle_str': 'samanthatse', 'profile_img_url': ''}
     user_2 = {'u_id': user_id_2, 'email': 'hdsfdfslo@mycompany.com',
-              'name_first': 'lemon', 'name_last': 'pie', 'handle_str': 'lemonpie'}
+              'name_first': 'lemon', 'name_last': 'pie', 'handle_str': 'lemonpie', 'profile_img_url': ''}
     user_3 = {'u_id': user_id_3, 'email': 'hdsfdfslo@gmail.com',
-              'name_first': 'lebron', 'name_last': 'james', 'handle_str': 'lebronjames'}
+              'name_first': 'lebron', 'name_last': 'james', 'handle_str': 'lebronjames', 'profile_img_url': ''}
 
     users_all = {'users': [user_0, user_1, user_2, user_3]}
 
@@ -120,7 +120,7 @@ def test_one_user(clear_data):
     resp = json.loads(resp.text)
 
     assert resp == {'users': [{'u_id': user_id, 'email': 'hello@mycompany.com', 'name_first': 'Firstname',
-                    'name_last': 'Lastname', 'handle_str': 'firstnamelastname'}]}
+                    'name_last': 'Lastname', 'handle_str': 'firstnamelastname', 'profile_img_url': ''}]}
 
 
 def test_invalid_token(clear_data):
