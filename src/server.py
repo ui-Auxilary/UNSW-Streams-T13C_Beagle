@@ -2,16 +2,14 @@ import sys
 import signal
 import threading
 from json import dumps
-from flask import Flask, request, url_for
+from flask import Flask, request, send_from_directory
 from flask_cors import CORS
-from werkzeug.utils import send_from_directory
-from src import user
 from src.error import InputError
 from src import config
 
 from src.error import InputError
 from src.users import users_all
-from src.user import user_profile, user_profile_sethandle, user_profile_setname, user_profile_setemail, user_profile_upload_profilephoto_v1
+from src.user import user_profile, user_profile_sethandle, user_profile_setname, user_profile_setemail, user_profile_uploadphoto_v1
 from src.auth import auth_register_v1, auth_login_v1, auth_logout_v1
 from src.message import message_send_v1, message_edit_v1, message_remove_v1
 from src.other import clear_v1
@@ -395,7 +393,7 @@ def user_profile_uploadphoto():
     x_end = data['x_end']
     y_end = data['y_end']
 
-    return dumps(user_profile_upload_profilephoto_v1(user_token, image_url, x_start, y_start, x_end, y_end))
+    return dumps(user_profile_uploadphoto_v1(user_token, image_url, x_start, y_start, x_end, y_end))
 
 
 @APP.route("/admin/user/remove/v1", methods=['DELETE'])

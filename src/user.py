@@ -151,7 +151,7 @@ def user_profile_sethandle(token, handle_str):
     edit_user(user_id, 'user_handle', handle_str)
 
 
-def user_profile_upload_profilephoto_v1(token, img_url, x_start, y_start, x_end, y_end):
+def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     # check if valid token and decode it
     user_id = decode_token(token)
 
