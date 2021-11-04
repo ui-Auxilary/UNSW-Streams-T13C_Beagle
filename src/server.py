@@ -2,15 +2,16 @@ import sys
 import signal
 import threading
 from json import dumps
-from flask import Flask, request
+from flask import Flask, request, url_for
 from flask_cors import CORS
+from werkzeug.utils import send_from_directory
 from src import user
 from src.error import InputError
 from src import config
 
 from src.error import InputError
 from src.users import users_all
-from src.user import user_profile, user_profile_sethandle, user_profile_setname, user_profile_setemail
+from src.user import user_profile, user_profile_sethandle, user_profile_setname, user_profile_setemail, user_profile_upload_profilephoto_v1
 from src.auth import auth_register_v1, auth_login_v1, auth_logout_v1
 from src.message import message_send_v1, message_edit_v1, message_remove_v1
 from src.other import clear_v1
@@ -383,6 +384,20 @@ def update_user_handle():
     })
 
 
+@APP.route("/user/profile/uploadphoto/v1", methods=['POST'])
+def user_profile_uploadphoto():
+    data = request.get_json()
+    # get user's token and the handle they want to update to
+    user_token = data['token']
+    image_url = data['img_url']
+    x_start = data['x_start']
+    y_start = data['y_start']
+    x_end = data['x_end']
+    y_end = data['y_end']
+
+    return dumps(user_profile_upload_profilephoto_v1(user_token, image_url, x_start, y_start, x_end, y_end))
+
+
 @APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def admin_user_remove():
     data = request.get_json()
@@ -391,6 +406,11 @@ def admin_user_remove():
     user_id = data['u_id']
 
     return dumps(admin_user_remove_v1(user_token, user_id))
+
+
+@APP.route('/imgurl/<path:path>')
+def send_js(path):
+    return send_from_directory('/static', path)
 
 
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
