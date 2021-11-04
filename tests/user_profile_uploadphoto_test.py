@@ -285,6 +285,33 @@ def test_invalid_dimensions_negative(clear_data, register_user_data):
 
     assert user_photo_data.status_code == 400
 
+def test_invalid_dimensions_negative_2(clear_data, register_user_data):
+    _, auth_token, _, _ = register_user_data
+
+    user_photo_data = requests.post(config.url + 'user/profile/uploadphoto/v1', json={
+        'token': auth_token,
+        'img_url': 'http://mkpcdn.com/profiles/8470fd4791757f137ab564a217a4ee8b.jpg',
+        'x_start': -10,
+        'y_start': -30,
+        'x_end': -5,
+        'y_end': -20
+    })
+
+    assert user_photo_data.status_code == 400
+
+def test_image_start_larger_than_image_size(clear_data, register_user_data):
+    _, auth_token, _, _ = register_user_data
+
+    user_photo_data = requests.post(config.url + 'user/profile/uploadphoto/v1', json={
+        'token': auth_token,
+        'img_url': 'http://mkpcdn.com/profiles/8470fd4791757f137ab564a217a4ee8b.jpg',
+        'x_start': 9999,
+        'y_start': 9999,
+        'x_end': 99999,
+        'y_end': 99999
+    })
+
+    assert user_photo_data.status_code == 400
 
 def test_invalid_url(clear_data, register_user_data):
     _, auth_token, _, _ = register_user_data
@@ -292,6 +319,20 @@ def test_invalid_url(clear_data, register_user_data):
     user_photo_data = requests.post(config.url + 'user/profile/uploadphoto/v1', json={
         'token': auth_token,
         'img_url': 'https://mkpcdn.com/profiles/8470fd4791757f137ab564a217a4ee8c.jpg',
+        'x_start': 0,
+        'y_start': 0,
+        'x_end': 10,
+        'y_end': 10
+    })
+
+    assert user_photo_data.status_code == 400
+
+def test_non_image_file(clear_data, register_user_data):
+    _, auth_token, _, _ = register_user_data
+
+    user_photo_data = requests.post(config.url + 'user/profile/uploadphoto/v1', json={
+        'token': auth_token,
+        'img_url': 'https://www.w3schools.com/xml/xml_xlink.asp',
         'x_start': 0,
         'y_start': 0,
         'x_end': 10,

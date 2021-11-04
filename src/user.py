@@ -165,8 +165,8 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     try:
         img = Image.open(image_data.raw)
-    except:
-        raise InputError(description='Link provided is not an image')
+    except Exception as err: 
+        raise InputError(description='Link provided is not an image') from err
 
     if img.format != 'JPEG':
         raise InputError(description='Image provided must be a jpg file!')
@@ -175,7 +175,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     width, height = img.size
     if x_start > x_end or y_start > y_end:
         raise InputError(description='Invalid dimensions')
-    if x_end < 0 or y_start < 0:
+    if x_end < 0 or y_end < 0:
         raise InputError(description='Invalid dimensions')
     if x_start > width or y_start > height:
         raise InputError(description='Invalid dimensions')
