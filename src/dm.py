@@ -301,7 +301,9 @@ def dm_messages_v1(token, dm_id, start):
                 'message_id': message_id,
                 'u_id': message_info['author'],
                 'message': message_info['content'],
-                'time_created': message_info['time_created']
+                'time_created': message_info['time_created'],
+                'reacts': message_info['reacts'],
+                'is_pinned': message_info['is_pinned']
             })
 
         # if past 50 messages, then exit
@@ -362,9 +364,13 @@ def message_senddm_v1(token, dm_id, message):
     dt = datetime.now()
     time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
 
+    # default values for new dms
+    reacts = []
+    is_pinned = False
+
     # add message to datastore
     add_message(is_channel, auth_user_id, dm_id,
-                new_message_id, message, time_created)
+                new_message_id, message, time_created, reacts, is_pinned)
 
     return {
         'message_id': new_message_id

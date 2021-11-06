@@ -20,6 +20,7 @@ Functions:
     get_channel_messages() -> list
     get_channel_ids() -> list
     remove_member_from_dm(dm_id: int, user_id: int)
+    get_dm_messages(dm_id: int) -> list
     get_dm(dm_id: int) -> dict
     get_dm_ids() -> list
     dm_remove(dm_id: int)
@@ -33,6 +34,8 @@ Functions:
     remove_message(is_channel: bool, channel_id: int, message_id: int, message: str):
     get_message_by_id(message_id: int) -> dict
     get_messages_by_channel(channel_id: int) -> list
+    add_react(user_id: int, message_id: int, react_id: int)
+    react_message(user_id: int, message_id: int, react_id: int)
     set_active_standup(channel_id: int)
     add_user_profileimage(user_id: int, cropped_image: img)
     add_session_token(token: str, user_id: int)
@@ -400,10 +403,10 @@ def get_channel(channel_id):
 
 def get_channel_messages(channel_id):
     '''
-    Gets a list of all the channel messages from the database
+    Gets a list of all the channel messages from the channel
 
     Arguments:
-        channel_id   (int): id of channel being added to database
+        channel_id        (int): id of channel
 
     Return Value:
         channel_messages (list): list of all channel messages
@@ -411,6 +414,20 @@ def get_channel_messages(channel_id):
 
     data_source = data_store.get()
     return data_source['channel_data'][channel_id]['message_ids']
+
+def get_dm_messages(dm_id):
+    '''
+    Gets a list of all the dm messages from the dm
+
+    Arguments:
+        dm_id        (int): id of dm
+
+    Return Value:
+        dm_messages (list): list of all dm messages
+    '''
+
+    data_source = data_store.get()
+    return data_source['dm_data'][dm_id]['message_ids']
 
 
 def get_channel_ids():
@@ -555,7 +572,7 @@ def get_global_owners():
     return data_source['global_owners']
 
 
-def add_message(is_channel, user_id, channel_id, message_id, content, time_created):
+def add_message(is_channel, user_id, channel_id, message_id, content, time_created, reacts, is_pinned):
     '''
     Adds a message to the database from a user
 
@@ -566,6 +583,8 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
         message_id   (int): id of message being added to the database
         content      (str): contents of the message
         time_created (int): time message was created
+        reacts      (list): stores different reacts
+        is_pinned   (bool): bool of whethere the message is pinned
 
     Return Value:
         None
@@ -580,7 +599,9 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
         'time_created': time_created,
         'message_id': message_id,
         'channel_created': channel_id,
-        'is_channel': is_channel
+        'is_channel': is_channel,
+        'reacts': reacts,
+        'is_pinned': is_pinned
     }
 
     # add message to the channel's message list
@@ -901,6 +922,45 @@ def remove_owner_from_channel(user_id, channel_id):
     # removes a user from the owner list of the channel
     data_source['channel_data'][channel_id]['owner'].remove(user_id)
 
+def add_react(user_id, message_id, react_id):
+    '''
+    adds new react to the reacts list
+
+    Arguments:
+        user_id     (int): user_id of new owner member
+        message_id  (int): id of message being reacted
+        react_id    (int): id of the react
+
+    Return Value:
+        None
+    '''
+    data_source = data_store.get()
+    react_data = {'react_id': react_id, 'u_ids':[user_id]}
+    data_source['message_data'][message_id]['reacts'].append(react_data)
+
+def react_message(user_id, message_id, react_id):
+    '''
+    reacts to a message
+
+    Arguments:
+        user_id     (int): user_id of new owner member
+        message_id  (int): id of message being reacted
+        react_id    (int): id of the react
+
+    Return Value:
+        None
+    '''
+    data_source = data_store.get()
+    index = len( data_source['message_data'][message_id]['reacts']) - 1
+    data_source['message_data'][message_id]['reacts'][index]['react_id'] = react_id
+
+    in_user_id = data_source['message_data'][message_id]['reacts'][index]['u_ids']
+    if user_id not in in_user_id:
+        in_user_id.append(user_id)
+    else:
+        in_user_id.remove(user_id)
+        if len(in_user_id) == 0:
+            in_user_id.remove()
 
 def data_dump():
     while True:
