@@ -277,7 +277,7 @@ def test_multiple_case_dm(clear_data, create_data):
     assert dm_react == [{'react_id': 1, 'u_ids': [1,2]}]
 
 def test_invalid_message_id(clear_data, create_data):
-    token, _, _, _, _ = create_data
+    token, _, _, _, _, _ = create_data
     message_id = 93232
     react_data = requests.post(config.url + 'message/react/v1', json={
         'token': token,
@@ -287,7 +287,7 @@ def test_invalid_message_id(clear_data, create_data):
     assert react_data.status_code == 400
 
 def test_invalid_react_id_number_channel(clear_data, create_data):
-    token, channel_messages, _, _, _ = create_data
+    token, _, channel_messages, _, _, _ = create_data
     react_data = requests.post(config.url + 'message/react/v1', json={
         'token': token,
         'message_id': channel_messages[0],
@@ -296,7 +296,7 @@ def test_invalid_react_id_number_channel(clear_data, create_data):
     assert react_data.status_code == 400
 
 def test_invalid_react_id_number_dm(clear_data, create_data):
-    token, _, dm_messages, _, _ = create_data
+    token, _, _, dm_messages, _, _ = create_data
     react_data = requests.post(config.url + 'message/react/v1', json={
         'token': token,
         'message_id': dm_messages[0],
@@ -305,7 +305,7 @@ def test_invalid_react_id_number_dm(clear_data, create_data):
     assert react_data.status_code == 400
 
 def test_invalid_react_id_string_channel(clear_data, create_data):
-    token, channel_messages, _, _, _ = create_data
+    token, _, channel_messages, _, _, _ = create_data
     react_data = requests.post(config.url + 'message/react/v1', json={
         'token': token,
         'message_id': channel_messages[0],
@@ -314,7 +314,7 @@ def test_invalid_react_id_string_channel(clear_data, create_data):
     assert react_data.status_code == 400
 
 def test_invalid_react_id_string_dm(clear_data, create_data):
-    token, _, dm_messages, _, _ = create_data
+    token, _, _, dm_messages, _, _ = create_data
     react_data = requests.post(config.url + 'message/react/v1', json={
         'token': token,
         'message_id': dm_messages[0],
@@ -323,7 +323,7 @@ def test_invalid_react_id_string_dm(clear_data, create_data):
     assert react_data.status_code == 400
 
 def test_react_id_already_exists_channel(clear_data, create_data):
-    token, channel_messages, _, _, _ = create_data
+    token, _, channel_messages, _, _, _ = create_data
     requests.post(config.url + 'message/react/v1', json={
         'token': token,
         'message_id': channel_messages[0],
@@ -337,7 +337,7 @@ def test_react_id_already_exists_channel(clear_data, create_data):
     assert react_data.status_code == 400
 
 def test_react_id_already_exists_dm(clear_data, create_data):
-    token, _, dm_messages, _, _ = create_data
+    token, _, _, dm_messages, _, _ = create_data
     requests.post(config.url + 'message/react/v1', json={
         'token': token,
         'message_id': dm_messages[0],
@@ -351,7 +351,7 @@ def test_react_id_already_exists_dm(clear_data, create_data):
     assert react_data.status_code == 400
 
 def test_invalid_token_channel(clear_data,create_data):
-    _, channel_messages, _, _, _ = create_data
+    _, _, channel_messages, _, _, _ = create_data
     react_data = requests.post(config.url + 'message/react/v1', json={
         'token': "random_string",
         'message_id': channel_messages[0],
@@ -360,7 +360,7 @@ def test_invalid_token_channel(clear_data,create_data):
     assert react_data.status_code == 403
 
 def test_invalid_token_dm(clear_data,create_data):
-    _, _, dm_messages, _, _ = create_data
+    _, _, _, dm_messages, _, _ = create_data
     react_data = requests.post(config.url + 'message/react/v1', json={
         'token': "random_string",
         'message_id': dm_messages[0],
