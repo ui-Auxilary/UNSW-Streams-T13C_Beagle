@@ -12,7 +12,9 @@ from src.data_operations import (
     reset_data_store_to_default,
     get_all_valid_tokens,
     add_session_token,
-    clear_active_threads
+    clear_active_threads,
+    get_user_ids,
+    get_user
 )
 
 from src.error import AccessError
@@ -31,6 +33,20 @@ def clear_v1():
     reset_data_store_to_default()
     return {}
 
+def get_uid_by_email(email):
+    '''
+    Gets a user's id using their email address
+
+    Arguments:
+        email (str): a valid email address for the user
+
+    Return Value:
+        user_id (int): the user's user_id
+    '''
+
+    for person in get_user_ids():
+        if get_user(person)['email_address'] == email:
+            return person
 
 def encode_token(user_id):
     '''
