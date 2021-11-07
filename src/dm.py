@@ -370,7 +370,7 @@ def message_senddm_v1(token, dm_id, message):
 
     # add message to datastore
     add_message(is_channel, auth_user_id, dm_id,
-                new_message_id, message, time_created, reacts, is_pinned)
+                new_message_id, message, time_created)
 
     return {
         'message_id': new_message_id
