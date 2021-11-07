@@ -199,7 +199,9 @@ def channel_messages_v1(token, channel_id, start):
                 'message_id': message_id,
                 'u_id': message_info['author'],
                 'message': message_info['content'],
-                'time_created': message_info['time_created']
+                'time_created': message_info['time_created'],
+                'reacts': message_info['reacts'],
+                'is_pinned': message_info['is_pinned']
             })
 
         # if past 50 messages, then exit

@@ -203,14 +203,18 @@ def test_removed_user_in_private_channel(clear_data, create_users, create_privat
         'message_id': message_id,
         'u_id': user_id_1,
         'message': 'first message',
-        'time_created': time_created
+        'time_created': time_created,
+        'reacts': [],
+        'is_pinned': False
     }
 
     message_data_2 = {
         'message_id': message_id_2,
         'u_id': user_id_2,
         'message': 'Removed user',
-        'time_created': time_created_2
+        'time_created': time_created_2,
+        'reacts': [],
+        'is_pinned': False
     }
 
     assert message_data in messages
@@ -298,14 +302,18 @@ def test_member_of_dm(clear_data, create_users, create_dms):
         'message_id': message_id,
         'u_id': user_id_2,
         'message': 'Removed user',
-        'time_created': time_created
+        'time_created': time_created,
+        'reacts': [],
+        'is_pinned': False
     }
 
     message_data_2 = {
         'message_id': message_id_2,
         'u_id': user_id_2,
         'message': 'Removed user',
-        'time_created': time_created_2
+        'time_created': time_created_2,
+        'reacts': [],
+        'is_pinned': False
     }
 
     assert message_data in messages
@@ -366,14 +374,18 @@ def test_member_of_channel(clear_data, create_users, create_channel):
         'message_id': message_id,
         'u_id': user_id_1,
         'message': 'first message',
-        'time_created': time_created
+        'time_created': time_created,
+        'reacts': [],
+        'is_pinned': False
     }
 
     message_data_2 = {
         'message_id': message_id_2,
         'u_id': user_id_2,
         'message': 'Removed user',
-        'time_created': time_created_2
+        'time_created': time_created_2,
+        'reacts': [],
+        'is_pinned': False
     }
 
     assert message_data in messages

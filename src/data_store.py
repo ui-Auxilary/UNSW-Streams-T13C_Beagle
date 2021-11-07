@@ -52,6 +52,13 @@ DATA INSIDE:
             - 'message_ids'
     - channel_ids
         quick access to all channel ids
+    - dm_data
+        key = dm_id
+        -> dictionary with keys
+            - 'name'
+            - 'owner'
+            - 'members'
+            - 'message_ids'
     - dm_ids
         quick access to all dm ids
     - global_owners
@@ -62,6 +69,8 @@ DATA INSIDE:
             - 'author'
             - 'content'
             - 'time_created'
+            - 'reacts' [{ react_id, u_ids }]
+            - 'is_pinned'
     - token
         key = session_token
         -> dictionary with keys
