@@ -14,10 +14,7 @@ from src.data_operations import (
     get_all_valid_tokens,
     add_session_token,
     clear_active_threads,
-<<<<<<< HEAD
-=======
     get_user_handles,
->>>>>>> refactor: Added helper functions for other_py to help notifications get the user
     get_user_ids,
     get_user
 )
