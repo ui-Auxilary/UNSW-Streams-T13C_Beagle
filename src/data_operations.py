@@ -959,6 +959,14 @@ def react_message(user_id, message_id, react_id):
 
     in_user_id.append(user_id)
 
+def pin_message(message_id):
+    data_source = data_store.get()
+    pinned = data_source['message_data'][message_id]['is_pinned']
+    if pinned == False:
+        data_source['message_data'][message_id]['is_pinned'] = True
+    elif pinned == True:
+        data_source['message_data'][message_id]['is_pinned'] = False
+
 def data_dump():
     while True:
         data_source = data_store.get()
