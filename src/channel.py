@@ -24,6 +24,7 @@ from src.data_operations import (
     remove_owner_from_channel,
     remove_member_from_channel,
 )
+from datetime import timezone, datetime
 
 
 def channel_invite_v1(token, channel_id, u_id):
@@ -67,8 +68,11 @@ def channel_invite_v1(token, channel_id, u_id):
     if u_id in get_channel(channel_id)['members']:
         raise InputError(description='New user is already existing member')
 
-    # adds the new user to the channel and notification
-    add_member_to_channel(channel_id, u_id) 
+    # adds the new user to the channel
+    dt = datetime.now()
+    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+
+    add_member_to_channel(channel_id, u_id, time_created)
 
     auth_user_handle = get_user(auth_user_id)['user_handle']
     channel_name = get_channel(channel_id)['name']
@@ -261,7 +265,10 @@ def channel_join_v1(token, channel_id):
             raise AccessError(description='User cannot join private channel')
 
     # add them to channel
-    add_member_to_channel(channel_id, auth_user_id)
+    dt = datetime.now()
+    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+
+    add_member_to_channel(channel_id, auth_user_id, time_created)
 
     return {
     }
@@ -303,8 +310,11 @@ def channel_leave_v1(token, channel_id):
     if auth_user_id in channel_owner:
         channel_owner.remove(auth_user_id)
 
+    dt = datetime.now()
+    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+
     # remove user from members in the channel
-    remove_member_from_channel(channel_id, auth_user_id)
+    remove_member_from_channel(channel_id, auth_user_id, time_created)
 
     return {}
 

@@ -22,7 +22,7 @@ from src.data_operations import (
     get_complete_user_ids,
     get_user_emails,
     add_user_profileimage,
-    get_user_notifications
+    get_user_notifications,
     calculate_involvement_rate,
     get_userstats_timestamp    
 )
@@ -226,6 +226,7 @@ def notifications_get_v1(token):
         'notifications': notifications_arr
     }
 
+
 def user_stats_v1(token):
 
     user_id = decode_token(token)
@@ -259,3 +260,4 @@ def user_stats_v1(token):
     }
 
     return user_stats
+
