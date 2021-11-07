@@ -46,7 +46,9 @@ def get_uid_by_email(email):
 
     for person in get_user_ids():
         if get_user(person)['email_address'] == email:
-            return person
+            user_id = person
+    
+    return user_id
 
 def encode_token(user_id):
     '''
