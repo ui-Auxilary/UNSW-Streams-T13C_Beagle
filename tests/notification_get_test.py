@@ -211,3 +211,115 @@ def test_user_channel_tag_notification(clear_data, userprofile_and_channel_data)
     assert notifications == [{'channel_id': channel_id, 'dm_id': -1, 'notification_message': f"{auth_user_handle} tagged you in {channel_name}: {message[:20]}"}, 
                              {'channel_id': channel_id, 'dm_id': -1, 'notification_message': f"{auth_user_handle} added you to {channel_name}"}]
 
+def test_user_react_message_channel_notification(clear_data, userprofile_and_channel_data):
+    auth_user_profile, user_token, user_2_profile, user_token_2, channel_id, _ = userprofile_and_channel_data
+
+    ## get auth_user and user_2's id and handle
+    auth_user_id = auth_user_profile['u_id']
+    auth_user_handle = auth_user_profile['handle_str']
+
+    user_2_id = user_2_profile['u_id']
+    user_2_handle = user_2_profile['handle_str']
+
+    ## user_1 invites user_2 to channel 1
+    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
+                                                            'token': user_token,
+                                                            'channel_id': channel_id,
+                                                            'u_id': user_2_id
+                                                            })
+    
+    ## get channel details
+    channel_detail_data = requests.get(config.url + 'channel/details/v2', params={
+                                                                                 'token': user_token,
+                                                                                 'channel_id': channel_id
+                                                                                })
+
+    channel_detail = json.loads(channel_detail_data.text)
+
+    channel_name = channel_detail['name']
+
+    ## user_2 sends a message and user_1 reacts to it
+    send_message_data = requests.post(config.url + 'message/send/v1', json={
+        'token': user_token_2,
+        'channel_id': channel_id,
+        'message': "Hey guys welcome back to faze clan"
+    })
+
+    message_id = json.loads(send_message_data.text)['message_id']
+
+    message_react_data = requests.post(config.url + 'message/react/v1', json={
+        'token': user_token,
+        'message_id': message_id,
+        'react_id': 1
+    })
+
+    assert message_react_data.status_code == 200
+
+    ## get user_2 notifications
+    notification_get_data = requests.get(config.url + 'notifications/get/v1', params={
+                                                                                      'token': user_token_2
+                                                                                     })
+    
+    assert notification_get_data.status_code == 200
+
+    notifications = json.loads(notification_get_data.text)['notifications']
+
+    assert notifications == [{'channel_id': channel_id, 'dm_id': -1, 'notification_message': f"{auth_user_handle} reacted to your message in {channel_name}"}, 
+    {'channel_id': channel_id, 'dm_id': -1, 'notification_message': f"{auth_user_handle} added you to {channel_name}"}]
+
+def test_user_dm_react_notifications(clear_data, register_user_data):
+    auth_user_id, user_token, user_id_2, user_token_2 = register_user_data
+
+    # get user_profile data
+    auth_user_profile_data = requests.get(config.url + 'user/profile/v1',
+                        params={'token': user_token, 'u_id': auth_user_id})
+
+    auth_user_profile = json.loads(auth_user_profile_data.text)['user']
+    auth_user_handle = auth_user_profile['handle_str']
+
+    # create a public channel with global_owner
+    dm_create_data = requests.post(config.url + 'dm/create/v1', json={
+                                                                       'token': user_token,
+                                                                       'u_ids': [user_id_2]
+                                                                     })
+
+    dm_id = json.loads(dm_create_data.text)['dm_id']
+
+    ## user_2 sends a dm and user_1 reacts to it
+    message_data = requests.post(config.url + 'message/senddm/v1', json={
+                                                                         'token': token,
+                                                                         'dm_id': dm_id,
+                                                                         'message': message
+                                                                         })
+
+    message_id = json.loads(message_data.text)['message_id']
+
+    message_react_data = requests.post(config.url + 'message/react/v1', json={
+        'token': user_token,
+        'message_id': message_id,
+        'react_id': 1
+    })
+
+    assert message_react_data.status_code == 200
+
+    ## get user_2 notifications
+    notification_get_data = requests.get(config.url + 'notifications/get/v1', params={
+                                                                                      'token': user_token_2
+                                                                                     })
+    
+    assert notification_get_data.status_code == 200
+
+    notifications = json.loads(notification_get_data.text)['notifications']
+
+    ## get information about the dm
+    dm_detail_data = requests.get(config.url + 'dm/details/v1', params={
+                                                                        'token': user_token,
+                                                                        'dm_id': dm_id
+                                                                       })
+
+    dm_detail = json.loads(dm_detail_data.text)
+
+    dm_name = dm_detail['name']
+
+    assert notifications == [{'channel_id': -1, 'dm_id': dm_id, 'notification_message': f"{auth_user_handle} reacted to your message in {dm_name}",
+    {'channel_id': -1, 'dm_id': dm_id, 'notification_message': f"{auth_user_handle} added you to {dm_name}"}]
