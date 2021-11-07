@@ -8,8 +8,8 @@ from src.error import InputError
 from src import config
 
 from src.error import InputError
-from src.users import users_all
-from src.user import user_profile, user_profile_sethandle, user_profile_setname, user_profile_setemail, user_profile_uploadphoto_v1, notifications_get_v1
+from src.users import users_all, users_stats_v1
+from src.user import user_profile, user_profile_sethandle, user_profile_setname, user_profile_setemail, user_profile_uploadphoto_v1, user_stats_v1, notifications_get_v1
 from src.auth import auth_register_v1, auth_login_v1, auth_logout_v1, auth_passwordreset_request, auth_passwordreset_reset
 from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_react_v1
 from src.other import clear_v1
@@ -454,6 +454,20 @@ def admin_userpermission_change():
     permission_id = data['permission_id']
 
     return dumps(admin_userpermission_change_v1(user_token, user_id, permission_id))
+
+
+@APP.route("/users/stats/v1", methods=['GET'])
+def users_stats():
+    user_token = request.args.get('token')
+
+    return dumps(users_stats_v1(user_token))
+
+
+@APP.route("/user/stats/v1", methods=['GET'])
+def user_stats():
+    user_token = request.args.get('token')
+
+    return dumps(user_stats_v1(user_token))
 
 
 @APP.route("/clear/v1", methods=['DELETE'])
