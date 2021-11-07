@@ -12,9 +12,19 @@ from src.data_operations import (
     get_user_handles,
     edit_user,
     get_user,
+    get_user_channels,
+    get_user_dms,
+    get_message_ids,
+    get_channel_ids,
+    get_dm_ids,
+    get_message_ids,
+    get_message_by_id,
     get_complete_user_ids,
     get_user_emails,
-    add_user_profileimage
+    add_user_profileimage,
+    get_user_notifications
+    calculate_involvement_rate,
+    get_userstats_timestamp    
 )
 
 from src.other import decode_token
@@ -188,3 +198,64 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     add_user_profileimage(user_id, cropped_image)
 
     return {}
+
+def notifications_get_v1(token):
+    auth_user_id = decode_token(token)
+
+    notifications_arr = []
+    # Gets all the user's notifications
+    notification_list = list(reversed(get_user_notifications(auth_user_id)))
+    end = 20
+
+    for index, notification in enumerate(notification_list):
+        # if notification in given range
+        print(notification)
+        if index < end:
+            # add notification to notifications_arr
+            notifications_arr.append({
+                'channel_id': notification['channel_id'],
+                'dm_id': notification['dm_id'],
+                'notification_message': notification['content']
+            })
+
+        # if past 20 notifications, then exit
+        if index == end - 1:
+            break
+
+    return {
+        'notifications': notifications_arr
+    }
+
+def user_stats_v1(token):
+
+    user_id = decode_token(token)
+
+    num_channels_joined = len(get_user_channels(user_id))
+    num_dms_joined = len(get_user_dms(user_id))
+    users_messages = []
+    for message_ids in get_message_ids():
+        if get_message_by_id(message_ids)['author'] == user_id:
+            users_messages.append(message_ids)
+
+    num_messages_sent = len(users_messages)
+
+    involvement = num_channels_joined + num_dms_joined + num_messages_sent
+    denom = len(get_channel_ids()) + len(get_dm_ids()) + len(get_message_ids())
+    rate = calculate_involvement_rate(involvement, denom)
+    user_stats = {
+        'channels_joined': [{
+            'num_channels_joined': num_channels_joined,
+            'time_stamp': get_userstats_timestamp(1)
+        }],
+        'dms_joined': [{
+            'num_dms_joined': num_dms_joined,
+            'time_stamp': get_userstats_timestamp(2)
+        }],
+        'messages_sent': [{
+            'num_messages_sent': num_messages_sent,
+            'time_stamp': get_userstats_timestamp(3)
+        }],
+        'involvement_rate': rate
+    }
+
+    return user_stats

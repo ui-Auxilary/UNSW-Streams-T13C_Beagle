@@ -9,7 +9,7 @@ from src import config
 
 from src.error import InputError
 from src.users import users_all
-from src.user import user_profile, user_profile_sethandle, user_profile_setname, user_profile_setemail, user_profile_uploadphoto_v1
+from src.user import user_profile, user_profile_sethandle, user_profile_setname, user_profile_setemail, user_profile_uploadphoto_v1, notifications_get_v1
 from src.auth import auth_register_v1, auth_login_v1, auth_logout_v1, auth_passwordreset_request, auth_passwordreset_reset
 from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_react_v1, message_unreact_v1, message_pin_v1, message_unpin_v1
 from src.other import clear_v1
@@ -329,6 +329,12 @@ def message_unpin():
 
     return dumps(message_unpin_v1(user_token, message_id))
 
+@APP.route("/notifications/get/v1", methods=['GET'])
+def notification_get():
+    token = request.args.get('token')
+    
+    return dumps(notifications_get_v1(token))
+    
 @APP.route("/standup/start/v1", methods=['POST'])
 def standup_start():
     data = request.get_json()

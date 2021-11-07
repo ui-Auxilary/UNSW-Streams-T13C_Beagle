@@ -1,10 +1,11 @@
 from src.error import InputError, AccessError
-from src.other import decode_token
+from src.other import decode_token, check_valid_tag
 from datetime import timezone, datetime
 
 from src.data_operations import (
     add_dm,
     add_message,
+    add_notification,
     add_user_to_dm,
     get_dm_ids,
     get_dm,
@@ -60,13 +61,15 @@ def dm_create_v1(token, u_ids):
     dm_name = ', '.join(sorted(user_handle_list))
 
     # get a new id for the dm and add DM to system
-    new_dm_id = len(get_dm_ids()) + 1
+    new_dm_id = len(get_dm_ids()) + 1 
     add_dm(new_dm_id, dm_name, auth_user_id)
 
-    # add each user to the DM
+    auth_user_handle = get_user(auth_user_id)['user_handle']
 
+    # add each user to the DM
     for u_id in user_list:
         add_user_to_dm(new_dm_id, u_id)
+        add_notification(False, new_dm_id, u_id, f"{auth_user_handle} added you to {dm_name}")
 
     return {
         'dm_id': new_dm_id
@@ -364,6 +367,13 @@ def message_senddm_v1(token, dm_id, message):
     dt = datetime.now()
     time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
 
+    if "@" in message:
+        tagged_user = check_valid_tag(message)
+        if tagged_user:
+            auth_user_handle = get_user(auth_user_id)['user_handle']
+            dm_name = get_dm(dm_id)['name']
+            add_notification(False, dm_id, tagged_user, f"{auth_user_handle} tagged you in {dm_name}: {message[:20]}")
+            
     # add message to datastore
     add_message(is_channel, auth_user_id, dm_id,
                 new_message_id, message, time_created)
