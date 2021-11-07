@@ -1077,14 +1077,6 @@ def react_message(user_id, message_id, react_id):
 
     in_user_id.append(user_id)
 
-def pin_message(message_id):
-    data_source = data_store.get()
-    pinned = data_source['message_data'][message_id]['is_pinned']
-    if pinned == False:
-        data_source['message_data'][message_id]['is_pinned'] = True
-    elif pinned == True:
-        data_source['message_data'][message_id]['is_pinned'] = False
-
 def calculate_utilization_rate(users_in_channels_or_dms, total_users):
     '''
     calculates utilization rate
@@ -1202,6 +1194,14 @@ def calculate_involvement_rate(numerator, denominator):
         rate = 1
     data_source['user_stats']['involvement_rate'] = rate
     return rate
+
+def pin_message(message_id):
+    data_source = data_store.get()
+    pinned = data_source['message_data'][message_id]['is_pinned']
+    if pinned == False:
+        data_source['message_data'][message_id]['is_pinned'] = True
+    elif pinned == True:
+        data_source['message_data'][message_id]['is_pinned'] = False
 
 def data_dump():
     while True:

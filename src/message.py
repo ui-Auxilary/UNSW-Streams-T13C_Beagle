@@ -257,6 +257,7 @@ def message_react_v1(token, message_id, react_id):
 
         react_message(auth_user_id, message_id, react_id)
 
+<<<<<<< HEAD
     ## send notification
     is_channel = get_message_by_id(message_id)['is_channel']
     channel_id = get_message_by_id(message_id)['channel_created']
@@ -270,7 +271,13 @@ def message_react_v1(token, message_id, react_id):
     auth_user_handle = get_user(auth_user_id)['user_handle']
     add_notification(is_channel, channel_id, author_id, f"{auth_user_handle} reacted to your message in {channel_name}")
     
+<<<<<<< HEAD
     return {}
+=======
+=======
+    return {}
+
+>>>>>>> fix: corrected unreact, pin and unpin tests, and added implementation
 def message_unreact_v1(token, message_id, react_id):
     '''
     Unreacts message in the channel/DM it was sent from
