@@ -65,10 +65,6 @@ def message_send_v1(token, channel_id, message):
     # time created
     dt = datetime.now()
     time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
-
-    # default values for new messages
-    reacts = []
-    is_pinned = False
     
     '''
     'author'

@@ -364,10 +364,6 @@ def message_senddm_v1(token, dm_id, message):
     dt = datetime.now()
     time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
 
-    # default values for new dms
-    reacts = []
-    is_pinned = False
-
     # add message to datastore
     add_message(is_channel, auth_user_id, dm_id,
                 new_message_id, message, time_created)
