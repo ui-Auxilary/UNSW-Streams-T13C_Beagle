@@ -952,25 +952,12 @@ def react_message(user_id, message_id, react_id):
         None
     '''
     data_source = data_store.get()
-    index = len( data_source['message_data'][message_id]['reacts']) - 1
+    index = len(data_source['message_data'][message_id]['reacts']) - 1
     data_source['message_data'][message_id]['reacts'][index]['react_id'] = react_id
 
     in_user_id = data_source['message_data'][message_id]['reacts'][index]['u_ids']
-    if user_id not in in_user_id:
-        in_user_id.append(user_id)
-    else:
-        in_user_id.remove(user_id)
-        if in_user_id == []:
-            in_user_id.remove()
 
-def pin_message(message_id):
-    data_source = data_store.get()
-    pinned = data_source['message_data'][message_id]['is_pinned']
-    if pinned == False:
-        print("yo what")
-        data_source['message_data'][message_id]['is_pinned'] = True
-    elif pinned == True:
-        data_source['message_data'][message_id]['is_pinned'] = False
+    in_user_id.append(user_id)
 
 def data_dump():
     while True:

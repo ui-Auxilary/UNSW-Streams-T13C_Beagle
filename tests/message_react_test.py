@@ -82,6 +82,7 @@ def create_data():
             'channel_id': channel_id,
             'message': f"This is message:{message}"
         })
+
         message_id = json.loads(message_send_data.text)['message_id']
         channel_messages.append(message_id)
 
@@ -101,17 +102,20 @@ def create_data():
     for message in range(0, 5):
         # user_2 sends a message
         message_send_data = requests.post(config.url + 'message/senddm/v1', json={
-        'token': token,
-        'dm_id': dm_id,
-        'message': dm_message[message]
-    })
+            'token': token,
+            'dm_id': dm_id,
+            'message': dm_message[message]
+        })
         message_id = json.loads(message_send_data.text)['message_id']
         dm_messages.append(message_id)
 
     return token, token2, channel_messages, dm_messages, channel_id, dm_id
+    
+# ___SIMPLE TEST CASES - NO DEPENDANT FUNCTIONS___ #
 
 def test_simple_case_channel(clear_data, create_data):
     token, _, channel_messages, _, channel_id, _ = create_data
+  
     requests.post(config.url + 'message/react/v1', json={
         'token': token,
         'message_id': channel_messages[1],
@@ -180,6 +184,8 @@ def test_simple_case_dm(clear_data, create_data):
     assert dm_react == [{'react_id': 1, 'u_ids': [1]}]
     dm_react = json.loads(dm_message_data.text)['messages'][length - 4]['reacts']
     assert dm_react == [{'react_id': 1, 'u_ids': [1]}]
+
+# ___COMPLEX TEST CASES - DEPENDANT FUNCTIONS___ #
 
 def test_muliple_reacts_channel(clear_data, create_data):
     token, token2, channel_messages, _, channel_id, _ = create_data
@@ -276,6 +282,8 @@ def test_multiple_case_dm(clear_data, create_data):
     dm_react = json.loads(dm_message_data.text)['messages'][length - 4]['reacts']
     assert dm_react == [{'react_id': 1, 'u_ids': [1,2]}]
 
+# ___TEST VALID INPUT___ #
+
 def test_invalid_message_id(clear_data, create_data):
     token, _, _, _, _, _ = create_data
     message_id = 93232
@@ -303,6 +311,54 @@ def test_invalid_react_id_number_dm(clear_data, create_data):
         'react_id': -1
     })
     assert react_data.status_code == 400
+
+def test_valid_message_and_channel_user_not_channel_member(clear_data, create_data):
+    _, _, channel_messages, _, _, _ = create_data
+
+    ## create a new user and get their token
+    register_data = requests.post(config.url + 'auth/register/v2', json={
+        'email': 'doofus@mycompany.com',
+        'password': 'bigdoofus',
+        'name_first': 'Bigus',
+        'name_last': 'Doofus'
+    })
+
+    user_3_token = json.loads(register_data.text)['token']
+
+    ## user3 tries to react to a message in channel_messages
+    message_1_id = channel_messages[0]
+
+    unauthorised_react = requests.post(config.url + 'message/react/v1', json={
+        'token': user_3_token,
+        'message_id': message_1_id,
+        'react_id': 1
+    })
+
+    assert unauthorised_react.status_code == 400
+
+def test_valid_message_and_dm_user_not_dm_member(clear_data, create_data):
+    _, _, _, dm_messages, _, _ = create_data
+
+    ## create a new user and get their token
+    register_data = requests.post(config.url + 'auth/register/v2', json={
+        'email': 'doofus@mycompany.com',
+        'password': 'bigdoofus',
+        'name_first': 'Bigus',
+        'name_last': 'Doofus'
+    })
+
+    user_3_token = json.loads(register_data.text)['token']
+
+    ## user3 tries to react to a message in channel_messages
+    message_1_id = dm_messages[0]
+
+    unauthorised_react = requests.post(config.url + 'message/react/v1', json={
+        'token': user_3_token,
+        'message_id': message_1_id,
+        'react_id': 1
+    })
+
+    assert unauthorised_react.status_code == 400
 
 def test_invalid_react_id_string_channel(clear_data, create_data):
     token, _, channel_messages, _, _, _ = create_data
@@ -349,6 +405,9 @@ def test_react_id_already_exists_dm(clear_data, create_data):
         'react_id': 1
     })
     assert react_data.status_code == 400
+
+
+# ___TEST ACCESS PERMISSIONS ___ #
 
 def test_invalid_token_channel(clear_data,create_data):
     _, _, channel_messages, _, _, _ = create_data
