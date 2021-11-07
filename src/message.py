@@ -20,6 +20,7 @@ from src.data_operations import (
     get_messages_by_dm,
     get_dm_messages,
     react_message,
+    pin_message,
     remove_message,
     get_user
 )
@@ -77,7 +78,7 @@ def message_send_v1(token, channel_id, message):
             - 'is_pinned'
     '''
     add_message(True, int(auth_user_id), int(channel_id),
-                int(message_id), message, time_created, reacts, is_pinned)
+                int(message_id), message, time_created)
 
     return {
         'message_id': int(message_id)
@@ -252,10 +253,40 @@ def message_unreact_v1(token, message_id, react_id):
 
     # checks if react_id exists in the message
     if len(get_message_by_id(message_id)['reacts']) < 1:
-        add_react(auth_user_id, message_id, react_id)
+        raise InputError(description="User has not reacted with this react_id")
     else:
         # checks if message has already been reacted from auth_user
         if auth_user_id not in get_message_by_id(message_id)['reacts'][0]['u_ids']:
             raise InputError(description="User has not reacted with this react_id")
 
     react_message(auth_user_id, message_id, react_id)
+
+'''
+def message_pin_v1(token, message_id):
+    print("A pin")
+    auth_user_id = decode_token(token)
+
+    # check message_id is valid
+    if message_id not in get_message_ids():
+        raise InputError(description="Invalid message id")
+
+    channel_ids = get_user_channels(auth_user_id)
+    dm_ids = get_user_dms(auth_user_id)
+    message_id_valid = False
+    if any(message_id in get_channel_messages(channel) for channel in channel_ids) == True:
+        message_id_valid = True
+    if any(message_id in get_dm_messages(dm) for dm in dm_ids) == True:
+        message_id_valid = True
+
+    if message_id_valid == False:
+        raise InputError(description="Not a valid message_id in any channels the user is in")
+        
+    # checks if message has been pinned
+    if get_message_by_id(message_id)['is_pinned'] == True:
+        raise InputError(description="Message has already been pinned")
+
+    print("pin")
+    pin_message(message_id)
+
+    return {}
+'''

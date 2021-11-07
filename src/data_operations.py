@@ -36,6 +36,7 @@ Functions:
     get_messages_by_channel(channel_id: int) -> list
     add_react(user_id: int, message_id: int, react_id: int)
     react_message(user_id: int, message_id: int, react_id: int)
+    pin_message(message_id: int)
     set_active_standup(channel_id: int)
     add_user_profileimage(user_id: int, cropped_image: img)
     add_session_token(token: str, user_id: int)
@@ -572,7 +573,7 @@ def get_global_owners():
     return data_source['global_owners']
 
 
-def add_message(is_channel, user_id, channel_id, message_id, content, time_created, reacts, is_pinned):
+def add_message(is_channel, user_id, channel_id, message_id, content, time_created):
     '''
     Adds a message to the database from a user
 
@@ -600,8 +601,8 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
         'message_id': message_id,
         'channel_created': channel_id,
         'is_channel': is_channel,
-        'reacts': reacts,
-        'is_pinned': is_pinned
+        'reacts': [],
+        'is_pinned': False
     }
 
     # add message to the channel's message list
@@ -959,8 +960,17 @@ def react_message(user_id, message_id, react_id):
         in_user_id.append(user_id)
     else:
         in_user_id.remove(user_id)
-        if len(in_user_id) == 0:
+        if in_user_id == []:
             in_user_id.remove()
+
+def pin_message(message_id):
+    data_source = data_store.get()
+    pinned = data_source['message_data'][message_id]['is_pinned']
+    if pinned == False:
+        print("yo what")
+        data_source['message_data'][message_id]['is_pinned'] = True
+    elif pinned == True:
+        data_source['message_data'][message_id]['is_pinned'] = False
 
 def data_dump():
     while True:
