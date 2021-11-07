@@ -67,7 +67,7 @@ def channel_invite_v1(token, channel_id, u_id):
     # check whether user is already member
     if u_id in get_channel(channel_id)['members']:
         raise InputError(description='New user is already existing member')
-
+git
     # adds the new user to the channel
     dt = datetime.now()
     time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
