@@ -66,7 +66,6 @@ def dm_create_v1(token, u_ids):
     time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
     add_dm(new_dm_id, dm_name, auth_user_id, time_created)
 
-
     auth_user_handle = get_user(auth_user_id)['user_handle']
 
     # add each user to the DM

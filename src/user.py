@@ -226,7 +226,6 @@ def notifications_get_v1(token):
         'notifications': notifications_arr
     }
 
-
 def user_stats_v1(token):
 
     user_id = decode_token(token)
