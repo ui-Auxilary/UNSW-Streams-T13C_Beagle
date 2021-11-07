@@ -14,7 +14,8 @@ from src.data_operations import (
     get_user,
     get_complete_user_ids,
     get_user_emails,
-    add_user_profileimage
+    add_user_profileimage,
+    get_user_notifications
 )
 
 from src.other import decode_token
@@ -188,3 +189,30 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     add_user_profileimage(user_id, cropped_image)
 
     return {}
+
+def notifications_get_v1(token):
+    auth_user_id = decode_token(token)
+
+    notifications_arr = []
+    # Gets all the user's notifications
+    notification_list = list(reversed(get_user_notifications(auth_user_id)))
+    end = 20
+
+    for index, notification in enumerate(notification_list):
+        # if notification in given range
+        print(notification)
+        if index < end:
+            # add notification to notifications_arr
+            notifications_arr.append({
+                'channel_id': notification['channel_id'],
+                'dm_id': notification['dm_id'],
+                'notification_message': notification['content']
+            })
+
+        # if past 20 notifications, then exit
+        if index == end - 1:
+            break
+
+    return {
+        'notifications': notifications_arr
+    }
