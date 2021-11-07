@@ -311,13 +311,14 @@ def get_complete_user_ids():
     return data_source['user_data'].keys()
 
 
-def add_member_to_channel(channel_id, user_id):
+def add_member_to_channel(channel_id, user_id, time_created):
     '''
     Adds a user to a channel as a member
 
     Arguments:
-        channel_id (int): id of channel that user is being added to
-        user_id    (int): id of user being added to channel
+        channel_id      (int): id of channel that user is being added to
+        user_id         (int): id of user being added to channel
+        time_created    (int): time when user is added to channel
 
     Return Value:
         None
@@ -328,8 +329,12 @@ def add_member_to_channel(channel_id, user_id):
     data_source['channel_data'][channel_id]['members'].append(user_id)
     data_source['user_data'][user_id]['in_channels'].append(channel_id)
 
+    num_of_channels = len(data_source['user_data'][user_id]['in_channels'])
+    data_source['user_stats']['channels_joined']['num_channels_joined'] = num_of_channels
+    time_stamp = data_source['channel_data'][channel_id]['time_created']
+    data_source['user_stats']['channels_joined']['time_stamp'] = time_stamp
 
-def remove_member_from_channel(channel_id, user_id):
+def remove_member_from_channel(channel_id, user_id, time_created):
     '''
     Removes a user from a channel
 
@@ -347,8 +352,12 @@ def remove_member_from_channel(channel_id, user_id):
     data_source['channel_data'][channel_id]['members'].remove(user_id)
     data_source['user_data'][user_id]['in_channels'].remove(channel_id)
 
+    num_of_channels = len(data_source['user_data'][user_id]['in_channels'])
+    data_source['user_stats']['channels_joined']['num_channels_joined'] = num_of_channels
+    time_stamp = data_source['channel_data'][channel_id]['time_created']
+    data_source['user_stats']['channels_joined']['time_stamp'] = time_stamp
 
-def add_channel(channel_id, channel_name, user_id, is_public):
+def add_channel(channel_id, channel_name, user_id, is_public, time_created):
     '''
     adds channel data to the database
 
@@ -375,13 +384,23 @@ def add_channel(channel_id, channel_name, user_id, is_public):
             'time_finish': None,
             'message_package': []
         },
-        'message_ids': []
+        'message_ids': [],
+        'time_created': time_created
     }
 
     # add channel to channel_ids list and channel to users' list of channels
     data_source['channel_ids'].append(channel_id)
     data_source['user_data'][user_id]['in_channels'].append(channel_id)
 
+    num_of_channels = len(data_source['channel_ids'])
+    data_source['workspace_stats']['channel_stats']['num_channels_exist'] = num_of_channels
+    time_stamp = data_source['channel_data'][channel_id]['time_created']
+    data_source['workspace_stats']['channel_stats']['time_stamp'] = time_stamp
+
+    num_of_channels = len(data_source['user_data'][user_id]['in_channels'])
+    data_source['user_stats']['channels_joined']['num_channels_joined'] = num_of_channels
+    time_stamp = data_source['channel_data'][channel_id]['time_created']
+    data_source['user_stats']['channels_joined']['time_stamp'] = time_stamp
 
 def get_channel(channel_id):
     '''
@@ -446,7 +465,7 @@ def get_channel_ids():
     return data_source['channel_ids']
 
 
-def remove_member_from_dm(dm_id, user_id):
+def remove_member_from_dm(dm_id, user_id, time_created):
     '''
     Removes a user from a dm
 
@@ -464,8 +483,13 @@ def remove_member_from_dm(dm_id, user_id):
     data_source['dm_data'][dm_id]['members'].remove(user_id)
     data_source['user_data'][user_id]['in_dms'].remove(dm_id)
 
+    num_of_dms = len(data_source['user_data'][user_id]['in_dms'])
+    data_source['user_stats']['dms_joined']['num_dms_joined'] = num_of_dms
+    time_stamp = data_source['dm_data'][dm_id]['time_created']
+    data_source['user_stats']['dms_joined']['time_stamp'] = time_stamp
 
-def add_user_to_dm(dm_id, user_id):
+
+def add_user_to_dm(dm_id, user_id, time_created):
     '''
     adds user to a dm
 
@@ -481,8 +505,13 @@ def add_user_to_dm(dm_id, user_id):
     data_source['dm_data'][dm_id]['members'].append(user_id)
     data_source['user_data'][user_id]['in_dms'].append(dm_id)
 
+    num_of_dms = len(data_source['user_data'][user_id]['in_dms'])
+    data_source['user_stats']['dms_joined']['num_dms_joined'] = num_of_dms
+    time_stamp = data_source['dm_data'][dm_id]['time_created']
+    data_source['user_stats']['dms_joined']['time_stamp'] = time_stamp
 
-def add_dm(dm_id, dm_name, auth_user_id):
+
+def add_dm(dm_id, dm_name, auth_user_id, time_created):
     '''
     adds dm data to the database
 
@@ -502,13 +531,24 @@ def add_dm(dm_id, dm_name, auth_user_id):
         'name': dm_name,
         'owner': [auth_user_id],
         'members': [],
-        'message_ids': []
+        'message_ids': [],
+        'time_created': time_created
     }
 
     # add dm to dm_ids list
     data_source['dm_ids'].append(dm_id)
     data_source['dm_data'][dm_id]['owner'].append(auth_user_id)
     data_source['user_data'][auth_user_id]['in_dms'].append(dm_id)
+
+    num_of_dms = len(data_source['dm_ids'])
+    data_source['workspace_stats']['dm_stats']['num_dms_exist'] = num_of_dms
+    time_stamp = data_source['dm_data'][dm_id]['time_created']
+    data_source['workspace_stats']['dm_stats']['time_stamp'] = time_stamp
+
+    num_of_dms = len(data_source['user_data'][auth_user_id]['in_dms'])
+    data_source['user_stats']['dms_joined']['num_dms_joined'] = num_of_dms
+    time_stamp = data_source['dm_data'][dm_id]['time_created']
+    data_source['user_stats']['dms_joined']['time_stamp'] = time_stamp
 
 
 def get_dm(dm_id):
@@ -543,7 +583,7 @@ def get_dm_ids():
     return data_source['dm_ids']
 
 
-def remove_dm(dm_id):
+def remove_dm(dm_id, time_created):
     '''
     Removes a dm, from the database list of DMs
 
@@ -556,6 +596,10 @@ def remove_dm(dm_id):
 
     data_source = data_store.get()
     data_source['dm_ids'].remove(dm_id)
+    num_of_dms = len(data_source['dm_ids'])
+    data_source['workspace_stats']['dm_stats']['num_dms_exist'] = num_of_dms
+    time_stamp = data_source['dm_data'][dm_id]['time_created']
+    data_source['workspace_stats']['dm_stats']['time_stamp'] = time_stamp
 
 
 def get_global_owners():
@@ -573,7 +617,7 @@ def get_global_owners():
     return data_source['global_owners']
 
 
-def add_message(is_channel, user_id, channel_id, message_id, content, time_created):
+def add_message(is_channel, user_id, channel_id, message_id, content, time_created, reacts, is_pinned):
     '''
     Adds a message to the database from a user
 
@@ -601,10 +645,10 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
         'message_id': message_id,
         'channel_created': channel_id,
         'is_channel': is_channel,
-        'reacts': [],
-        'is_pinned': False
+        'reacts': reacts,
+        'is_pinned': is_pinned
     }
-
+    
     # add message to the channel's message list
     if is_channel:
         data_source['channel_data'][channel_id]['message_ids'].append(
@@ -614,7 +658,13 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
 
     # add unique message id to message_ids list
     data_source['message_ids'].append(message_id)
+    num_of_messages = len(data_source['message_ids'])
+    data_source['workspace_stats']['message_stats']['num_messages_sent'] = num_of_messages
+    time_stamp = data_source['message_data'][message_id]['time_created']
+    data_source['workspace_stats']['message_stats']['time_stamp'] = time_stamp
 
+    time_stamp = data_source['message_data'][message_id]['time_created']
+    data_source['user_stats']['messages_sent']['time_stamp'] = time_stamp
 
 def add_standup_message(channel_id, content):
     '''
@@ -673,14 +723,17 @@ def edit_message(is_channel, channel_id, message_id, message):
 
     # check if message is empty and edit the message
     if not message:
-        remove_message(is_channel, channel_id, message_id)
+        dt = datetime.now()
+        time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+
+        remove_message(is_channel, channel_id, message_id, time_created)
     elif message == 'Removed user':
         data_source['message_data'][message_id]['content'] = 'Removed user'
     else:
         data_source['message_data'][message_id]['content'] = message
 
 
-def remove_message(is_channel, channel_id, message_id):
+def remove_message(is_channel, channel_id, message_id, time_created):
     '''
     Removes a message from the datastore and associated channels/dms
 
@@ -693,7 +746,7 @@ def remove_message(is_channel, channel_id, message_id):
     '''
 
     data_source = data_store.get()
-
+    time_stamp = data_source['message_data'][message_id]['time_created']
     if is_channel:
         data_source['channel_data'][channel_id]['message_ids'].remove(
             message_id)
@@ -702,6 +755,8 @@ def remove_message(is_channel, channel_id, message_id):
 
     data_source['message_ids'].remove(message_id)
     del data_source['message_data'][message_id]
+    
+    data_source['workspace_stats']['message_stats']['time_stamp'] = time_stamp
 
 
 def get_message_ids():
@@ -958,6 +1013,126 @@ def react_message(user_id, message_id, react_id):
     in_user_id = data_source['message_data'][message_id]['reacts'][index]['u_ids']
 
     in_user_id.append(user_id)
+
+
+def calculate_utilization_rate(users_in_channels_or_dms, total_users):
+    '''
+    calculates utilization rate
+
+    Arguments:
+        users_in_channels_or_dms    (int): number of users who are in atleast one channel or dm
+        total_users                 (int): total number of users in the database
+    '''
+
+    data_source = data_store.get()
+    if users_in_channels_or_dms == 0 or total_users == 0:
+        rate = 0
+    else:
+        rate = float(users_in_channels_or_dms / total_users)
+    data_source['workspace_stats']['utilization_rate'] = rate
+    return rate
+
+def initialise_workspace_stats():
+    '''
+    adds workspace stats
+
+    Arguments:
+        None
+
+    Return Value:
+        workspace_stats (dict): contains how many channels, dms and messages exist
+    '''
+    data_source = data_store.get()
+    data_source['workspace_stats']['channel_stats'] = {}
+    data_source['workspace_stats']['channel_stats']['time_stamp'] = 0
+    data_source['workspace_stats']['dm_stats'] = {}
+    data_source['workspace_stats']['dm_stats']['time_stamp'] = 0
+    data_source['workspace_stats']['message_stats'] = {}
+    data_source['workspace_stats']['message_stats']['time_stamp'] = 0
+    data_source['workspace_stats']['utilization_rate'] = 0
+    
+
+def get_workspace_timestamp(stat_type):
+    '''
+    gets workspace timestamp based on stats type
+
+    Arguments:
+        None
+
+    Return Value:
+        time_stamp  (int): unix time_stamp of stats
+    '''
+    data_source = data_store.get()
+    if stat_type == 1:
+        time_stamp = data_source['workspace_stats']['channel_stats']['time_stamp']
+    elif stat_type == 2:
+        time_stamp = data_source['workspace_stats']['dm_stats']['time_stamp']
+    elif stat_type == 3:
+        time_stamp = data_source['workspace_stats']['message_stats']['time_stamp']
+    return time_stamp
+
+def initialise_user_stats():
+    '''
+    initialises a user's stats
+
+    Arguments:
+        None
+
+    Return Value:
+        user_stats (dict): contains how many channels, dms and messages exist
+    '''
+    data_source = data_store.get()
+    data_source['user_stats']['channels_joined'] = {}
+    data_source['user_stats']['channels_joined']['time_stamp'] = 0
+    data_source['user_stats']['dms_joined'] = {}
+    data_source['user_stats']['dms_joined']['time_stamp'] = 0
+    data_source['user_stats']['messages_sent'] = {}
+    data_source['user_stats']['messages_sent']['time_stamp'] = 0
+    data_source['user_stats']['involvement_rate'] = 0
+    
+
+def get_userstats_timestamp(stat_type):
+    '''
+    gets user_stats timestamp based on stats type
+
+    Arguments:
+        None
+
+    Return Value:
+        time_stamp  (int): unix time_stamp of stats
+    '''
+    data_source = data_store.get()
+    if stat_type == 1:
+        time_stamp = data_source['user_stats']['channels_joined']['time_stamp']
+    elif stat_type == 2:
+        time_stamp = data_source['user_stats']['dms_joined']['time_stamp']
+    elif stat_type == 3:
+        time_stamp = data_source['user_stats']['messages_sent']['time_stamp']
+    return time_stamp
+
+
+def calculate_involvement_rate(numerator, denominator):
+    '''
+    calculates involvement rate
+
+    Arguments:
+        numerator       (int): sum(num_channels_joined, num_dms_joined, num_msgs_sent)
+        denominator     (int): sum(num_channels, num_dms, num_msgs)
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+    if numerator == 0 or denominator == 0:
+        rate = 0
+    else:
+        rate = float(numerator / denominator)
+    if rate > 1:
+        rate = 1
+    data_source['user_stats']['involvement_rate'] = rate
+    return rate
+
 
 def data_dump():
     while True:
