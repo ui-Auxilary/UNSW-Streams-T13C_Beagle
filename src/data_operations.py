@@ -77,6 +77,8 @@ def reset_data_store_to_default():
         'message_ids': [],
         'token': {},
         'password_reset_key': {},
+        'workspace_stats': {},
+        'user_stats': {}
     }
 
     # update data_store
