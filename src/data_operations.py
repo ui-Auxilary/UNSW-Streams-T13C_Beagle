@@ -1258,8 +1258,6 @@ def update_user_stats(user_id, channel_data, dm_data, message_data):
     rate = calculate_involvement_rate(involvement, denom)
 
     data_source['user_stats'][user_id]['involvement_rate'] = rate
-    print(data_source['user_stats'])
-    print(data_source['user_stats'][user_id]['involvement_rate'])
 
 
 def update_workspace_stats(channel_data, dm_data, message_data):
@@ -1282,9 +1280,6 @@ def update_workspace_stats(channel_data, dm_data, message_data):
         len(users_in_channel_or_dm), len(get_user_ids()))
 
     data_source['workspace_stats']['utilization_rate'] = rate
-
-    print(data_source['workspace_stats']['utilization_rate'])
-    print(data_source['workspace_stats'])
 
 
 def get_user_stats(user_id):
