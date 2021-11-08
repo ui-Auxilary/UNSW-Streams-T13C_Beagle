@@ -637,7 +637,7 @@ def get_global_owners():
     return data_source['global_owners']
 
 
-def add_message(is_channel, user_id, channel_id, message_id, content, time_created, reacts, is_pinned):
+def add_message(is_channel, user_id, channel_id, message_id, content, time_created):
     '''
     Adds a message to the database from a user
 
@@ -665,8 +665,8 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
         'message_id': message_id,
         'channel_created': channel_id,
         'is_channel': is_channel,
-        'reacts': reacts,
-        'is_pinned': is_pinned
+        'reacts': [],
+        'is_pinned': False
     }
     
     # add message to the channel's message list
