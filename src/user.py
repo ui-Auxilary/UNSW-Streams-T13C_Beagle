@@ -208,7 +208,6 @@ def notifications_get_v1(token):
 
     for index, notification in enumerate(notification_list):
         # if notification in given range
-        print(notification)
         if index < end:
             # add notification to notifications_arr
             notifications_arr.append({

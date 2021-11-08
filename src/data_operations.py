@@ -1075,7 +1075,10 @@ def react_message(user_id, message_id, react_id):
 
     in_user_id = data_source['message_data'][message_id]['reacts'][index]['u_ids']
 
-    in_user_id.append(user_id)
+    if user_id not in in_user_id:
+        in_user_id.append(user_id)
+    else:
+        in_user_id.remove(user_id)
 
 def calculate_utilization_rate(users_in_channels_or_dms, total_users):
     '''

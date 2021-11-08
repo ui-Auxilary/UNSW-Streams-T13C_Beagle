@@ -313,7 +313,8 @@ def test_unreact_already_unreacted_message_dm(clear_data, create_data):
     assert react_data.status_code == 400
 
 def test_double_unreact_channel(clear_data, create_data):
-    token, channel_messages, _, _, _, _ , _ = create_data
+    token, channel_messages, _, _, _, _, _ = create_data
+
     requests.post(config.url + 'message/unreact/v1', json={
         'token': token,
         'message_id': channel_messages[1],
@@ -327,7 +328,8 @@ def test_double_unreact_channel(clear_data, create_data):
     assert react_data.status_code == 400
 
 def test_double_unreact_dm(clear_data, create_data):
-    token, _, dm_messages, _, _, _ , _ = create_data
+    token, _, dm_messages, _, _, _, _ = create_data
+
     requests.post(config.url + 'message/unreact/v1', json={
         'token': token,
         'message_id': dm_messages[0],
@@ -335,13 +337,13 @@ def test_double_unreact_dm(clear_data, create_data):
     })
     react_data = requests.post(config.url + 'message/unreact/v1', json={
         'token': token,
-        'message_id': dm_messages[1],
+        'message_id': dm_messages[0],
         'react_id': 1
     })
     assert react_data.status_code == 400
 
 def test_unauthorised_user_channel(clear_data, create_data):
-    _, channel_messages, _, _, _, _, token2 , _ = create_data
+    _, channel_messages, _, _, _, _, token2 = create_data
     react_data = requests.post(config.url + 'message/unreact/v1', json={
         'token': token2,
         'message_id': channel_messages[0],
@@ -350,7 +352,8 @@ def test_unauthorised_user_channel(clear_data, create_data):
     assert react_data.status_code == 400
 
 def test_unauthorised_user_dm(clear_data, create_data):
-    _, _, dm_messages, _, _, _, token2 , _ = create_data
+    _, _, dm_messages, _, _, _, token2 = create_data
+
     react_data = requests.post(config.url + 'message/unreact/v1', json={
         'token': token2,
         'message_id': dm_messages[1],

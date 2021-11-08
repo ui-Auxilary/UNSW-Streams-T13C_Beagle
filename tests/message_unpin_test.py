@@ -204,7 +204,7 @@ def test_simple_case_dm(clear_data, create_data):
     # get the messages in the dm
     dm_message_data = requests.get(config.url + 'dm/messages/v1', params={
         'token': token,
-        'channel_id': dm_id,
+        'dm_id': dm_id,
         'start': 0
     })
 
