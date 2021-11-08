@@ -171,7 +171,7 @@ def auth_register_v1(email, password, name_first, name_last):
 
     # add user to the system
     add_user(new_user_id, user_information, p_hash, user_handle, user_global_owner)
-    initialise_user_stats()
+    initialise_user_stats(new_user_id)
 
     ## add token to session
     user_token = encode_token(new_user_id)

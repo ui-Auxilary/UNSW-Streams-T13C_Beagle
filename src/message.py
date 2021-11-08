@@ -19,6 +19,7 @@ from src.data_operations import (
     get_messages_by_dm,
     get_dm_messages,
     react_message,
+    pin_message,
     remove_message,
     get_user,
     add_notification
@@ -70,7 +71,8 @@ def message_send_v1(token, channel_id, message):
         if tagged_user:
             auth_user_handle = get_user(auth_user_id)['user_handle']
             channel_name = get_channel(channel_id)['name']
-            add_notification(True, channel_id, tagged_user, f"{auth_user_handle} tagged you in {channel_name}: {message[:20]}")
+            add_notification(True, channel_id, tagged_user,
+                             f"{auth_user_handle} tagged you in {channel_name}: {message[:20]}")
 
     add_message(True, int(auth_user_id), int(channel_id),
                 int(message_id), message, time_created)
@@ -142,8 +144,9 @@ def message_edit_v1(token, message_id, message):
         tagged_user = check_valid_tag(message)
         if tagged_user:
             auth_user_handle = get_user(auth_user_id)['user_handle']
-            
-            add_notification(is_channel, channel_id, tagged_user, f"{auth_user_handle} tagged you in {channel_name}: {message[:20]}")
+
+            add_notification(is_channel, channel_id, tagged_user,
+                             f"{auth_user_handle} tagged you in {channel_name}: {message[:20]}")
 
     edit_message(is_channel, channel_id, message_id, message)
 
@@ -203,7 +206,27 @@ def message_remove_v1(token, message_id):
 
     return {}
 
+
 def message_react_v1(token, message_id, react_id):
+    '''
+    Reacts to a message in a channel/DM
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        message_id   (int): unique message_id for the content
+        react_id     (int): id of the react type
+
+    InputError when any of:
+    - message_id is not a valid message within a channel or DM that the authorised user has joined
+    - react_id is not a valid react ID - currently, the only valid react ID the frontend has is 1
+    - the message already contains a react with ID react_id from the authorised user
+
+    AccessError when any of:
+        - invalid_id
+
+    Return Value:
+        {}
+    '''
     auth_user_id = decode_token(token)
 
     # check message_id is valid
@@ -220,24 +243,26 @@ def message_react_v1(token, message_id, react_id):
         message_id_valid = True
 
     if message_id_valid == False:
-        raise InputError(description="Not a valid message_id in any channels the user is in")
+        raise InputError(
+            description="Not a valid message_id in any channels the user is in")
 
     # check if react_id is valid
     valid_react_ids = [1]
     if react_id not in valid_react_ids:
         raise InputError(description="Invalid react id")
-        
+
     # checks if react_id exists in the message
     if len(get_message_by_id(message_id)['reacts']) < 1:
         add_react(auth_user_id, message_id, react_id)
     else:
         # checks if message has already been reacted from auth_user
         if auth_user_id in get_message_by_id(message_id)['reacts'][0]['u_ids']:
-            raise InputError(description="User has already reacted with this react_id")
+            raise InputError(
+                description="User has already reacted with this react_id")
 
         react_message(auth_user_id, message_id, react_id)
 
-    ## send notification
+    # send notification
     is_channel = get_message_by_id(message_id)['is_channel']
     channel_id = get_message_by_id(message_id)['channel_created']
 
@@ -246,8 +271,189 @@ def message_react_v1(token, message_id, react_id):
     else:
         channel_name = get_dm(channel_id)['name']
 
-    author_id = get_message_by_id(message_id)['author']    
+    author_id = get_message_by_id(message_id)['author']
     auth_user_handle = get_user(auth_user_id)['user_handle']
-    add_notification(is_channel, channel_id, author_id, f"{auth_user_handle} reacted to your message in {channel_name}")
+    add_notification(is_channel, channel_id, author_id,
+                     f"{auth_user_handle} reacted to your message in {channel_name}")
+
+    return {}
+
+
+def message_unreact_v1(token, message_id, react_id):
+    '''
+    Unreacts message in the channel/DM it was sent from
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        message_id   (int): unique message_id for the content
+        react_id     (int): id of the react type
+
+    InputError when any of:
+    - message_id is not a valid message within a channel or DM that the authorised user has joined
+    - react_id is not a valid react ID
+    - the message does not contain a react with ID react_id from the authorised user
+
+    AccessError when any of:
+        - invalid_id
+
+    Return Value:
+        {}
+    '''
+    auth_user_id = decode_token(token)
+
+    # check message_id is valid
+    if message_id not in get_message_ids():
+        raise InputError(description="Invalid message id")
+
+    channel_ids = get_user_channels(auth_user_id)
+    dm_ids = get_user_dms(auth_user_id)
+
+    message_id_valid = False
+    if any(message_id in get_channel_messages(channel) for channel in channel_ids) == True:
+        message_id_valid = True
+    if any(message_id in get_dm_messages(dm) for dm in dm_ids) == True:
+        message_id_valid = True
+
+    if message_id_valid == False:
+        raise InputError(
+            description="Not a valid message_id in any channels the user is in")
+
+    # check if react_id is valid
+    valid_react_ids = [1]
+
+    if react_id not in valid_react_ids:
+        raise InputError(description="Invalid react id")
+
+    # checks if react_id exists in the message
+    if len(get_message_by_id(message_id)['reacts']) < 1:
+        raise InputError(description="User has not reacted with this react_id")
+    else:
+        # checks if message has already been reacted from auth_user
+        if auth_user_id not in get_message_by_id(message_id)['reacts'][0]['u_ids']:
+            raise InputError(
+                description="User has not reacted with this react_id")
+
+    react_message(auth_user_id, message_id, react_id)
+
+
+def message_pin_v1(token, message_id):
+    '''
+    Pins message in the channel/DM it was sent from
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        message_id   (int): unique message_id for the content
+
+    InputError when any of: 
+        - message_id is not a valid message within a channel or DM that the authorised user has joined
+        - the message is already pinned
+
+    AccessError when:
+        - message_id refers to a valid message in a joined channel/DM and the authorised user does not have owner permissions in the channel/DM
+        - invalid_token
+
+    Return Value:
+        {}
+    '''
+    auth_user_id = decode_token(token)
+
+    # check message_id is valid
+    if message_id not in get_message_ids():
+        raise InputError(description="Invalid message id")
+
+    channel_ids = get_user_channels(auth_user_id)
+    dm_ids = get_user_dms(auth_user_id)
+    message_id_valid = False
+
+    if any(message_id in get_channel_messages(channel) for channel in channel_ids) == True:
+        message_id_valid = True
+        is_channel = True
+    if any(message_id in get_dm_messages(dm) for dm in dm_ids) == True:
+        message_id_valid = True
+
+    if message_id_valid == False:
+        raise InputError(
+            description="Not a valid message_id in any channels the user is in")
+
+    # check whether user has owner permissions in that channel
+    channel_id = get_message_by_id(message_id)['channel_created']
+    is_channel = get_message_by_id(message_id)['is_channel']
     
+    if is_channel:
+        if auth_user_id not in get_channel(channel_id)['owner'] and not get_user(auth_user_id)['global_owner']:
+            raise AccessError(
+                description='Not sufficient permissions to pin message')
+    else:
+        if auth_user_id not in get_dm(channel_id)['owner']:
+            raise AccessError(
+                description='Not sufficient permissions to pin message')
+
+    # checks if message has been pinned
+    if get_message_by_id(message_id)['is_pinned'] == True:
+        raise InputError(description="Message has already been pinned")
+
+    pin_message(message_id)
+
+    return {}
+
+
+def message_unpin_v1(token, message_id):
+    '''
+    Unpins message in the channel/DM it was sent from
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        message_id   (int): unique message_id for the content
+
+    InputError when any of: 
+        - message_id is not a valid message within a channel or DM that the authorised user has joined
+        - the message is already pinned
+
+    AccessError when:
+        - message_id refers to a valid message in a joined channel/DM and the authorised user does not have owner permissions in the channel/DM
+        - invalid_token
+
+    Return Value:
+        {}
+    '''
+    auth_user_id = decode_token(token)
+
+    # check message_id is valid
+    if message_id not in get_message_ids():
+        raise InputError(description="Invalid message id")
+
+    channel_ids = get_user_channels(auth_user_id)
+    dm_ids = get_user_dms(auth_user_id)
+    message_id_valid = False
+    
+
+    if any(message_id in get_channel_messages(channel) for channel in channel_ids) == True:
+        message_id_valid = True
+
+    if any(message_id in get_dm_messages(dm) for dm in dm_ids) == True:
+        message_id_valid = True
+
+    if message_id_valid == False:
+        raise InputError(
+            description="Not a valid message_id in any channels the user is in")
+
+    # check whether user has owner permissions in that channel
+    channel_id = get_message_by_id(message_id)['channel_created']
+    is_channel = get_message_by_id(message_id)['is_channel']
+
+    if is_channel:
+        if auth_user_id not in get_channel(channel_id)['owner'] and not get_user(auth_user_id)['global_owner']:
+            raise AccessError(
+                description='Not sufficient permissions to pin message')
+    else:
+        if auth_user_id not in get_dm(channel_id)['owner']:
+            raise AccessError(
+                description='Not sufficient permissions to unpin message')
+
+    # checks if message has been pinned
+    if get_message_by_id(message_id)['is_pinned'] == False:
+        raise InputError(description="Message has not been pinned")
+
+    pin_message(message_id)
+
     return {}
