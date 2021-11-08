@@ -360,7 +360,7 @@ def test_over_20_notitifications(clear_data, userprofile_and_channel_data):
                                                             })
     
     ## get channel details
-    channel_detail_data = requests.get(config.url + 'channel/details/v2', params={
+    requests.get(config.url + 'channel/details/v2', params={
                                                                                  'token': user_token,
                                                                                  'channel_id': channel_id
                                                                                 })
