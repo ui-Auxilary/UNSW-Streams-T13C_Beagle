@@ -346,7 +346,7 @@ def test_user_dm_react_notifications(clear_data, register_user_data):
     {'channel_id': -1, 'dm_id': dm_id, 'notification_message': f"{auth_user_handle} added you to {dm_name}"}]
 
 def test_over_20_notitifications(clear_data, userprofile_and_channel_data):
-    auth_user_profile, user_token, user_2_profile, user_token_2, channel_id, _ = userprofile_and_channel_data
+    _, user_token, user_2_profile, user_token_2, channel_id, _ = userprofile_and_channel_data
 
     ## get user_2 id and handle
     user_2_id = user_2_profile['u_id']
@@ -364,8 +364,6 @@ def test_over_20_notitifications(clear_data, userprofile_and_channel_data):
                                                                                  'token': user_token,
                                                                                  'channel_id': channel_id
                                                                                 })
-
-    channel_detail = json.loads(channel_detail_data.text)
 
     for i in range(22):
         ## auth_user sends user 2 20 messages
@@ -421,7 +419,7 @@ def test_invalid_tag(clear_data, userprofile_and_channel_data):
                                                        })
 
     message = f"@fakehandlelolsadjasidoajsiodsajiodjsaiodjsaiojsadjioasjdio joe mama went to school then she graduated and she went to sawcon deez nutz"
-    message_first_20 = message[0:20]
+
     ## auth_user sends user 2 a message
     requests.post(config.url + 'message/send/v1', json={
                                                         'token': user_token,
@@ -470,7 +468,7 @@ def test_multiple_tags(clear_data, userprofile_and_channel_data):
                                                             'u_id': user_2_id
                                                             })
     
-    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
+    requests.post(config.url + 'channel/invite/v2', json={
                                                             'token': user_token,
                                                             'channel_id': channel_id,
                                                             'u_id': user_id_3
@@ -556,7 +554,7 @@ def test_tag_in_dm(clear_data, userprofile_and_dm_data):
                              {'channel_id': -1, 'dm_id': dm_id, 'notification_message': f"{auth_user_handle} added you to {dm_name}"}]
 
 def test_invalid_tag_in_dm(clear_data, userprofile_and_dm_data):
-    auth_user_profile, user_token, user_2_profile, user_token_2, dm_id = userprofile_and_dm_data
+    auth_user_profile, user_token, _, user_token_2, dm_id = userprofile_and_dm_data
 
     ## get auth user_handle
     auth_user_handle = auth_user_profile['handle_str']
@@ -637,7 +635,7 @@ def test_dm_edit_message_tag(clear_data, userprofile_and_dm_data):
                              {'channel_id': -1, 'dm_id': dm_id, 'notification_message': f"{auth_user_handle} added you to {dm_name}"}]
 
 def test_dm_edit_message_invalid_tag(clear_data, userprofile_and_dm_data):
-    auth_user_profile, user_token, user_2_profile, user_token_2, dm_id = userprofile_and_dm_data
+    auth_user_profile, user_token, _, user_token_2, dm_id = userprofile_and_dm_data
 
     auth_user_handle = auth_user_profile['handle_str']
 

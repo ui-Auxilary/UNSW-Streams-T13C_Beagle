@@ -218,7 +218,7 @@ def notifications_get_v1(token):
             })
 
         # if past 20 notifications, then exit
-        if index == end - 1:
+        else:
             break
 
     return {

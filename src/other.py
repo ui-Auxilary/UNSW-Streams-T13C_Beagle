@@ -105,17 +105,15 @@ def check_valid_tag(message):
 
     if re.search(pattern, message):
         user_handle = re.search(pattern, message)[1]
-
-        if user_handle in get_user_handles():
-            return get_user_from_handle(user_handle)       
-
-    else:
-        return False
+        user_id = get_user_from_handle(user_handle)       
+        if user_id:
+            return user_id
+    
+    return False
 
 def get_user_from_handle(user_handle):
     for person in get_user_ids():
         if get_user(person)['user_handle'] == user_handle:
             user_id = person
-            break
-    
-    return user_id
+            return user_id
+    return False
