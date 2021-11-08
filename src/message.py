@@ -1,5 +1,5 @@
 from src.error import InputError, AccessError
-from src.other import decode_token
+from src.other import decode_token, check_valid_tag
 from datetime import timezone, datetime
 
 from src.data_operations import (
@@ -20,7 +20,8 @@ from src.data_operations import (
     get_dm_messages,
     react_message,
     remove_message,
-    get_user
+    get_user,
+    add_notification
 )
 
 
@@ -63,14 +64,14 @@ def message_send_v1(token, channel_id, message):
     # time created
     dt = datetime.now()
     time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
-    
-    '''
-    'author'
-            - 'content'
-            - 'time_created'
-            - 'reacts' [{ react_id, u_ids }]
-            - 'is_pinned'
-    '''
+
+    if "@" in message:
+        tagged_user = check_valid_tag(message)
+        if tagged_user:
+            auth_user_handle = get_user(auth_user_id)['user_handle']
+            channel_name = get_channel(channel_id)['name']
+            add_notification(True, channel_id, tagged_user, f"{auth_user_handle} tagged you in {channel_name}: {message[:20]}")
+
     add_message(True, int(auth_user_id), int(channel_id),
                 int(message_id), message, time_created)
 
@@ -131,6 +132,18 @@ def message_edit_v1(token, message_id, message):
         if message_author != auth_user_id and auth_user_id not in dm_owner:
             raise AccessError(
                 description="User does not have permissions to edit message")
+
+    if is_channel:
+        channel_name = get_channel(channel_id)['name']
+    else:
+        channel_name = get_dm(channel_id)['name']
+
+    if "@" in message:
+        tagged_user = check_valid_tag(message)
+        if tagged_user:
+            auth_user_handle = get_user(auth_user_id)['user_handle']
+            
+            add_notification(is_channel, channel_id, tagged_user, f"{auth_user_handle} tagged you in {channel_name}: {message[:20]}")
 
     edit_message(is_channel, channel_id, message_id, message)
 
@@ -224,4 +237,17 @@ def message_react_v1(token, message_id, react_id):
 
         react_message(auth_user_id, message_id, react_id)
 
+    ## send notification
+    is_channel = get_message_by_id(message_id)['is_channel']
+    channel_id = get_message_by_id(message_id)['channel_created']
+
+    if is_channel:
+        channel_name = get_channel(channel_id)['name']
+    else:
+        channel_name = get_dm(channel_id)['name']
+
+    author_id = get_message_by_id(message_id)['author']    
+    auth_user_handle = get_user(auth_user_id)['user_handle']
+    add_notification(is_channel, channel_id, author_id, f"{auth_user_handle} reacted to your message in {channel_name}")
+    
     return {}

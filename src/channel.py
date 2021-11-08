@@ -19,6 +19,7 @@ from src.data_operations import (
     get_message_by_id,
     get_messages_by_channel,
     add_message,
+    add_notification,
     add_owner_to_channel,
     remove_owner_from_channel,
     remove_member_from_channel,
@@ -66,12 +67,16 @@ def channel_invite_v1(token, channel_id, u_id):
     # check whether user is already member
     if u_id in get_channel(channel_id)['members']:
         raise InputError(description='New user is already existing member')
-
+        
     # adds the new user to the channel
     dt = datetime.now()
     time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
 
     add_member_to_channel(channel_id, u_id, time_created)
+
+    auth_user_handle = get_user(auth_user_id)['user_handle']
+    channel_name = get_channel(channel_id)['name']
+    add_notification(True, channel_id, u_id, f"{auth_user_handle} added you to {channel_name}")
 
     return {
     }

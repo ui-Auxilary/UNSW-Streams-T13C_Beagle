@@ -36,7 +36,7 @@ Functions:
     get_messages_by_channel(channel_id: int) -> list
     add_react(user_id: int, message_id: int, react_id: int)
     react_message(user_id: int, message_id: int, react_id: int)
-    pin_message(message_id: int)
+    get_user_notifications(user_id: int) -> list
     set_active_standup(channel_id: int)
     add_user_profileimage(user_id: int, cropped_image: img)
     add_session_token(token: str, user_id: int)
@@ -118,7 +118,6 @@ def add_user(user_id, user_details, password, user_handle, is_owner):
         password       (str): password of user
         user_handle    (str): the generated handle of the user
         is_owner       (bool): whether the user is an owner
-        in_channels    (list): list of channels user is in
 
     Return Value:
         None
@@ -144,6 +143,7 @@ def add_user(user_id, user_details, password, user_handle, is_owner):
         'user_handle': user_handle,
         'global_owner': is_owner,
         'image_url': '',
+        'notifications': [],
         'in_channels': [],
         'in_dms': [],
     }
@@ -840,6 +840,49 @@ def get_messages_by_dm(dm_id):
     data_source = data_store.get()
     return data_source['dm_data'][dm_id]['message_ids']
 
+def add_notification(is_channel, channel_id, user_id, content):
+    '''
+    adds a notifcation to the database
+
+    Arguments:
+        is_channel       (bool): whether or not the channel is a channel or dm
+        channel_id        (int): id of channel parsed
+        user_id           (int): the id of the user retrieving notifications
+        content           (str): content of the notification
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+
+    if is_channel:
+        data_source['user_data'][user_id]['notifications'].append({
+            'channel_id': channel_id,
+            'dm_id': -1,
+            'content': content,
+        })
+    else:
+        data_source['user_data'][user_id]['notifications'].append({
+            'channel_id': -1,
+            'dm_id': channel_id,
+            'content': content,
+        })
+
+def get_user_notifications(user_id):
+    '''
+    Gets a list of a user's notifications
+
+    Arguments:
+        user_id      (int): id of user we are retrieving notifications for
+
+    Return Value:
+        notifications (list): list of all the user's notifications
+    '''
+
+    data_source = data_store.get()
+
+    return data_source['user_data'][user_id]['notifications']
 
 def set_active_standup(set_active, channel_id, time_finished):
     '''
@@ -1172,6 +1215,6 @@ def data_restore():
     except:
         pass
 
-    # save it back purely for pylint unused global data_source
+    # save it back purely   for pylint unused global data_source
     with open('data_store.json', 'w') as data_file:
         json.dump(data_source, data_file)
