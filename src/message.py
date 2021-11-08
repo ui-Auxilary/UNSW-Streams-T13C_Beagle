@@ -2,7 +2,6 @@ from src.error import InputError, AccessError
 from src.other import decode_token, check_valid_tag
 from datetime import timezone, datetime
 
-from datetime import datetime
 from src.data_operations import (
     add_react,
     get_channel_ids,
