@@ -10,6 +10,7 @@ Functions:
 from src.data_operations import get_channel_ids, get_channel, add_channel
 from src.other import decode_token
 from src.error import InputError
+from datetime import timezone, datetime
 
 def channels_list_v1(token):
     '''
@@ -99,7 +100,9 @@ def channels_create_v1(token, name, is_public):
 
     ## get a new id for the channel and add channel to system
     new_channel_id = len(get_channel_ids()) + 1
-    add_channel(new_channel_id, name, auth_user_id, is_public)
+    dt = datetime.now()
+    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    add_channel(new_channel_id, name, auth_user_id, is_public, time_created)
 
     return {
         'channel_id': new_channel_id,

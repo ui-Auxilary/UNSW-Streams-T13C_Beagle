@@ -94,6 +94,8 @@ initial_object = {
     'message_ids'       : [],
     'token'             : {},
     'password_reset_key': {},
+    'user_stats'        : {},
+    'workspace_stats'   : {}
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 

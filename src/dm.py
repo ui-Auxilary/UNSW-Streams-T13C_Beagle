@@ -61,12 +61,14 @@ def dm_create_v1(token, u_ids):
 
     # get a new id for the dm and add DM to system
     new_dm_id = len(get_dm_ids()) + 1
-    add_dm(new_dm_id, dm_name, auth_user_id)
+    dt = datetime.now()
+    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    add_dm(new_dm_id, dm_name, auth_user_id, time_created)
 
     # add each user to the DM
 
     for u_id in user_list:
-        add_user_to_dm(new_dm_id, u_id)
+        add_user_to_dm(new_dm_id, u_id, time_created)
 
     return {
         'dm_id': new_dm_id
@@ -136,15 +138,19 @@ def dm_remove_v1(token, dm_id):
     if auth_user_id not in dm_owner:
         raise AccessError(description="User is not the owner of the DM")
 
+    dt = datetime.now()
+    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+
+
     # remove users from members in the DM
     for member in reversed(dm_members):
-        remove_member_from_dm(dm_id, member)
+        remove_member_from_dm(dm_id, member, time_created)
 
     # remove owner from owners in the DM
     dm_owner.remove(auth_user_id)
 
     # remove dm_id from list
-    remove_dm(dm_id)
+    remove_dm(dm_id, time_created)
 
     return {}
 
@@ -243,9 +249,13 @@ def dm_leave_v1(token, dm_id):
     # check if user is the owner of the DM
     if auth_user_id in dm_owner:
         dm_owner.remove(auth_user_id)
-
+        
+    # find time updated
+    dt = datetime.now()
+    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    
     # remove user from members in the DM
-    remove_member_from_dm(dm_id, auth_user_id)
+    remove_member_from_dm(dm_id, auth_user_id, time_created)
 
     return {}
 

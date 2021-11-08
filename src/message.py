@@ -2,7 +2,6 @@ from src.error import InputError, AccessError
 from src.other import decode_token
 from datetime import timezone, datetime
 
-from datetime import datetime
 from src.data_operations import (
     add_react,
     get_channel_ids,
@@ -184,7 +183,10 @@ def message_remove_v1(token, message_id):
             raise AccessError(
                 description="User does not have permissions to remove message")
 
-    remove_message(is_channel, channel_id, message_id)
+    dt = datetime.now()
+    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+
+    remove_message(is_channel, channel_id, message_id, time_created)
 
     return {}
 

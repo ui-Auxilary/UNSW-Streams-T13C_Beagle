@@ -25,7 +25,9 @@ from src.data_operations import (
     add_session_token,
     remove_session_token,
     add_passwordreset_key,
-    get_passwordreset_key
+    get_passwordreset_key,
+    initialise_workspace_stats,
+    initialise_user_stats
 )
 from src.other import encode_token, decode_token, get_uid_by_email
 
@@ -162,12 +164,14 @@ def auth_register_v1(email, password, name_first, name_last):
     user_global_owner = False
     if new_user_id == 1:
         user_global_owner = True
+        initialise_workspace_stats()
 
     # get the hash of the password for security
     p_hash = hashlib.sha256(password.encode()).hexdigest()
 
     # add user to the system
     add_user(new_user_id, user_information, p_hash, user_handle, user_global_owner)
+    initialise_user_stats()
 
     ## add token to session
     user_token = encode_token(new_user_id)
