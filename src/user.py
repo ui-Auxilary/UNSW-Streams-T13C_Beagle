@@ -24,7 +24,8 @@ from src.data_operations import (
     add_user_profileimage,
     get_user_notifications,
     calculate_involvement_rate,
-    get_userstats_timestamp    
+    update_user_stats,
+    get_user_stats
 )
 from src.other import decode_token
 
@@ -225,7 +226,6 @@ def notifications_get_v1(token):
     }
 
 def user_stats_v1(token):
-
     user_id = decode_token(token)
 
     num_channels_joined = len(get_user_channels(user_id))
@@ -240,21 +240,9 @@ def user_stats_v1(token):
     involvement = num_channels_joined + num_dms_joined + num_messages_sent
     denom = len(get_channel_ids()) + len(get_dm_ids()) + len(get_message_ids())
     rate = calculate_involvement_rate(involvement, denom)
-    user_stats = {
-        'channels_joined': [{
-            'num_channels_joined': num_channels_joined,
-            'time_stamp': get_userstats_timestamp(1)
-        }],
-        'dms_joined': [{
-            'num_dms_joined': num_dms_joined,
-            'time_stamp': get_userstats_timestamp(2)
-        }],
-        'messages_sent': [{
-            'num_messages_sent': num_messages_sent,
-            'time_stamp': get_userstats_timestamp(3)
-        }],
-        'involvement_rate': rate
-    }
+    
+    update_user_stats(user_id, False, False, False, rate)
+    user_stats = get_user_stats(user_id)
 
     return {
         'user_stats': user_stats
