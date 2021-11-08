@@ -640,13 +640,6 @@ def remove_dm(dm_id, time_updated):
 
     update_workspace_stats(False, dm_data, False)
 
-    dm_data = {
-        'num_dms_exist': num_of_dms,
-        'time_stamp': time_updated
-    }
-
-    update_workspace_stats(False, dm_data, False, False)
-
 
 def get_global_owners():
     '''
@@ -827,17 +820,6 @@ def remove_message(is_channel, channel_id, message_id, time_updated):
         'num_messages_exist': num_of_messages,
         'time_stamp': time_updated
     }
-
-    update_workspace_stats(False, False, message_data, False)
-
-    data_source['user_data'][message_author]['messages_sent'] -= 1
-    num_user_messages = data_source['user_data'][message_author]['messages_sent']
-    message_data = {
-        'num_messages_sent': num_user_messages,
-        'time_stamp': time_updated
-    }
-
-    update_user_stats(message_author, False, False, message_data, False)
 
 
 def get_message_ids():
