@@ -25,7 +25,7 @@ from src.data_operations import (
     get_user_notifications,
     calculate_involvement_rate,
     get_userstats_timestamp    
-
+)
 from src.other import decode_token
 
 

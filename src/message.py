@@ -257,8 +257,20 @@ def message_react_v1(token, message_id, react_id):
 
         react_message(auth_user_id, message_id, react_id)
 
-    return {}
+    ## send notification
+    is_channel = get_message_by_id(message_id)['is_channel']
+    channel_id = get_message_by_id(message_id)['channel_created']
 
+    if is_channel:
+        channel_name = get_channel(channel_id)['name']
+    else:
+        channel_name = get_dm(channel_id)['name']
+
+    author_id = get_message_by_id(message_id)['author']    
+    auth_user_handle = get_user(auth_user_id)['user_handle']
+    add_notification(is_channel, channel_id, author_id, f"{auth_user_handle} reacted to your message in {channel_name}")
+    
+    return {}
 def message_unreact_v1(token, message_id, react_id):
     '''
     Unreacts message in the channel/DM it was sent from

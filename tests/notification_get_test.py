@@ -115,15 +115,13 @@ def userprofile_and_dm_data(clear_data, register_user_data):
 def test_user_invite_channel_notification(clear_data, userprofile_and_channel_data):
     auth_user_profile, user_token, user_2_profile, user_token_2, channel_id, _ = userprofile_and_channel_data
 
-    ## get auth_user and user_2's id and handle
-    auth_user_id = auth_user_profile['u_id']
+    ## get auth_user and user_2's id
     auth_user_handle = auth_user_profile['handle_str']
 
     user_2_id = user_2_profile['u_id']
-    user_2_handle = user_2_profile['handle_str']
 
     ## user_1 invites user_2 to channel 1
-    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
+    requests.post(config.url + 'channel/invite/v2', json={
                                                             'token': user_token,
                                                             'channel_id': channel_id,
                                                             'u_id': user_2_id
@@ -193,14 +191,13 @@ def test_user_channel_tag_notification(clear_data, userprofile_and_channel_data)
     auth_user_profile, user_token, user_2_profile, user_token_2, channel_id, _ = userprofile_and_channel_data
 
     ## get auth_user and user_2's id and handle
-    auth_user_id = auth_user_profile['u_id']
     auth_user_handle = auth_user_profile['handle_str']
 
     user_2_id = user_2_profile['u_id']
     user_2_handle = user_2_profile['handle_str']
 
     ## user_1 invites user_2 to channel 1
-    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
+    requests.post(config.url + 'channel/invite/v2', json={
                                                             'token': user_token,
                                                             'channel_id': channel_id,
                                                             'u_id': user_2_id
@@ -217,7 +214,7 @@ def test_user_channel_tag_notification(clear_data, userprofile_and_channel_data)
     channel_name = channel_detail['name']
 
     message = f"@{user_2_handle} joe mama went to school then she graduated and she went to sawcon deez nutz"
-    message_first_20 = message[0:20]
+
     ## auth_user sends user 2 a message
     requests.post(config.url + 'message/send/v1', json={
                                                         'token': user_token,
@@ -240,15 +237,13 @@ def test_user_channel_tag_notification(clear_data, userprofile_and_channel_data)
 def test_user_react_message_channel_notification(clear_data, userprofile_and_channel_data):
     auth_user_profile, user_token, user_2_profile, user_token_2, channel_id, _ = userprofile_and_channel_data
 
-    ## get auth_user and user_2's id and handle
-    auth_user_id = auth_user_profile['u_id']
+    ## get auth_user and user_2's id
     auth_user_handle = auth_user_profile['handle_str']
 
     user_2_id = user_2_profile['u_id']
-    user_2_handle = user_2_profile['handle_str']
 
     ## user_1 invites user_2 to channel 1
-    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
+    requests.post(config.url + 'channel/invite/v2', json={
                                                             'token': user_token,
                                                             'channel_id': channel_id,
                                                             'u_id': user_2_id
@@ -353,15 +348,12 @@ def test_user_dm_react_notifications(clear_data, register_user_data):
 def test_over_20_notitifications(clear_data, userprofile_and_channel_data):
     auth_user_profile, user_token, user_2_profile, user_token_2, channel_id, _ = userprofile_and_channel_data
 
-    ## get auth_user and user_2's id and handle
-    auth_user_id = auth_user_profile['u_id']
-    auth_user_handle = auth_user_profile['handle_str']
-
+    ## get user_2 id and handle
     user_2_id = user_2_profile['u_id']
     user_2_handle = user_2_profile['handle_str']
 
     ## user_1 invites user_2 to channel 1
-    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
+    requests.post(config.url + 'channel/invite/v2', json={
                                                             'token': user_token,
                                                             'channel_id': channel_id,
                                                             'u_id': user_2_id
@@ -374,8 +366,6 @@ def test_over_20_notitifications(clear_data, userprofile_and_channel_data):
                                                                                 })
 
     channel_detail = json.loads(channel_detail_data.text)
-
-    channel_name = channel_detail['name']
 
     for i in range(22):
         ## auth_user sends user 2 20 messages
@@ -399,15 +389,13 @@ def test_over_20_notitifications(clear_data, userprofile_and_channel_data):
 def test_invalid_tag(clear_data, userprofile_and_channel_data):
     auth_user_profile, user_token, user_2_profile, user_token_2, channel_id, _ = userprofile_and_channel_data
 
-    ## get auth_user and user_2's id and handle
-    auth_user_id = auth_user_profile['u_id']
+    ## get auth_user and user_2's id
     auth_user_handle = auth_user_profile['handle_str']
 
     user_2_id = user_2_profile['u_id']
-    user_2_handle = user_2_profile['handle_str']
 
     ## user_1 invites user_2 to channel 1
-    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
+    requests.post(config.url + 'channel/invite/v2', json={
                                                             'token': user_token,
                                                             'channel_id': channel_id,
                                                             'u_id': user_2_id
@@ -424,7 +412,7 @@ def test_invalid_tag(clear_data, userprofile_and_channel_data):
     channel_name = channel_detail['name']
 
     message = f"@fakehandlelol joe mama went to school then she graduated and she went to sawcon deez nutz"
-    message_first_20 = message[0:20]
+
     ## auth_user sends user 2 a message
     requests.post(config.url + 'message/send/v1', json={
                                                         'token': user_token,
@@ -453,7 +441,7 @@ def test_invalid_tag(clear_data, userprofile_and_channel_data):
     assert notifications == [{'channel_id': channel_id, 'dm_id': -1, 'notification_message': f"{auth_user_handle} added you to {channel_name}"}]
 
 def test_multiple_tags(clear_data, userprofile_and_channel_data):
-    auth_user_profile, user_token, user_2_profile, user_token_2, channel_id, _ = userprofile_and_channel_data
+    auth_user_profile, user_token, user_2_profile, _, channel_id, _ = userprofile_and_channel_data
 
     register_data_3 = requests.post(config.url + 'auth/register/v2', json={
         'email': 'bobbyssjones@gmail.com',
@@ -465,12 +453,10 @@ def test_multiple_tags(clear_data, userprofile_and_channel_data):
     user_id_3 = json.loads(register_data_3.text)['auth_user_id']
     user_token_3 = json.loads(register_data_3.text)['token']
 
-    ## get all user_handles
-    auth_user_id = auth_user_profile['u_id']
+    ## get user data
     auth_user_handle = auth_user_profile['handle_str']
 
     user_2_id = user_2_profile['u_id']
-    user_2_handle = user_2_profile['handle_str']
 
     user_profile_data = requests.get(config.url + 'user/profile/v1',
                         params={'token': user_token_3, 'u_id': user_id_3})
@@ -478,7 +464,7 @@ def test_multiple_tags(clear_data, userprofile_and_channel_data):
     user_handle_3 = json.loads(user_profile_data.text)['user']['handle_str']
 
     ## user_1 invites user_2 and user_3 to channel 1
-    channel_invite_data = requests.post(config.url + 'channel/invite/v2', json={
+    requests.post(config.url + 'channel/invite/v2', json={
                                                             'token': user_token,
                                                             'channel_id': channel_id,
                                                             'u_id': user_2_id
@@ -536,10 +522,8 @@ def test_tag_in_dm(clear_data, userprofile_and_dm_data):
     auth_user_profile, user_token, user_2_profile, user_token_2, dm_id = userprofile_and_dm_data
 
     ## get all user_handles
-    auth_user_id = auth_user_profile['u_id']
     auth_user_handle = auth_user_profile['handle_str']
 
-    user_2_id = user_2_profile['u_id']
     user_2_handle = user_2_profile['handle_str']
 
     ## get dm details
@@ -551,7 +535,6 @@ def test_tag_in_dm(clear_data, userprofile_and_dm_data):
     dm_name = json.loads(dm_detail_data.text)['name']
 
     message = f"@{user_2_handle} joe mama went to school then she graduated and she went to sawcon deez nutz"
-    message_first_20 = message[0:20]
 
     ## auth_user sends user 2 a message
     requests.post(config.url + 'message/senddm/v1', json={
@@ -575,12 +558,8 @@ def test_tag_in_dm(clear_data, userprofile_and_dm_data):
 def test_invalid_tag_in_dm(clear_data, userprofile_and_dm_data):
     auth_user_profile, user_token, user_2_profile, user_token_2, dm_id = userprofile_and_dm_data
 
-    ## get all user_handles
-    auth_user_id = auth_user_profile['u_id']
+    ## get auth user_handle
     auth_user_handle = auth_user_profile['handle_str']
-
-    user_2_id = user_2_profile['u_id']
-    user_2_handle = user_2_profile['handle_str']
 
     ## get dm details
     dm_detail_data = requests.get(config.url + 'dm/details/v1', params={
@@ -591,7 +570,6 @@ def test_invalid_tag_in_dm(clear_data, userprofile_and_dm_data):
     dm_name = json.loads(dm_detail_data.text)['name']
 
     message = f"@adgasdasdhioahdasdiosaadasdasda joe mama went to school then she graduated and she went to sawcon deez nutz"
-    message_first_20 = message[0:20]
 
     ## auth_user sends user 2 a message
     requests.post(config.url + 'message/senddm/v1', json={
@@ -615,10 +593,8 @@ def test_dm_edit_message_tag(clear_data, userprofile_and_dm_data):
     auth_user_profile, user_token, user_2_profile, user_token_2, dm_id = userprofile_and_dm_data
 
     ## get all user_handles
-    auth_user_id = auth_user_profile['u_id']
     auth_user_handle = auth_user_profile['handle_str']
 
-    user_2_id = user_2_profile['u_id']
     user_2_handle = user_2_profile['handle_str']
 
     ## get dm details
@@ -642,7 +618,7 @@ def test_dm_edit_message_tag(clear_data, userprofile_and_dm_data):
 
     edited_message = f"@{user_2_handle} sike"
 
-    user_1_edit = requests.put(config.url + 'message/edit/v1', json={
+    requests.put(config.url + 'message/edit/v1', json={
         'token': user_token,
         'message_id': message_id,
         'message': edited_message
@@ -663,12 +639,7 @@ def test_dm_edit_message_tag(clear_data, userprofile_and_dm_data):
 def test_dm_edit_message_invalid_tag(clear_data, userprofile_and_dm_data):
     auth_user_profile, user_token, user_2_profile, user_token_2, dm_id = userprofile_and_dm_data
 
-    ## get all user_handles
-    auth_user_id = auth_user_profile['u_id']
     auth_user_handle = auth_user_profile['handle_str']
-
-    user_2_id = user_2_profile['u_id']
-    user_2_handle = user_2_profile['handle_str']
 
     ## get dm details
     dm_detail_data = requests.get(config.url + 'dm/details/v1', params={
@@ -691,7 +662,7 @@ def test_dm_edit_message_invalid_tag(clear_data, userprofile_and_dm_data):
 
     edited_message = f"@sadaiodjadhasfhasigfsagfaulgfas sike"
 
-    user_1_edit = requests.put(config.url + 'message/edit/v1', json={
+    requests.put(config.url + 'message/edit/v1', json={
         'token': user_token,
         'message_id': message_id,
         'message': edited_message
