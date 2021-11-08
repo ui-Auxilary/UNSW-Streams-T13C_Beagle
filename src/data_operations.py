@@ -50,7 +50,7 @@ import os
 import json
 import time
 import threading
-
+from datetime import timezone, datetime 
 
 def reset_data_store_to_default():
     '''
@@ -77,8 +77,28 @@ def reset_data_store_to_default():
         'message_ids': [],
         'token': {},
         'password_reset_key': {},
-        'workspace_stats': {},
-        'user_stats': {}
+        'workspace_stats': {
+            'channel_stats': {
+                'time_stamp': 0
+            },
+            'dm_stats': {
+                'time_stamp': 0
+            },
+            'message_stats': {
+                'time_stamp': 0
+            }
+        },
+        'user_stats': {
+            'channels_joined': {
+                'time_stamp': 0
+            },
+            'dms_joined': {
+                'time_stamp': 0
+            },
+            'messages_sent': {
+                'time_stamp': 0
+            }
+        }
     }
 
     # update data_store
@@ -544,13 +564,11 @@ def add_dm(dm_id, dm_name, auth_user_id, time_created):
 
     num_of_dms = len(data_source['dm_ids'])
     data_source['workspace_stats']['dm_stats']['num_dms_exist'] = num_of_dms
-    time_stamp = data_source['dm_data'][dm_id]['time_created']
-    data_source['workspace_stats']['dm_stats']['time_stamp'] = time_stamp
+    data_source['workspace_stats']['dm_stats']['time_stamp'] = time_created
 
     num_of_dms = len(data_source['user_data'][auth_user_id]['in_dms'])
     data_source['user_stats']['dms_joined']['num_dms_joined'] = num_of_dms
-    time_stamp = data_source['dm_data'][dm_id]['time_created']
-    data_source['user_stats']['dms_joined']['time_stamp'] = time_stamp
+    data_source['user_stats']['dms_joined']['time_stamp'] = time_created
 
 
 def get_dm(dm_id):
@@ -619,7 +637,7 @@ def get_global_owners():
     return data_source['global_owners']
 
 
-def add_message(is_channel, user_id, channel_id, message_id, content, time_created, reacts, is_pinned):
+def add_message(is_channel, user_id, channel_id, message_id, content, time_created):
     '''
     Adds a message to the database from a user
 
@@ -647,8 +665,8 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
         'message_id': message_id,
         'channel_created': channel_id,
         'is_channel': is_channel,
-        'reacts': reacts,
-        'is_pinned': is_pinned
+        'reacts': [],
+        'is_pinned': False
     }
     
     # add message to the channel's message list
@@ -1069,7 +1087,7 @@ def get_workspace_timestamp(stat_type):
         time_stamp = data_source['workspace_stats']['channel_stats']['time_stamp']
     elif stat_type == 2:
         time_stamp = data_source['workspace_stats']['dm_stats']['time_stamp']
-    elif stat_type == 3:
+    else:
         time_stamp = data_source['workspace_stats']['message_stats']['time_stamp']
     return time_stamp
 
@@ -1108,7 +1126,7 @@ def get_userstats_timestamp(stat_type):
         time_stamp = data_source['user_stats']['channels_joined']['time_stamp']
     elif stat_type == 2:
         time_stamp = data_source['user_stats']['dms_joined']['time_stamp']
-    elif stat_type == 3:
+    else:
         time_stamp = data_source['user_stats']['messages_sent']['time_stamp']
     return time_stamp
 

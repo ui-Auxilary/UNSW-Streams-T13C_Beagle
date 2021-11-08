@@ -20,7 +20,7 @@ from src.data_operations import (
 )
 
 from src.other import decode_token
-
+from datetime import timezone, datetime
 
 def admin_user_remove_v1(token, u_id):
     '''
@@ -76,14 +76,17 @@ def admin_user_remove_v1(token, u_id):
             if message_author == u_id:
                 edit_message(False, dm_id, message_id, 'Removed user')
 
+    # time created
+    dt = datetime.now()
+    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+
     # remove user from every channel and dm
     for channel_id in reversed(channels_list):
-        remove_member_from_channel(channel_id, u_id)
+        remove_member_from_channel(channel_id, u_id, time_created)
 
     for dm_id in reversed(dm_list):
         if u_id in get_dm(dm_id)['members']:
-            remove_member_from_dm(dm_id, u_id)
-
+            remove_member_from_dm(dm_id, u_id, time_created)
     # Remove user so data is reuseable
     remove_user_details(u_id)
 
