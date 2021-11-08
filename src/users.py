@@ -65,7 +65,7 @@ def users_all(token):
     return users
 
 def users_stats_v1(token):
-    user_id = decode_token(token)
+    decode_token(token)
     users_in_channel_or_dm = []
 
     for user in get_user_ids():
