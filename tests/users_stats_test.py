@@ -104,11 +104,11 @@ def test_no_channels_or_dms(clear_data, create_users):
 
     assert stats.status_code == 200
 
-    workspace_stats = json.loads(stats.text)
-    channel_stats = json.loads(stats.text)['channel_stats']
-    dm_stats = json.loads(stats.text)['dm_stats']
-    messages = json.loads(stats.text)['message_stats']
-    rate = json.loads(stats.text)['utilization_rate']
+    workspace_stats = json.loads(stats.text)['workspace_stats']
+    channel_stats = workspace_stats['channel_stats']
+    dm_stats = workspace_stats['dm_stats']
+    messages = workspace_stats['message_stats']
+    rate = workspace_stats['utilization_rate']
 
     assert workspace_stats == {
                           'channel_stats': channel_stats,
@@ -134,11 +134,11 @@ def test_join_single_channel(clear_data, create_users, create_channels):
 
     assert stats.status_code == 200
 
-    workspace_stats = json.loads(stats.text)
-    channel_stats = json.loads(stats.text)['channel_stats']
-    dm_stats = json.loads(stats.text)['dm_stats']
-    messages = json.loads(stats.text)['message_stats']
-    rate = json.loads(stats.text)['utilization_rate']
+    workspace_stats = json.loads(stats.text)['workspace_stats']
+    channel_stats = workspace_stats['channel_stats']
+    dm_stats = workspace_stats['dm_stats']
+    messages = workspace_stats['message_stats']
+    rate = workspace_stats['utilization_rate']
 
     assert workspace_stats == {
                           'channel_stats': channel_stats,
@@ -171,11 +171,11 @@ def test_channel_and_dm(clear_data, create_users, create_channels, create_dms):
 
     assert stats.status_code == 200
 
-    workspace_stats = json.loads(stats.text)
-    channel_stats = json.loads(stats.text)['channel_stats']
-    dm_stats = json.loads(stats.text)['dm_stats']
-    messages = json.loads(stats.text)['message_stats']
-    rate = json.loads(stats.text)['utilization_rate']
+    workspace_stats = json.loads(stats.text)['workspace_stats']
+    channel_stats = workspace_stats['channel_stats']
+    dm_stats = workspace_stats['dm_stats']
+    messages = workspace_stats['message_stats']
+    rate = workspace_stats['utilization_rate']
 
     assert workspace_stats == {
                               'channel_stats': channel_stats,
@@ -223,11 +223,11 @@ def test_multiple_channels_and_dms(clear_data, create_users, create_channels, cr
 
     assert stats.status_code == 200
 
-    workspace_stats = json.loads(stats.text)
-    channel_stats = json.loads(stats.text)['channel_stats']
-    dm_stats = json.loads(stats.text)['dm_stats']
-    messages = json.loads(stats.text)['message_stats']
-    rate = json.loads(stats.text)['utilization_rate']
+    workspace_stats = json.loads(stats.text)['workspace_stats']
+    channel_stats = workspace_stats['channel_stats']
+    dm_stats = workspace_stats['dm_stats']
+    messages = workspace_stats['message_stats']
+    rate = workspace_stats['utilization_rate']
 
     assert workspace_stats == {
                               'channel_stats': channel_stats,
@@ -242,11 +242,11 @@ def test_multiple_channels_and_dms(clear_data, create_users, create_channels, cr
 
     assert stats.status_code == 200
 
-    workspace_stats = json.loads(stats.text)
-    channel_stats = json.loads(stats.text)['channel_stats']
-    dm_stats = json.loads(stats.text)['dm_stats']
-    messages = json.loads(stats.text)['message_stats']
-    rate = json.loads(stats.text)['utilization_rate']
+    workspace_stats = json.loads(stats.text)['workspace_stats']
+    channel_stats = workspace_stats['channel_stats']
+    dm_stats = workspace_stats['dm_stats']
+    messages = workspace_stats['message_stats']
+    rate = workspace_stats['utilization_rate']
 
     assert workspace_stats == {
                               'channel_stats': channel_stats,
@@ -259,11 +259,11 @@ def test_multiple_channels_and_dms(clear_data, create_users, create_channels, cr
                                                                   'token': token_3
                                                                 })
 
-    workspace_stats = json.loads(stats.text)
-    channel_stats = json.loads(stats.text)['channel_stats']
-    dm_stats = json.loads(stats.text)['dm_stats']
-    messages = json.loads(stats.text)['message_stats']
-    rate = json.loads(stats.text)['utilization_rate']
+    workspace_stats = json.loads(stats.text)['workspace_stats']
+    channel_stats = workspace_stats['channel_stats']
+    dm_stats = workspace_stats['dm_stats']
+    messages = workspace_stats['message_stats']
+    rate = workspace_stats['utilization_rate']
 
     assert workspace_stats == {
                               'channel_stats': channel_stats,

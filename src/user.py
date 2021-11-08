@@ -256,4 +256,6 @@ def user_stats_v1(token):
         'involvement_rate': rate
     }
 
-    return user_stats
+    return {
+        'user_stats': user_stats
+    }

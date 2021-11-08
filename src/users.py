@@ -112,4 +112,6 @@ def users_stats_v1(token):
         }],
         'utilization_rate': rate
     }
-    return workspace_stats
+    return {
+        'workspace_stats': workspace_stats
+    }

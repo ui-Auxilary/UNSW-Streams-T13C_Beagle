@@ -104,11 +104,11 @@ def test_no_channels_or_dms(clear_data, create_users):
 
     assert stats.status_code == 200
 
-    user_stats = json.loads(stats.text)
-    channels_joined = json.loads(stats.text)['channels_joined']
-    dms_joined = json.loads(stats.text)['dms_joined']
-    messages = json.loads(stats.text)['messages_sent']
-    rate = json.loads(stats.text)['involvement_rate']
+    user_stats = json.loads(stats.text)['user_stats']
+    channels_joined = user_stats['channels_joined']
+    dms_joined = user_stats['dms_joined']
+    messages = user_stats['messages_sent']
+    rate = user_stats['involvement_rate']
 
     assert user_stats == {
                           'channels_joined': channels_joined,
@@ -134,11 +134,11 @@ def test_join_single_channel(clear_data, create_users, create_channels):
 
     assert stats.status_code == 200
 
-    user_stats = json.loads(stats.text)
-    channels_joined = json.loads(stats.text)['channels_joined']
-    dms_joined = json.loads(stats.text)['dms_joined']
-    messages = json.loads(stats.text)['messages_sent']
-    rate = json.loads(stats.text)['involvement_rate']
+    user_stats = json.loads(stats.text)['user_stats']
+    channels_joined = user_stats['channels_joined']
+    dms_joined = user_stats['dms_joined']
+    messages = user_stats['messages_sent']
+    rate = user_stats['involvement_rate']
 
     assert user_stats == {
                           'channels_joined': channels_joined,
@@ -171,11 +171,11 @@ def test_channel_and_dm(clear_data, create_users, create_channels, create_dms):
 
     assert stats.status_code == 200
 
-    user_stats = json.loads(stats.text)
-    channels_joined = json.loads(stats.text)['channels_joined']
-    dms_joined = json.loads(stats.text)['dms_joined']
-    messages = json.loads(stats.text)['messages_sent']
-    rate = json.loads(stats.text)['involvement_rate']
+    user_stats = json.loads(stats.text)['user_stats']
+    channels_joined = user_stats['channels_joined']
+    dms_joined = user_stats['dms_joined']
+    messages = user_stats['messages_sent']
+    rate = user_stats['involvement_rate']
 
     assert user_stats == {
                               'channels_joined': channels_joined,
@@ -223,11 +223,11 @@ def test_multiple_channels_and_dms(clear_data, create_users, create_channels, cr
 
     assert stats.status_code == 200
 
-    user_stats = json.loads(stats.text)
-    channels_joined = json.loads(stats.text)['channels_joined']
-    dms_joined = json.loads(stats.text)['dms_joined']
-    messages = json.loads(stats.text)['messages_sent']
-    rate = json.loads(stats.text)['involvement_rate']
+    user_stats = json.loads(stats.text)['user_stats']
+    channels_joined = user_stats['channels_joined']
+    dms_joined = user_stats['dms_joined']
+    messages = user_stats['messages_sent']
+    rate = user_stats['involvement_rate']
 
     assert user_stats == {
                               'channels_joined': channels_joined,
@@ -242,11 +242,11 @@ def test_multiple_channels_and_dms(clear_data, create_users, create_channels, cr
 
     assert stats.status_code == 200
 
-    user_stats = json.loads(stats.text)
-    channels_joined = json.loads(stats.text)['channels_joined']
-    dms_joined = json.loads(stats.text)['dms_joined']
-    messages = json.loads(stats.text)['messages_sent']
-    rate = json.loads(stats.text)['involvement_rate']
+    user_stats = json.loads(stats.text)['user_stats']
+    channels_joined = user_stats['channels_joined']
+    dms_joined = user_stats['dms_joined']
+    messages = user_stats['messages_sent']
+    rate = user_stats['involvement_rate']
 
     assert user_stats == {
                               'channels_joined': channels_joined,
@@ -261,11 +261,11 @@ def test_multiple_channels_and_dms(clear_data, create_users, create_channels, cr
 
     assert stats.status_code == 200
 
-    user_stats = json.loads(stats.text)
-    channels_joined = json.loads(stats.text)['channels_joined']
-    dms_joined = json.loads(stats.text)['dms_joined']
-    messages = json.loads(stats.text)['messages_sent']
-    rate = json.loads(stats.text)['involvement_rate']
+    user_stats = json.loads(stats.text)['user_stats']
+    channels_joined = user_stats['channels_joined']
+    dms_joined = user_stats['dms_joined']
+    messages = user_stats['messages_sent']
+    rate = user_stats['involvement_rate']
 
     assert user_stats == {
                               'channels_joined': channels_joined,
