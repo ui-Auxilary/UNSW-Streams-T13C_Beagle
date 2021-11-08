@@ -363,9 +363,8 @@ def message_pin_v1(token, message_id):
 
     channel_ids = get_user_channels(auth_user_id)
     dm_ids = get_user_dms(auth_user_id)
-
     message_id_valid = False
-    is_channel = False
+
     if any(message_id in get_channel_messages(channel) for channel in channel_ids) == True:
         message_id_valid = True
         is_channel = True
@@ -378,24 +377,16 @@ def message_pin_v1(token, message_id):
 
     # check whether user has owner permissions in that channel
     channel_id = get_message_by_id(message_id)['channel_created']
-
+    is_channel = get_message_by_id(message_id)['is_channel']
+    
     if is_channel:
         if auth_user_id not in get_channel(channel_id)['owner'] and not get_user(auth_user_id)['global_owner']:
             raise AccessError(
                 description='Not sufficient permissions to pin message')
-
-        # check whether authorised user is a member of the channel
-        if auth_user_id not in get_channel(channel_id)['members']:
-            raise AccessError(
-                description='User does not have owner permissions in the channel')
     else:
-        if auth_user_id not in get_dm(channel_id)['owner'] and not get_user(auth_user_id)['global_owner']:
+        if auth_user_id not in get_dm(channel_id)['owner']:
             raise AccessError(
                 description='Not sufficient permissions to pin message')
-
-        if auth_user_id not in get_dm(channel_id)['members']:
-            raise AccessError(
-                description='User does not have owner permissions in the channel')
 
     # checks if message has been pinned
     if get_message_by_id(message_id)['is_pinned'] == True:
@@ -433,12 +424,12 @@ def message_unpin_v1(token, message_id):
 
     channel_ids = get_user_channels(auth_user_id)
     dm_ids = get_user_dms(auth_user_id)
-
     message_id_valid = False
-    is_channel = False
+    
+
     if any(message_id in get_channel_messages(channel) for channel in channel_ids) == True:
         message_id_valid = True
-        is_channel = True
+
     if any(message_id in get_dm_messages(dm) for dm in dm_ids) == True:
         message_id_valid = True
 
@@ -448,24 +439,16 @@ def message_unpin_v1(token, message_id):
 
     # check whether user has owner permissions in that channel
     channel_id = get_message_by_id(message_id)['channel_created']
+    is_channel = get_message_by_id(message_id)['is_channel']
 
     if is_channel:
         if auth_user_id not in get_channel(channel_id)['owner'] and not get_user(auth_user_id)['global_owner']:
             raise AccessError(
                 description='Not sufficient permissions to pin message')
-
-        # check whether authorised user is a member of the channel
-        if auth_user_id not in get_channel(channel_id)['members']:
-            raise AccessError(
-                description='User does not have owner permissions in the channel')
     else:
-        if auth_user_id not in get_dm(channel_id)['owner'] and not get_user(auth_user_id)['global_owner']:
+        if auth_user_id not in get_dm(channel_id)['owner']:
             raise AccessError(
-                description='Not sufficient permissions to pin message')
-
-        if auth_user_id not in get_dm(channel_id)['members']:
-            raise AccessError(
-                description='User does not have owner permissions in the channel')
+                description='Not sufficient permissions to unpin message')
 
     # checks if message has been pinned
     if get_message_by_id(message_id)['is_pinned'] == False:

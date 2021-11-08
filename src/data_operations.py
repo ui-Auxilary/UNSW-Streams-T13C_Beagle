@@ -1034,7 +1034,7 @@ def add_react(user_id, message_id, react_id):
         None
     '''
     data_source = data_store.get()
-    react_data = {'react_id': react_id, 'u_ids':[user_id]}
+    react_data = {'react_id': react_id, 'u_ids':[user_id], 'is_this_user_reacted': True} 
     data_source['message_data'][message_id]['reacts'].append(react_data)
 
 def react_message(user_id, message_id, react_id):
@@ -1058,6 +1058,7 @@ def react_message(user_id, message_id, react_id):
     if user_id not in in_user_id:
         in_user_id.append(user_id)
     else:
+        data_source['message_data'][message_id]['reacts'][index]['is_this_user_reacted'] = False
         in_user_id.remove(user_id)
 
 def calculate_utilization_rate(users_in_channels_or_dms, total_users):
@@ -1184,7 +1185,7 @@ def pin_message(message_id):
     pinned = data_source['message_data'][message_id]['is_pinned']
     if pinned == False:
         data_source['message_data'][message_id]['is_pinned'] = True
-    elif pinned == True:
+    else:
         data_source['message_data'][message_id]['is_pinned'] = False
 
 def data_dump():

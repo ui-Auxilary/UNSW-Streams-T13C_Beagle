@@ -143,11 +143,11 @@ def test_simple_case_channel(clear_data, create_data):
 
     length = len(channel_messages) - 1
     channel_react = json.loads(channel_message_data.text)['messages'][length - 1]['reacts']
-    assert channel_react == [{'react_id': 1, 'u_ids': [1]}]
+    assert channel_react == [{'react_id': 1, 'u_ids': [1], 'is_this_user_reacted': True}]
     channel_react = json.loads(channel_message_data.text)['messages'][length - 2]['reacts']
-    assert channel_react == [{'react_id': 1, 'u_ids': [1]}]
+    assert channel_react == [{'react_id': 1, 'u_ids': [1], 'is_this_user_reacted': True}]
     channel_react = json.loads(channel_message_data.text)['messages'][length - 5]['reacts']
-    assert channel_react == [{'react_id': 1, 'u_ids': [1]}]
+    assert channel_react == [{'react_id': 1, 'u_ids': [1], 'is_this_user_reacted': True}]
 
 def test_simple_case_dm(clear_data, create_data):
     token, _, _, dm_messages, _, dm_id = create_data
@@ -179,11 +179,11 @@ def test_simple_case_dm(clear_data, create_data):
     length = len(dm_messages) - 1
     print(json.loads(dm_message_data.text)['messages'])
     dm_react = json.loads(dm_message_data.text)['messages'][length - 1]['reacts']
-    assert dm_react == [{'react_id': 1, 'u_ids': [1]}]
+    assert dm_react == [{'react_id': 1, 'u_ids': [1], 'is_this_user_reacted': True}]
     dm_react = json.loads(dm_message_data.text)['messages'][length - 2]['reacts']
-    assert dm_react == [{'react_id': 1, 'u_ids': [1]}]
+    assert dm_react == [{'react_id': 1, 'u_ids': [1], 'is_this_user_reacted': True}]
     dm_react = json.loads(dm_message_data.text)['messages'][length - 4]['reacts']
-    assert dm_react == [{'react_id': 1, 'u_ids': [1]}]
+    assert dm_react == [{'react_id': 1, 'u_ids': [1], 'is_this_user_reacted': True}]
 
 # ___COMPLEX TEST CASES - DEPENDANT FUNCTIONS___ #
 
@@ -228,11 +228,11 @@ def test_muliple_reacts_channel(clear_data, create_data):
 
     length = len(channel_messages) - 1
     channel_react = json.loads(channel_message_data.text)['messages'][length - 1]['reacts']
-    assert channel_react == [{'react_id': 1, 'u_ids': [1]}]
+    assert channel_react == [{'react_id': 1, 'u_ids': [1], 'is_this_user_reacted': True}]
     channel_react = json.loads(channel_message_data.text)['messages'][length - 2]['reacts']
-    assert channel_react == [{'react_id': 1, 'u_ids': [1,2]}]
+    assert channel_react == [{'react_id': 1, 'u_ids': [1,2], 'is_this_user_reacted': True}]
     channel_react = json.loads(channel_message_data.text)['messages'][length - 5]['reacts']
-    assert channel_react == [{'react_id': 1, 'u_ids': [1,2]}]
+    assert channel_react == [{'react_id': 1, 'u_ids': [1,2], 'is_this_user_reacted': True}]
 
 def test_multiple_case_dm(clear_data, create_data):
     token, token2, _, dm_messages, _, dm_id = create_data
@@ -276,11 +276,11 @@ def test_multiple_case_dm(clear_data, create_data):
     length = len(dm_messages) - 1
     print(json.loads(dm_message_data.text)['messages'])
     dm_react = json.loads(dm_message_data.text)['messages'][length - 1]['reacts']
-    assert dm_react == [{'react_id': 1, 'u_ids': [1]}]
+    assert dm_react == [{'react_id': 1, 'u_ids': [1], 'is_this_user_reacted': True}]
     dm_react = json.loads(dm_message_data.text)['messages'][length - 2]['reacts']
-    assert dm_react == [{'react_id': 1, 'u_ids': [1,2]}]
+    assert dm_react == [{'react_id': 1, 'u_ids': [1,2], 'is_this_user_reacted': True}]
     dm_react = json.loads(dm_message_data.text)['messages'][length - 4]['reacts']
-    assert dm_react == [{'react_id': 1, 'u_ids': [1,2]}]
+    assert dm_react == [{'react_id': 1, 'u_ids': [1,2], 'is_this_user_reacted': True}]
 
 # ___TEST VALID INPUT___ #
 
