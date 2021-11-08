@@ -1188,6 +1188,126 @@ def pin_message(message_id):
     else:
         data_source['message_data'][message_id]['is_pinned'] = False
 
+
+def calculate_utilization_rate(users_in_channels_or_dms, total_users):
+    '''
+    calculates utilization rate
+
+    Arguments:
+        users_in_channels_or_dms    (int): number of users who are in atleast one channel or dm
+        total_users                 (int): total number of users in the database
+    '''
+
+    data_source = data_store.get()
+    if users_in_channels_or_dms == 0 or total_users == 0:
+        rate = 0
+    else:
+        rate = float(users_in_channels_or_dms / total_users)
+    data_source['workspace_stats']['utilization_rate'] = rate
+    return rate
+
+def initialise_workspace_stats():
+    '''
+    adds workspace stats
+
+    Arguments:
+        None
+
+    Return Value:
+        workspace_stats (dict): contains how many channels, dms and messages exist
+    '''
+    data_source = data_store.get()
+    data_source['workspace_stats']['channel_stats'] = {}
+    data_source['workspace_stats']['channel_stats']['time_stamp'] = 0
+    data_source['workspace_stats']['dm_stats'] = {}
+    data_source['workspace_stats']['dm_stats']['time_stamp'] = 0
+    data_source['workspace_stats']['message_stats'] = {}
+    data_source['workspace_stats']['message_stats']['time_stamp'] = 0
+    data_source['workspace_stats']['utilization_rate'] = 0
+    
+
+def get_workspace_timestamp(stat_type):
+    '''
+    gets workspace timestamp based on stats type
+
+    Arguments:
+        None
+
+    Return Value:
+        time_stamp  (int): unix time_stamp of stats
+    '''
+    data_source = data_store.get()
+    if stat_type == 1:
+        time_stamp = data_source['workspace_stats']['channel_stats']['time_stamp']
+    elif stat_type == 2:
+        time_stamp = data_source['workspace_stats']['dm_stats']['time_stamp']
+    else:
+        time_stamp = data_source['workspace_stats']['message_stats']['time_stamp']
+    return time_stamp
+
+def initialise_user_stats():
+    '''
+    initialises a user's stats
+
+    Arguments:
+        None
+
+    Return Value:
+        user_stats (dict): contains how many channels, dms and messages exist
+    '''
+    data_source = data_store.get()
+    data_source['user_stats']['channels_joined'] = {}
+    data_source['user_stats']['channels_joined']['time_stamp'] = 0
+    data_source['user_stats']['dms_joined'] = {}
+    data_source['user_stats']['dms_joined']['time_stamp'] = 0
+    data_source['user_stats']['messages_sent'] = {}
+    data_source['user_stats']['messages_sent']['time_stamp'] = 0
+    data_source['user_stats']['involvement_rate'] = 0
+    
+
+def get_userstats_timestamp(stat_type):
+    '''
+    gets user_stats timestamp based on stats type
+
+    Arguments:
+        None
+
+    Return Value:
+        time_stamp  (int): unix time_stamp of stats
+    '''
+    data_source = data_store.get()
+    if stat_type == 1:
+        time_stamp = data_source['user_stats']['channels_joined']['time_stamp']
+    elif stat_type == 2:
+        time_stamp = data_source['user_stats']['dms_joined']['time_stamp']
+    else:
+        time_stamp = data_source['user_stats']['messages_sent']['time_stamp']
+    return time_stamp
+
+
+def calculate_involvement_rate(numerator, denominator):
+    '''
+    calculates involvement rate
+
+    Arguments:
+        numerator       (int): sum(num_channels_joined, num_dms_joined, num_msgs_sent)
+        denominator     (int): sum(num_channels, num_dms, num_msgs)
+
+    Return Value:
+        None
+    '''
+
+    data_source = data_store.get()
+    if numerator == 0 or denominator == 0:
+        rate = 0
+    else:
+        rate = float(numerator / denominator)
+    if rate > 1:
+        rate = 1
+    data_source['user_stats']['involvement_rate'] = rate
+    return rate
+
+
 def data_dump():
     while True:
         data_source = data_store.get()
