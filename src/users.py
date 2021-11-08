@@ -75,7 +75,7 @@ def users_stats_v1(token):
     rate = calculate_utilization_rate(len(users_in_channel_or_dm), len(get_user_ids()))
 
     update_workspace_stats(False, False, False, rate)
-    workspace_stats = get_workspace_stats(user_id)
+    workspace_stats = get_workspace_stats()
   
     return {
         'workspace_stats': workspace_stats
