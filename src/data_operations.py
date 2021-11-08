@@ -77,28 +77,8 @@ def reset_data_store_to_default():
         'message_ids': [],
         'token': {},
         'password_reset_key': {},
-        'workspace_stats': {
-            'channel_stats': {
-                'time_stamp': 0
-            },
-            'dm_stats': {
-                'time_stamp': 0
-            },
-            'message_stats': {
-                'time_stamp': 0
-            }
-        },
-        'user_stats': {
-            'channels_joined': {
-                'time_stamp': 0
-            },
-            'dms_joined': {
-                'time_stamp': 0
-            },
-            'messages_sent': {
-                'time_stamp': 0
-            }
-        }
+        'workspace_stats': {},
+        'user_stats': {}
     }
 
     # update data_store
@@ -1108,6 +1088,7 @@ def initialise_workspace_stats():
         workspace_stats (dict): contains how many channels, dms and messages exist
     '''
     data_source = data_store.get()
+    print('initializing')
     data_source['workspace_stats']['channel_stats'] = {}
     data_source['workspace_stats']['channel_stats']['time_stamp'] = 0
     data_source['workspace_stats']['dm_stats'] = {}

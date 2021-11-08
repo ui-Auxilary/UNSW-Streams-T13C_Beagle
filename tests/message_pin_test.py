@@ -186,7 +186,7 @@ def test_simple_case_dm(clear_data, create_data):
     assert dm_pin == True
 
 def test_pin_no_messages_channel(clear_data, create_data):
-    token, channel_messages, _, channel_id, _, _ , _ = create_data
+    token, _, _, channel_id, _, _ , _ = create_data
     # get the messages in the channel
     channel_message_data = requests.get(config.url + 'channel/messages/v2', params={
         'token': token,
@@ -208,7 +208,7 @@ def test_pin_no_messages_channel(clear_data, create_data):
     assert channel_pin == False
 
 def test_pin_no_messages_dm(clear_data, create_data):
-    token, _, dm_messages, _, dm_id, _ , _ = create_data
+    token, _, _, _, dm_id, _ , _ = create_data
 
     # get the messages in the dm
     dm_message_data = requests.get(config.url + 'dm/messages/v1', params={
@@ -278,7 +278,7 @@ def test_double_pin_dm(clear_data, create_data):
     assert pin_data.status_code == 400
 
 def test_user_is_not_owner_channel(clear_data, create_data):
-    token, channel_messages, _, _, _, _, token_2 = create_data
+    _, channel_messages, _, _, _, _, token_2 = create_data
     pin_data = requests.post(config.url + 'message/pin/v1', json={
         'token': token_2,
         'message_id': channel_messages[0]
