@@ -63,15 +63,17 @@ def dm_create_v1(token, u_ids):
     # get a new id for the dm and add DM to system
     new_dm_id = len(get_dm_ids()) + 1
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_created = int(dt.timestamp())
     add_dm(new_dm_id, dm_name, auth_user_id, time_created)
 
     auth_user_handle = get_user(auth_user_id)['user_handle']
 
     # add each user to the DM
     for u_id in user_list:
-        add_user_to_dm(new_dm_id, u_id, time_created)
-        add_notification(False, new_dm_id, u_id, f"{auth_user_handle} added you to {dm_name}")
+        if u_id != auth_user_id:
+            add_user_to_dm(new_dm_id, u_id, time_created)
+            add_notification(False, new_dm_id, u_id,
+                             f"{auth_user_handle} added you to {dm_name}")
 
     return {
         'dm_id': new_dm_id
@@ -142,8 +144,7 @@ def dm_remove_v1(token, dm_id):
         raise AccessError(description="User is not the owner of the DM")
 
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
-
+    time_created = int(dt.timestamp())
 
     # remove users from members in the DM
     for member in reversed(dm_members):
@@ -252,11 +253,11 @@ def dm_leave_v1(token, dm_id):
     # check if user is the owner of the DM
     if auth_user_id in dm_owner:
         dm_owner.remove(auth_user_id)
-        
+
     # find time updated
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
-    
+    time_created = int(dt.timestamp())
+
     # remove user from members in the DM
     remove_member_from_dm(dm_id, auth_user_id, time_created)
 
@@ -375,15 +376,16 @@ def message_senddm_v1(token, dm_id, message):
 
     # time created
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_created = int(dt.timestamp())
 
     if "@" in message:
         tagged_user = check_valid_tag(message)
         if tagged_user:
             auth_user_handle = get_user(auth_user_id)['user_handle']
             dm_name = get_dm(dm_id)['name']
-            add_notification(False, dm_id, tagged_user, f"{auth_user_handle} tagged you in {dm_name}: {message[:20]}")
-            
+            add_notification(False, dm_id, tagged_user,
+                             f"{auth_user_handle} tagged you in {dm_name}: {message[:20]}")
+
     # add message to datastore
     add_message(is_channel, auth_user_id, dm_id,
                 new_message_id, message, time_created)

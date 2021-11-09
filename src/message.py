@@ -64,7 +64,7 @@ def message_send_v1(token, channel_id, message):
 
     # time created
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_created = int(dt.timestamp())
 
     if "@" in message:
         tagged_user = check_valid_tag(message)
@@ -200,7 +200,7 @@ def message_remove_v1(token, message_id):
                 description="User does not have permissions to remove message")
 
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_created = int(dt.timestamp())
 
     remove_message(is_channel, channel_id, message_id, time_created)
 

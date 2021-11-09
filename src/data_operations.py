@@ -50,7 +50,8 @@ import os
 import json
 import time
 import threading
-from datetime import timezone, datetime 
+from datetime import timezone, datetime
+
 
 def reset_data_store_to_default():
     '''
@@ -338,7 +339,8 @@ def add_member_to_channel(channel_id, user_id, time_updated):
         'time_stamp': time_updated
     }
 
-    update_user_stats(user_id, channel_data, False, False, False)
+    update_user_stats(user_id, channel_data, False, False)
+
 
 def remove_member_from_channel(channel_id, user_id, time_updated):
     '''
@@ -364,7 +366,8 @@ def remove_member_from_channel(channel_id, user_id, time_updated):
         'time_stamp': time_updated
     }
 
-    update_user_stats(user_id, channel_data, False, False, False)
+    update_user_stats(user_id, channel_data, False, False)
+
 
 def add_channel(channel_id, channel_name, user_id, is_public, time_created):
     '''
@@ -407,15 +410,16 @@ def add_channel(channel_id, channel_name, user_id, is_public, time_created):
         'time_stamp': time_created
     }
 
-    update_user_stats(user_id, channel_data, False, False, False)
+    update_user_stats(user_id, channel_data, False, False)
 
     num_of_channels = len(data_source['channel_ids'])
     channel_data_2 = {
         'num_channels_exist': num_of_channels,
         'time_stamp': time_created
     }
-    
-    update_workspace_stats(channel_data_2, False, False, False)
+
+    update_workspace_stats(channel_data_2, False, False)
+
 
 def get_channel(channel_id):
     '''
@@ -449,6 +453,7 @@ def get_channel_messages(channel_id):
 
     data_source = data_store.get()
     return data_source['channel_data'][channel_id]['message_ids']
+
 
 def get_dm_messages(dm_id):
     '''
@@ -504,7 +509,8 @@ def remove_member_from_dm(dm_id, user_id, time_updated):
         'time_stamp': time_updated
     }
 
-    update_user_stats(user_id, False, dm_data, False, False)
+    update_user_stats(user_id, False, dm_data, False)
+
 
 def add_user_to_dm(dm_id, user_id, time_updated):
     '''
@@ -525,11 +531,11 @@ def add_user_to_dm(dm_id, user_id, time_updated):
     num_of_dms = len(data_source['user_data'][user_id]['in_dms'])
 
     dm_data = {
-        'num_channels_joined': num_of_dms,
+        'num_dms_joined': num_of_dms,
         'time_stamp': time_updated
     }
 
-    update_user_stats(user_id, False, dm_data, False, False)
+    update_user_stats(user_id, False, dm_data, False)
 
 
 def add_dm(dm_id, dm_name, auth_user_id, time_created):
@@ -551,7 +557,7 @@ def add_dm(dm_id, dm_name, auth_user_id, time_created):
     data_source['dm_data'][dm_id] = {
         'name': dm_name,
         'owner': [auth_user_id],
-        'members': [],
+        'members': [auth_user_id],
         'message_ids': [],
         'time_created': time_created
     }
@@ -567,17 +573,17 @@ def add_dm(dm_id, dm_name, auth_user_id, time_created):
         'num_dms_exist': num_of_dms,
         'time_stamp': time_created
     }
-    
-    update_workspace_stats(False, dm_data, False, False)
+
+    update_workspace_stats(False, dm_data, False)
 
     num_of_dms = len(data_source['user_data'][auth_user_id]['in_dms'])
 
     dm_data = {
-        'num_channels_joined': num_of_dms,
+        'num_dms_joined': num_of_dms,
         'time_stamp': time_created
     }
 
-    update_user_stats(auth_user_id, False, dm_data, False, False)
+    update_user_stats(auth_user_id, False, dm_data, False)
 
 
 def get_dm(dm_id):
@@ -631,8 +637,9 @@ def remove_dm(dm_id, time_updated):
         'num_dms_exist': num_of_dms,
         'time_stamp': time_updated
     }
-    
-    update_workspace_stats(False, dm_data, False, False)
+
+    update_workspace_stats(False, dm_data, False)
+
 
 def get_global_owners():
     '''
@@ -680,7 +687,7 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
         'reacts': [],
         'is_pinned': False
     }
-    
+
     # add message to the channel's message list
     if is_channel:
         data_source['channel_data'][channel_id]['message_ids'].append(
@@ -698,8 +705,8 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
         'num_messages_exist': num_of_messages,
         'time_stamp': time_created
     }
-    
-    update_workspace_stats(False, False, message_data, False)
+
+    update_workspace_stats(False, False, message_data)
 
     num_user_messages = data_source['user_data'][user_id]['messages_sent']
     message_data = {
@@ -707,7 +714,8 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
         'time_stamp': time_created
     }
 
-    update_user_stats(user_id, False, False, message_data, False)
+    update_user_stats(user_id, False, False, message_data)
+
 
 def add_standup_message(channel_id, content):
     '''
@@ -767,7 +775,7 @@ def edit_message(is_channel, channel_id, message_id, message):
     # check if message is empty and edit the message
     if not message:
         dt = datetime.now()
-        time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+        time_created = int(dt.timestamp())
 
         remove_message(is_channel, channel_id, message_id, time_created)
     elif message == 'Removed user':
@@ -790,8 +798,6 @@ def remove_message(is_channel, channel_id, message_id, time_updated):
 
     data_source = data_store.get()
 
-    message_author = get_message_by_id(message_id)['author']
-
     if is_channel:
         data_source['channel_data'][channel_id]['message_ids'].remove(
             message_id)
@@ -800,24 +806,21 @@ def remove_message(is_channel, channel_id, message_id, time_updated):
 
     data_source['message_ids'].remove(message_id)
     del data_source['message_data'][message_id]
-    
+
     num_of_messages = len(data_source['message_ids'])
 
     message_data = {
         'num_messages_exist': num_of_messages,
         'time_stamp': time_updated
     }
-    
-    update_workspace_stats(False, False, message_data, False)
 
-    data_source['user_data'][message_author]['messages_sent'] -= 1
-    num_user_messages = data_source['user_data'][message_author]['messages_sent']
+    update_workspace_stats(False, False, message_data)
+
     message_data = {
-        'num_messages_sent': num_user_messages,
+        'num_messages_exist': num_of_messages,
         'time_stamp': time_updated
     }
 
-    update_user_stats(message_author, False, False, message_data, False)
 
 def get_message_ids():
     '''
@@ -880,6 +883,7 @@ def get_messages_by_dm(dm_id):
     data_source = data_store.get()
     return data_source['dm_data'][dm_id]['message_ids']
 
+
 def add_notification(is_channel, channel_id, user_id, content):
     '''
     adds a notifcation to the database
@@ -909,6 +913,7 @@ def add_notification(is_channel, channel_id, user_id, content):
             'content': content,
         })
 
+
 def get_user_notifications(user_id):
     '''
     Gets a list of a user's notifications
@@ -923,6 +928,7 @@ def get_user_notifications(user_id):
     data_source = data_store.get()
 
     return data_source['user_data'][user_id]['notifications']
+
 
 def set_active_standup(set_active, channel_id, time_finished):
     '''
@@ -1013,6 +1019,7 @@ def get_all_valid_tokens():
     data_source = data_store.get()
     return set(data_source['token'].keys())
 
+
 def add_passwordreset_key(user_id, reset_key):
     '''
     adds a unique password reset request key to
@@ -1028,6 +1035,7 @@ def add_passwordreset_key(user_id, reset_key):
 
     data_source = data_store.get()
     data_source['password_reset_key'][reset_key] = user_id
+
 
 def get_passwordreset_key(reset_key):
     '''
@@ -1047,6 +1055,7 @@ def get_passwordreset_key(reset_key):
         return (True, data_source['password_reset_key'][reset_key])
     else:
         return (False, 0)
+
 
 def add_owner_to_channel(user_id, channel_id):
     '''
@@ -1081,6 +1090,7 @@ def remove_owner_from_channel(user_id, channel_id):
     # removes a user from the owner list of the channel
     data_source['channel_data'][channel_id]['owner'].remove(user_id)
 
+
 def add_react(user_id, message_id, react_id):
     '''
     adds new react to the reacts list
@@ -1094,8 +1104,10 @@ def add_react(user_id, message_id, react_id):
         None
     '''
     data_source = data_store.get()
-    react_data = {'react_id': react_id, 'u_ids':[user_id], 'is_this_user_reacted': True} 
+    react_data = {'react_id': react_id, 'u_ids': [
+        user_id], 'is_this_user_reacted': True}
     data_source['message_data'][message_id]['reacts'].append(react_data)
+
 
 def react_message(user_id, message_id, react_id):
     '''
@@ -1121,6 +1133,7 @@ def react_message(user_id, message_id, react_id):
         data_source['message_data'][message_id]['reacts'][index]['is_this_user_reacted'] = False
         in_user_id.remove(user_id)
 
+
 def calculate_utilization_rate(users_in_channels_or_dms, total_users):
     '''
     calculates utilization rate
@@ -1136,6 +1149,7 @@ def calculate_utilization_rate(users_in_channels_or_dms, total_users):
 
     return rate
 
+
 def initialise_workspace_stats():
     '''
     adds workspace stats
@@ -1146,20 +1160,24 @@ def initialise_workspace_stats():
     Return Value:
         workspace_stats (dict): contains how many channels, dms and messages exist
     '''
+    dt = datetime.now()
+    time_intialised = int(dt.timestamp())
+
     data_source = data_store.get()
     data_source['workspace_stats']['channels_exist'] = [{
         'num_channels_exist': 0,
-        'time_stamp': 0
+        'time_stamp': time_intialised
     }]
     data_source['workspace_stats']['dms_exist'] = [{
         'num_dms_exist': 0,
-        'time_stamp': 0
+        'time_stamp': time_intialised
     }]
     data_source['workspace_stats']['messages_exist'] = [{
         'num_messages_exist': 0,
-        'time_stamp': 0
+        'time_stamp': time_intialised
     }]
     data_source['workspace_stats']['utilization_rate'] = 0.0
+
 
 def initialise_user_stats(user_id):
     '''
@@ -1172,21 +1190,24 @@ def initialise_user_stats(user_id):
         user_stats (dict): contains how many channels, dms and messages exist
     '''
     data_source = data_store.get()
+
+    dt = datetime.now()
+    time_intialised = int(dt.timestamp())
     data_source['user_stats'][user_id] = {}
     data_source['user_stats'][user_id]['channels_joined'] = [{
         'num_channels_joined': 0,
-        'time_stamp': 0
+        'time_stamp': time_intialised
     }]
     data_source['user_stats'][user_id]['dms_joined'] = [{
         'num_dms_joined': 0,
-        'time_stamp': 0
+        'time_stamp': time_intialised
     }]
     data_source['user_stats'][user_id]['messages_sent'] = [{
-        'num_dms_joined': 0,
-        'time_stamp': 0
+        'num_messages_sent': 0,
+        'time_stamp': time_intialised
     }]
     data_source['user_stats'][user_id]['involvement_rate'] = 0.0
-    
+
 
 def calculate_involvement_rate(numerator, denominator):
     '''
@@ -1200,27 +1221,46 @@ def calculate_involvement_rate(numerator, denominator):
         None
     '''
 
+    print(numerator, denominator)
     if numerator == 0 or denominator == 0:
         rate = 0.0
     else:
         rate = float(numerator / denominator)
-    if rate > 1:
+        print(rate)
+    if rate > 1.0:
         rate = 1.0
     return rate
 
-def update_user_stats(user_id, channel_data, dm_data, message_data, rate):
+
+def update_user_stats(user_id, channel_data, dm_data, message_data):
     data_source = data_store.get()
 
     if channel_data:
-        data_source['user_stats'][user_id]['channels_joined'].append(channel_data)
+        data_source['user_stats'][user_id]['channels_joined'].append(
+            channel_data)
     if dm_data:
         data_source['user_stats'][user_id]['dms_joined'].append(dm_data)
     if message_data:
-        data_source['user_stats'][user_id]['messages_sent'].append(message_data)
-    if rate:
-        data_source['user_stats'][user_id]['involvement_rate'] = rate
+        data_source['user_stats'][user_id]['messages_sent'].append(
+            message_data)
 
-def update_workspace_stats(channel_data, dm_data, message_data, rate):
+    num_channels_joined = len(get_user_channels(user_id))
+    num_dms_joined = len(get_user_dms(user_id))
+    users_messages = []
+    for message_ids in get_message_ids():
+        if get_message_by_id(message_ids)['author'] == user_id:
+            users_messages.append(message_ids)
+
+    num_messages_sent = len(users_messages)
+
+    involvement = num_channels_joined + num_dms_joined + num_messages_sent
+    denom = len(get_channel_ids()) + len(get_dm_ids()) + len(get_message_ids())
+    rate = calculate_involvement_rate(involvement, denom)
+
+    data_source['user_stats'][user_id]['involvement_rate'] = rate
+
+
+def update_workspace_stats(channel_data, dm_data, message_data):
     data_source = data_store.get()
 
     if channel_data:
@@ -1229,18 +1269,30 @@ def update_workspace_stats(channel_data, dm_data, message_data, rate):
         data_source['workspace_stats']['dms_exist'].append(dm_data)
     if message_data:
         data_source['workspace_stats']['messages_exist'].append(message_data)
-    if rate:
-        data_source['workspace_stats']['utilization_rate'] = rate
+
+    users_in_channel_or_dm = []
+
+    for user in get_user_ids():
+        if get_user(user)['in_channels'] or get_user(user)['in_dms']:
+            users_in_channel_or_dm.append(user)
+
+    rate = calculate_utilization_rate(
+        len(users_in_channel_or_dm), len(get_user_ids()))
+
+    data_source['workspace_stats']['utilization_rate'] = rate
+
 
 def get_user_stats(user_id):
     data_source = data_store.get()
 
     return data_source['user_stats'][user_id]
 
+
 def get_workspace_stats():
     data_source = data_store.get()
 
     return data_source['workspace_stats']
+
 
 def pin_message(message_id):
     data_source = data_store.get()
@@ -1249,6 +1301,7 @@ def pin_message(message_id):
         data_source['message_data'][message_id]['is_pinned'] = True
     else:
         data_source['message_data'][message_id]['is_pinned'] = False
+
 
 def data_dump():
     while True:

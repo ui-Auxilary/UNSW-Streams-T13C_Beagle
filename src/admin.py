@@ -22,6 +22,7 @@ from src.data_operations import (
 from src.other import decode_token
 from datetime import timezone, datetime
 
+
 def admin_user_remove_v1(token, u_id):
     '''
     Removes a user from Streams, including all channels and dms. Their messages
@@ -78,7 +79,7 @@ def admin_user_remove_v1(token, u_id):
 
     # time created
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_created = int(dt.timestamp())
 
     # remove user from every channel and dm
     for channel_id in reversed(channels_list):

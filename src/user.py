@@ -175,7 +175,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     try:
         img = Image.open(image_data.raw)
-    except Exception as err: 
+    except Exception as err:
         raise InputError(description='Link provided is not an image') from err
 
     if img.format != 'JPEG':
@@ -198,6 +198,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     add_user_profileimage(user_id, cropped_image)
 
     return {}
+
 
 def notifications_get_v1(token):
     auth_user_id = decode_token(token)
@@ -225,23 +226,11 @@ def notifications_get_v1(token):
         'notifications': notifications_arr
     }
 
+
 def user_stats_v1(token):
     user_id = decode_token(token)
 
-    num_channels_joined = len(get_user_channels(user_id))
-    num_dms_joined = len(get_user_dms(user_id))
-    users_messages = []
-    for message_ids in get_message_ids():
-        if get_message_by_id(message_ids)['author'] == user_id:
-            users_messages.append(message_ids)
-
-    num_messages_sent = len(users_messages)
-
-    involvement = num_channels_joined + num_dms_joined + num_messages_sent
-    denom = len(get_channel_ids()) + len(get_dm_ids()) + len(get_message_ids())
-    rate = calculate_involvement_rate(involvement, denom)
-    
-    update_user_stats(user_id, False, False, False, rate)
+    update_user_stats(user_id, False, False, False)
     user_stats = get_user_stats(user_id)
 
     return {

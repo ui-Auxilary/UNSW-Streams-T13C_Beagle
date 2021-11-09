@@ -64,19 +64,13 @@ def users_all(token):
 
     return users
 
+
 def users_stats_v1(token):
     decode_token(token)
-    users_in_channel_or_dm = []
 
-    for user in get_user_ids():
-        if get_user(user)['in_channels'] or get_user(user)['in_dms']:
-            users_in_channel_or_dm.append(user)
-
-    rate = calculate_utilization_rate(len(users_in_channel_or_dm), len(get_user_ids()))
-
-    update_workspace_stats(False, False, False, rate)
+    update_workspace_stats(False, False, False)
     workspace_stats = get_workspace_stats()
-  
+
     return {
         'workspace_stats': workspace_stats
     }
