@@ -63,7 +63,7 @@ def dm_create_v1(token, u_ids):
     # get a new id for the dm and add DM to system
     new_dm_id = len(get_dm_ids()) + 1
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_created = int(dt.timestamp())
     add_dm(new_dm_id, dm_name, auth_user_id, time_created)
 
     auth_user_handle = get_user(auth_user_id)['user_handle']
@@ -144,7 +144,7 @@ def dm_remove_v1(token, dm_id):
         raise AccessError(description="User is not the owner of the DM")
 
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_created = int(dt.timestamp())
 
     # remove users from members in the DM
     for member in reversed(dm_members):
@@ -256,7 +256,7 @@ def dm_leave_v1(token, dm_id):
 
     # find time updated
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_created = int(dt.timestamp())
 
     # remove user from members in the DM
     remove_member_from_dm(dm_id, auth_user_id, time_created)
@@ -376,7 +376,7 @@ def message_senddm_v1(token, dm_id, message):
 
     # time created
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_created = int(dt.timestamp())
 
     if "@" in message:
         tagged_user = check_valid_tag(message)

@@ -12,6 +12,7 @@ from src.other import decode_token
 from src.error import InputError
 from datetime import timezone, datetime
 
+
 def channels_list_v1(token):
     '''
     Returns a list of all the channels with their channel id's and channel name that the user
@@ -31,17 +32,18 @@ def channels_list_v1(token):
     auth_user_id = decode_token(token)
 
     channel_list = []
-    ## get channel id
+    # get channel id
     for channel in get_channel_ids():
         if auth_user_id in get_channel(channel)['members']:
             channel_list.append({
                 'channel_id': channel,
-                'name'      : get_channel(channel)['name']
+                'name': get_channel(channel)['name']
             })
 
     return {
         'channels': channel_list,
     }
+
 
 def channels_listall_v1(token):
     '''
@@ -61,16 +63,17 @@ def channels_listall_v1(token):
     decode_token(token)
 
     all_channels = []
-    ## get all channel ids
+    # get all channel ids
     for channel in get_channel_ids():
         all_channels.append({
             'channel_id': channel,
-            'name'      : get_channel(channel)['name']
+            'name': get_channel(channel)['name']
         })
 
     return {
         'channels': all_channels,
     }
+
 
 def channels_create_v1(token, name, is_public):
     '''
@@ -94,14 +97,14 @@ def channels_create_v1(token, name, is_public):
 
     auth_user_id = decode_token(token)
 
-    ## check channel name between 1 and 20 characters
+    # check channel name between 1 and 20 characters
     if not 1 <= len(name) <= 20:
         raise InputError(description='Invalid channel name size')
 
-    ## get a new id for the channel and add channel to system
+    # get a new id for the channel and add channel to system
     new_channel_id = len(get_channel_ids()) + 1
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_created = int(dt.timestamp())
     add_channel(new_channel_id, name, auth_user_id, is_public, time_created)
 
     return {

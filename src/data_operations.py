@@ -775,7 +775,7 @@ def edit_message(is_channel, channel_id, message_id, message):
     # check if message is empty and edit the message
     if not message:
         dt = datetime.now()
-        time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+        time_created = int(dt.timestamp())
 
         remove_message(is_channel, channel_id, message_id, time_created)
     elif message == 'Removed user':
@@ -1161,7 +1161,7 @@ def initialise_workspace_stats():
         workspace_stats (dict): contains how many channels, dms and messages exist
     '''
     dt = datetime.now()
-    time_intialised = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_intialised = int(dt.timestamp())
 
     data_source = data_store.get()
     data_source['workspace_stats']['channels_exist'] = [{
@@ -1192,7 +1192,7 @@ def initialise_user_stats(user_id):
     data_source = data_store.get()
 
     dt = datetime.now()
-    time_intialised = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_intialised = int(dt.timestamp())
     data_source['user_stats'][user_id] = {}
     data_source['user_stats'][user_id]['channels_joined'] = [{
         'num_channels_joined': 0,

@@ -67,16 +67,17 @@ def channel_invite_v1(token, channel_id, u_id):
     # check whether user is already member
     if u_id in get_channel(channel_id)['members']:
         raise InputError(description='New user is already existing member')
-        
+
     # adds the new user to the channel
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_created = int(dt.timestamp())
 
     add_member_to_channel(channel_id, u_id, time_created)
 
     auth_user_handle = get_user(auth_user_id)['user_handle']
     channel_name = get_channel(channel_id)['name']
-    add_notification(True, channel_id, u_id, f"{auth_user_handle} added you to {channel_name}")
+    add_notification(True, channel_id, u_id,
+                     f"{auth_user_handle} added you to {channel_name}")
 
     return {
     }
@@ -266,7 +267,7 @@ def channel_join_v1(token, channel_id):
 
     # add them to channel
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_created = int(dt.timestamp())
 
     add_member_to_channel(channel_id, auth_user_id, time_created)
 
@@ -311,7 +312,7 @@ def channel_leave_v1(token, channel_id):
         channel_owner.remove(auth_user_id)
 
     dt = datetime.now()
-    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    time_created = int(dt.timestamp())
 
     # remove user from members in the channel
     remove_member_from_channel(channel_id, auth_user_id, time_created)
