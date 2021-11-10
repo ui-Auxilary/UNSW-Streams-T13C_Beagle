@@ -133,17 +133,18 @@ def test_share_channel_to_dm(clear_data, create_users, create_channels, create_d
     
     assert share.status_code == 200
     
-    share_msg_id = json.loads(share.text)
-    time = json.loads(share.text)['time_created']
-    reacts = json.loads(share.text)['reacts']
+    share_msg_id = json.loads(share.text)['shared_message_id']
     
-    assert share_msg_id == {
-                          'author': token_1,
-                          'content': message,
-                          'time_created': time,
-                          'reacts': reacts,
-                          'is_pinned': False
-                        }
+    dm_message_data = requests.get(config.url + 'dm/messages/v1', params={
+                                                               'token': token_1,
+                                                               'dm_id': dm_id,
+                                                               'start': 0
+                                                               })
+
+    message_list = json.loads(dm_message_data.text)['messages']
+
+    assert share_msg_id != message_id
+    assert any(('message', message) in msg.items() for msg in message_list)
     
 def test_share_dm_to_channel(clear_data, create_users, create_channels, create_dms):
     token_1, _, _, _, _, _ = create_users
@@ -169,22 +170,23 @@ def test_share_dm_to_channel(clear_data, create_users, create_channels, create_d
     
     assert share.status_code == 200
     
-    share_msg_id = json.loads(share.text)
-    time = json.loads(share.text)['time_created']
-    reacts = json.loads(share.text)['reacts']
-    
-    assert share_msg_id == {
-                          'author': token_1,
-                          'content': message,
-                          'time_created': time,
-                          'reacts': reacts,
-                          'is_pinned': False
-                        }
+    share_msg_id = json.loads(share.text)['shared_message_id']
+
+    message_data = requests.get(config.url + 'channel/messages/v2', params={
+        'token': token_1,
+        'channel_id': channel_id,
+        'start': 0
+    })
+
+    message_list = json.loads(message_data.text)['messages']
+
+    assert any(('message', message) in msg.items() for msg in message_list)
     
 def test_share_channel_to_channel(clear_data, create_users, create_channels):
     token_1, _, _, _, _, _ = create_users
     channel_id_1, channel_id_2 = create_channels
     message = "imagine"
+    new_message = "hey"
 
     send_message = requests.post(config.url + 'message/send/v1', json={
                                                                           'token': token_1,
@@ -197,24 +199,25 @@ def test_share_channel_to_channel(clear_data, create_users, create_channels):
     share = requests.post(config.url + 'message/share/v1', json={
                                                                   'token': token_1,
                                                                   'og_message_id': message_id,
-                                                                  'message': '',
+                                                                  'message': new_message,
                                                                   'channel_id': channel_id_2,
                                                                   'dm_id': -1
                                                                 })
     
     assert share.status_code == 200
     
-    share_msg_id = json.loads(share.text)
-    time = json.loads(share.text)['time_created']
-    reacts = json.loads(share.text)['reacts']
+    share_msg_id = json.loads(share.text)['shared_message_id']
     
-    assert share_msg_id == {
-                          'author': token_1,
-                          'content': message,
-                          'time_created': time,
-                          'reacts': reacts,
-                          'is_pinned': False
-                        }
+    message_data = requests.get(config.url + 'channel/messages/v2', params={
+        'token': token_1,
+        'channel_id': channel_id_2,
+        'start': 0
+    })
+
+    message_list = json.loads(message_data.text)['messages']
+    
+    assert any(('message', message + new_message) in msg.items() for msg in message_list)
+
 
 def test_share_dm_to_dm(clear_data, create_users, create_dms):
     token_1, _, _, _, _, _ = create_users
@@ -239,24 +242,24 @@ def test_share_dm_to_dm(clear_data, create_users, create_dms):
     
     assert share.status_code == 200
     
-    share_msg_id = json.loads(share.text)
-    time = json.loads(share.text)['time_created']
-    reacts = json.loads(share.text)['reacts']
-    
-    assert share_msg_id == {
-                          'author': token_1,
-                          'content': message,
-                          'time_created': time,
-                          'reacts': reacts,
-                          'is_pinned': False
-                        }
+    share_msg_id = json.loads(share.text)['shared_message_id']
+    dm_message_data = requests.get(config.url + 'dm/messages/v1', params={
+                                                               'token': token_1,
+                                                               'dm_id': dm_id,
+                                                               'start': 0
+                                                               })
+
+    message_list = json.loads(dm_message_data.text)['messages']
+
+    assert share_msg_id != message_id
+    assert any(('message', message) in msg.items() for msg in message_list)
     
 def test_share_with_optional_msg(clear_data, create_users, create_channels, create_dms):
     token_1, _, _, _, _, _ = create_users
     channel_id, _ = create_channels
     dm_id, _, _ = create_dms
-    message = "imagine"
-
+    message = 'imagine'
+    optional_msg = 'this is so cool'
     send_message = requests.post(config.url + 'message/send/v1', json={
                                                                           'token': token_1,
                                                                           'channel_id': channel_id,
@@ -268,24 +271,24 @@ def test_share_with_optional_msg(clear_data, create_users, create_channels, crea
     share = requests.post(config.url + 'message/share/v1', json={
                                                                   'token': token_1,
                                                                   'og_message_id': message_id,
-                                                                  'message': 'this is so cool',
+                                                                  'message': optional_msg,
                                                                   'channel_id': -1,
                                                                   'dm_id': dm_id
                                                                 })
     
     assert share.status_code == 200
     
-    share_msg_id = json.loads(share.text)
-    time = json.loads(share.text)['time_created']
-    reacts = json.loads(share.text)['reacts']
-    
-    assert share_msg_id == {
-                          'author': token_1,
-                          'content': message + 'this is so cool',
-                          'time_created': time,
-                          'reacts': reacts,
-                          'is_pinned': False
-                        }
+    share_msg_id = json.loads(share.text)['shared_message_id']
+    dm_message_data = requests.get(config.url + 'dm/messages/v1', params={
+                                                               'token': token_1,
+                                                               'dm_id': dm_id,
+                                                               'start': 0
+                                                               })
+
+    message_list = json.loads(dm_message_data.text)['messages']
+
+    assert share_msg_id != message_id
+    assert any(('message', message + optional_msg) in msg.items() for msg in message_list)
 
 
 # ___TEST INVALID INPUT___ #
@@ -293,7 +296,7 @@ def test_share_with_optional_msg(clear_data, create_users, create_channels, crea
 
 def test_invalid_dm_and_channel(clear_data, create_users, create_channels, create_dms):
     token_1, _, _, _, _, _ = create_users
-    channel_id, _, _ = create_channels
+    channel_id, _ = create_channels
     create_dms
     message = "imagine"
 

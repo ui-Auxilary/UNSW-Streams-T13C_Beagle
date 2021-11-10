@@ -12,8 +12,10 @@ from src.data_operations import (
     get_user_dms,
     get_dm,
     get_dm_ids,
+    get_message_by_id,
     get_message_ids,
     get_messages_by_channel,
+    get_message_content,
     get_message_by_id,
     edit_message,
     get_messages_by_dm,
@@ -488,38 +490,47 @@ AccessError when:
     users_channels = get_user_channels(user_id)
     users_dms = get_user_dms(user_id)    
     
-    valid_message_ids = []
-    for channel_ids in users_channels:
-        channel_messages = get_channel_messages(channel_ids)
-        for ch_msg in channel_messages:
-            valid_message_ids.append(channel_messages)
-    
-    for dm_ids in users_dms:
-        dm_messages = get_dm_messages(dm_ids)
-        for dm_msg in dm_messages:
-            valid_message_ids.append(dm_messages)
-        
-    if og_message_id not in valid_message_ids:
-        raise InputError(description="Cannot share invalid message")
-    if channel_id not in users_channels and dm_id not in users_dms:
-        raise AccessError(description="Not a member of channel or dm")
-    
-    if len(message) >= 1000:
-        raise InputError(description="Message must be less than 1000 characters")
-    
     if channel_id is -1 and dm_id is -1:
         raise InputError(description="Must share to valid dm or channel")
     
     if channel_id is not -1 and dm_id is not -1:
         raise InputError(description="User can only share to a channel or a dm")
 
-    old_message = get_message_content(og_message_id)
-    if dm_id is -1:
+    is_channel = False
+
+    if dm_id == -1:
+        channel_members = get_channel(channel_id)['members']
         is_channel = True
         send_to = channel_id
-    else:
-        is_channel = False
+
+        if user_id not in channel_members:
+            raise AccessError(description="User not in channel they are trying to share the message to")
+    
+    if channel_id == -1:
+        dm_members = get_dm(dm_id)['members']
         send_to = dm_id
+        
+        if user_id not in dm_members:
+            raise AccessError(description="User not in dm they are trying to share the message to")
+
+    valid_message_ids = []
+    for channel_ids in users_channels:
+        channel_messages = get_channel_messages(channel_ids)
+        for ch_msg in channel_messages:
+            valid_message_ids.append(ch_msg)
+    
+    for dm_ids in users_dms:
+        dm_messages = get_dm_messages(dm_ids)
+        for dm_msg in dm_messages:
+            valid_message_ids.append(dm_msg)
+        
+    if og_message_id not in valid_message_ids:
+        raise InputError(description="Cannot share invalid message")
+    
+    if len(message) > 1000:
+        raise InputError(description="Message must be less than or equal to 1000 characters")
+
+    old_message = get_message_content(og_message_id)
     
     shared_message_id = len(get_message_ids()) + 1
     content = old_message + message
