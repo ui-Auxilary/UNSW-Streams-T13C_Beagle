@@ -5,8 +5,7 @@ import requests
 from src import config
 
 '''
-InputError when any of:
-      
+InputError when any of:      
     - both channel_id and dm_id are invalid
     - neither channel_id nor dm_id are -1        
     - og_message_id does not refer to a valid message within a channel/DM that the authorised user has joined
@@ -118,11 +117,11 @@ def test_share_channel_to_dm(clear_data, create_users, create_channels, create_d
 
     send_message = requests.post(config.url + 'message/send/v1', json={
                                                                           'token': token_1,
-                                                                          'dm_id': channel_id,
+                                                                          'channel_id': channel_id,
                                                                           'message': message
                                                                         })
     
-    message_id = json.load(send_message.text)
+    message_id = json.loads(send_message.text)['message_id']
     
     share = requests.post(config.url + 'message/share/v1', json={
                                                                   'token': token_1,
@@ -154,11 +153,11 @@ def test_share_dm_to_channel(clear_data, create_users, create_channels, create_d
 
     send_message = requests.post(config.url + 'message/senddm/v1', json={
                                                                           'token': token_1,
-                                                                          'channel_id': dm_id,
+                                                                          'dm_id': dm_id,
                                                                           'message': message
                                                                         })
     
-    message_id = json.load(send_message.text)
+    message_id = json.loads(send_message.text)['message_id']
     
     share = requests.post(config.url + 'message/share/v1', json={
                                                                   'token': token_1,
@@ -193,7 +192,7 @@ def test_share_channel_to_channel(clear_data, create_users, create_channels):
                                                                           'message': message
                                                                         })
     
-    message_id = json.load(send_message.text)
+    message_id = json.loads(send_message.text)['message_id']
     
     share = requests.post(config.url + 'message/share/v1', json={
                                                                   'token': token_1,
@@ -228,7 +227,7 @@ def test_share_dm_to_dm(clear_data, create_users, create_dms):
                                                                           'message': message
                                                                         })
     
-    message_id = json.load(send_message.text)
+    message_id = json.loads(send_message.text)['message_id']
     
     share = requests.post(config.url + 'message/share/v1', json={
                                                                   'token': token_1,
@@ -264,7 +263,7 @@ def test_share_with_optional_msg(clear_data, create_users, create_channels, crea
                                                                           'message': message
                                                                         })
     
-    message_id = json.load(send_message.text)
+    message_id = json.loads(send_message.text)['message_id']
     
     share = requests.post(config.url + 'message/share/v1', json={
                                                                   'token': token_1,
@@ -294,17 +293,17 @@ def test_share_with_optional_msg(clear_data, create_users, create_channels, crea
 
 def test_invalid_dm_and_channel(clear_data, create_users, create_channels, create_dms):
     token_1, _, _, _, _, _ = create_users
-    create_channels
+    channel_id, _, _ = create_channels
     create_dms
     message = "imagine"
 
     send_message = requests.post(config.url + 'message/send/v1', json={
                                                                           'token': token_1,
-                                                                          'dm_id': channel_id,
+                                                                          'channel_id': channel_id,
                                                                           'message': message
                                                                         })
     
-    message_id = json.load(send_message.text)
+    message_id = json.loads(send_message.text)['message_id']
     
     share = requests.post(config.url + 'message/share/v1', json={
                                                                   'token': token_1,
@@ -324,11 +323,11 @@ def test_neither_id_negative_one(clear_data, create_users, create_channels, crea
 
     send_message = requests.post(config.url + 'message/send/v1', json={
                                                                           'token': token_1,
-                                                                          'dm_id': channel_id,
+                                                                          'channel_id': channel_id,
                                                                           'message': message
                                                                         })
     
-    message_id = json.load(send_message.text)
+    message_id = json.loads(send_message.text)['message_id']
     
     share = requests.post(config.url + 'message/share/v1', json={
                                                                   'token': token_1,
@@ -348,11 +347,11 @@ def test_both_negative_one(clear_data, create_users, create_channels, create_dms
 
     send_message = requests.post(config.url + 'message/send/v1', json={
                                                                           'token': token_1,
-                                                                          'dm_id': channel_id,
+                                                                          'channel_id': channel_id,
                                                                           'message': message
                                                                         })
     
-    message_id = json.load(send_message.text)
+    message_id = json.loads(send_message.text)['message_id']
     
     share = requests.post(config.url + 'message/share/v1', json={
                                                                   'token': token_1,
@@ -372,11 +371,11 @@ def test_invalid_og_id(clear_data, create_users, create_channels, create_dms):
 
     send_message = requests.post(config.url + 'message/send/v1', json={
                                                                           'token': token_1,
-                                                                          'dm_id': channel_id,
+                                                                          'channel_id': channel_id,
                                                                           'message': message
                                                                         })
     
-    json.load(send_message.text)
+    json.loads(send_message.text)
     
     share = requests.post(config.url + 'message/share/v1', json={
                                                                   'token': token_1,
@@ -396,11 +395,11 @@ def test_invalid_message_length(clear_data, create_users, create_channels, creat
 
     send_message = requests.post(config.url + 'message/send/v1', json={
                                                                           'token': token_1,
-                                                                          'dm_id': channel_id,
+                                                                          'channel_id': channel_id,
                                                                           'message': message
                                                                         })
     
-    message_id = json.load(send_message.text)
+    message_id = json.loads(send_message.text)['message_id']
     
     opt_msg = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam nec sagittis sem, id aliquet est. Maecenas dignissim gravida enim at vehicula,\
                 Vestibulum non ullamcorper ante. Integer pellentesque placerat urna et mollis. Donec ornare, nisl id fringilla suscipit, diam diam viverra nibh, \
@@ -434,11 +433,11 @@ def test_invalid_token(clear_data, create_users, create_channels, create_dms):
 
     send_message = requests.post(config.url + 'message/send/v1', json={
                                                                           'token': token_1,
-                                                                          'dm_id': channel_id,
+                                                                          'channel_id': channel_id,
                                                                           'message': message
                                                                         })
     
-    message_id = json.load(send_message.text)
+    message_id = json.loads(send_message.text)['message_id']
     
     share = requests.post(config.url + 'message/share/v1', json={
                                                                   'token': 'token_1',
@@ -458,11 +457,11 @@ def test_unauthorized_share(clear_data, create_users, create_channels, create_dm
 
     send_message = requests.post(config.url + 'message/send/v1', json={
                                                                           'token': token_1,
-                                                                          'dm_id': channel_id,
+                                                                          'channel_id': channel_id,
                                                                           'message': message
                                                                         })
     
-    message_id = json.load(send_message.text)
+    message_id = json.loads(send_message.text)['message_id']
     
     share = requests.post(config.url + 'message/share/v1', json={
                                                                   'token': token_3,

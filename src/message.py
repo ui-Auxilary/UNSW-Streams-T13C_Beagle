@@ -457,3 +457,76 @@ def message_unpin_v1(token, message_id):
     pin_message(message_id)
 
     return {}
+
+
+def message_share_v1(token, og_message_id, message, channel_id, dm_id):
+    '''
+    Shares a message from a channel or dm to another channel or dm
+
+    Arguments:
+        token           (str): an encoded token containing a users id
+        og_message_id   (int): unique message_id for the content
+        message         (str): optional message the user can add to the shared message
+        channel_id      (int): id of the channel the message is being shared to
+        dm_id           (int): id of the dm the message is being shared to
+
+    InputError when any of:      
+    - both channel_id and dm_id are invalid
+    - neither channel_id nor dm_id are -1        
+    - og_message_id does not refer to a valid message within a channel/DM that the authorised user has joined
+    - length of message is more than 1000 characters
+      
+AccessError when:      
+    - The pair of channel_id and dm_id are valid (i.e. one is -1, the other is valid) and the authorised 
+      user has not joined the channel or DM they are trying to share the message to
+
+    Return Value:
+        {shared_message_id}
+    '''
+    user_id = decode_token(token)
+       
+    users_channels = get_user_channels(user_id)
+    users_dms = get_user_dms(user_id)    
+    
+    valid_message_ids = []
+    for channel_ids in users_channels:
+        channel_messages = get_channel_messages(channel_ids)
+        for ch_msg in channel_messages:
+            valid_message_ids.append(channel_messages)
+    
+    for dm_ids in users_dms:
+        dm_messages = get_dm_messages(dm_ids)
+        for dm_msg in dm_messages:
+            valid_message_ids.append(dm_messages)
+        
+    if og_message_id not in valid_message_ids:
+        raise InputError(description="Cannot share invalid message")
+    if channel_id not in users_channels and dm_id not in users_dms:
+        raise AccessError(description="Not a member of channel or dm")
+    
+    if len(message) >= 1000:
+        raise InputError(description="Message must be less than 1000 characters")
+    
+    if channel_id is -1 and dm_id is -1:
+        raise InputError(description="Must share to valid dm or channel")
+    
+    if channel_id is not -1 and dm_id is not -1:
+        raise InputError(description="User can only share to a channel or a dm")
+
+    old_message = get_message_content(og_message_id)
+    if dm_id is -1:
+        is_channel = True
+        send_to = channel_id
+    else:
+        is_channel = False
+        send_to = dm_id
+    
+    shared_message_id = len(get_message_ids()) + 1
+    content = old_message + message
+    dt = datetime.now()
+    time_created = int(dt.timestamp())
+    add_message(is_channel, user_id, send_to, shared_message_id, content, time_created)
+        
+    return {
+              'shared_message_id': int(shared_message_id)
+            }
