@@ -170,7 +170,7 @@ def test_share_dm_to_channel(clear_data, create_users, create_channels, create_d
     
     assert share.status_code == 200
     
-    share_msg_id = json.loads(share.text)['shared_message_id']
+    json.loads(share.text)['shared_message_id']
 
     message_data = requests.get(config.url + 'channel/messages/v2', params={
         'token': token_1,
@@ -206,7 +206,7 @@ def test_share_channel_to_channel(clear_data, create_users, create_channels):
     
     assert share.status_code == 200
     
-    share_msg_id = json.loads(share.text)['shared_message_id']
+    json.loads(share.text)['shared_message_id']
     
     message_data = requests.get(config.url + 'channel/messages/v2', params={
         'token': token_1,
