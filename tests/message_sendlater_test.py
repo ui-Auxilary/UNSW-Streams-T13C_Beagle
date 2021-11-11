@@ -102,7 +102,7 @@ def test_message_sendlater_to_past(clear_data, user_and_channel_data):
     assert message_data.status_code == 400
 
 def test_message_sendlater_to_invalid_channel(clear_data, user_and_channel_data):
-    user_token, _, channel_id, _, _ = user_and_channel_data
+    user_token, _, _, _, _ = user_and_channel_data
 
     # get current time
     dt = datetime.now(timezone.utc)
