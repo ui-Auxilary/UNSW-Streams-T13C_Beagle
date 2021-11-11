@@ -230,13 +230,13 @@ def test_channel_and_dm_query(clear_data, create_users, create_channels, create_
     assert get_search[1]['is_pinned'] == False
 
 def test_multiple_channels_and_dms(clear_data, create_users, create_channels, create_dms):
-    token_1, user_1, token_2, user_2, token_3, user_3, = create_users
+    token_1, user_1, token_2, user_2, token_3, _, = create_users
     channel_id_1, channel_id_2 = create_channels
     dm_id_1, dm_id_2, _ = create_dms
     message_1 = "imagine"
     message_2 = "imagine dragon"
     message_3 = "deez peanuts"
-    message_4 = "cringe"
+    message_4 = "not"
 
     send_message_data = requests.post(config.url + 'message/send/v1', json={
                                                                               'token': token_1,
@@ -252,7 +252,8 @@ def test_multiple_channels_and_dms(clear_data, create_users, create_channels, cr
                                                                               'message': message_3
                                                                             })
 
-
+    
+    
     message_data_1 = requests.post(config.url + 'message/senddm/v1', json={'token': token_2,
                                                                          'dm_id': dm_id_1,
                                                                          'message': message_2
@@ -260,13 +261,12 @@ def test_multiple_channels_and_dms(clear_data, create_users, create_channels, cr
 
     dm_message_id_1 = json.loads(message_data_1.text)['message_id']
     
-    message_data_2 = requests.post(config.url + 'message/senddm/v1', json={'token': token_3,
+    message_data_1 = requests.post(config.url + 'message/senddm/v1', json={'token': token_3,
                                                                          'dm_id': dm_id_2,
                                                                          'message': message_4
                                                                          })
 
-    dm_message_id_2 = json.loads(message_data_2.text)['message_id']
-    
+        
     query_str = 'in'
 
     search = requests.get(config.url + 'search/v1', params={
@@ -287,12 +287,6 @@ def test_multiple_channels_and_dms(clear_data, create_users, create_channels, cr
     assert get_search[1]['content'] == message_2
     assert get_search[1]['reacts'] == []
     assert get_search[1]['is_pinned'] == False
-    
-    assert get_search[2]['message_id'] == dm_message_id_2
-    assert get_search[2]['u_id'] == user_3
-    assert get_search[2]['content'] == message_4
-    assert get_search[2]['reacts'] == []
-    assert get_search[2]['is_pinned'] == False
 
 
 # ___TEST VALID INPUT___ #

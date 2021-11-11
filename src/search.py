@@ -1,4 +1,4 @@
-from src.error import InputError, AccessError
+from src.error import InputError
 from src.other import decode_token
 
 from src.data_operations import (
@@ -12,7 +12,7 @@ from src.data_operations import (
 def search_v1(token, query_str):
     auth_user_id = decode_token(token)
 
-    if not 1 < len(query_str) < 1000:
+    if not 0 < len(query_str) < 1000:
         raise InputError(description='Invalid query string length')
 
     # get all the messages in dms and channels that the user is in that contain the substring
@@ -29,7 +29,7 @@ def search_v1(token, query_str):
                 message = {
                     'message_id': message_id,
                     'u_id': get_message_by_id(message_id)['author'],
-                    'content': get_message_by_id(message_id)['content'],
+                    'content': message_content,
                     'time_created': get_message_by_id(message_id)['time_created'],
                     'reacts': get_message_by_id(message_id)['reacts'],
                     'is_pinned': get_message_by_id(message_id)['is_pinned']
@@ -45,7 +45,7 @@ def search_v1(token, query_str):
                 message = {
                     'message_id': message_id,
                     'u_id': get_message_by_id(message_id)['author'],
-                    'content': get_message_by_id(message_id)['content'],
+                    'content': message_content,
                     'time_created': get_message_by_id(message_id)['time_created'],
                     'reacts': get_message_by_id(message_id)['reacts'],
                     'is_pinned': get_message_by_id(message_id)['is_pinned']
