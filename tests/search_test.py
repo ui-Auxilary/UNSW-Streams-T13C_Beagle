@@ -252,8 +252,7 @@ def test_multiple_channels_and_dms(clear_data, create_users, create_channels, cr
                                                                               'message': message_3
                                                                             })
 
-    message_id_2 = json.loads(send_message_data.text)['message_id']
-    
+
     message_data_1 = requests.post(config.url + 'message/senddm/v1', json={'token': token_2,
                                                                          'dm_id': dm_id_1,
                                                                          'message': message_2
