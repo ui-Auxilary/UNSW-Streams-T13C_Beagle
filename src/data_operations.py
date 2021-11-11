@@ -836,6 +836,18 @@ def get_message_ids():
     data_source = data_store.get()
     return data_source['message_ids']
 
+def get_message_content(message_id):
+    '''
+    Gets a specific message from its id
+
+    Arguments:
+        message_id (int): id of message being added to the database
+
+    Return Value:
+        {content      (str): content of the message}
+    '''
+    data_source = data_store.get()
+    return data_source['message_data'][message_id]['content']
 
 def get_message_by_id(message_id):
     '''
