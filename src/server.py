@@ -23,6 +23,7 @@ from src.admin import admin_user_remove_v1, admin_userpermission_change_v1
 from src.data_operations import data_dump, data_restore
 from src.data_store import data_store
 from src.standup import standup_start_v1, standup_active_v1, standup_send_v1
+from src.search import search_v1
 
 
 def quit_gracefully(*args):
@@ -340,6 +341,13 @@ def message_share():
     dm_id = data['dm_id']
     
     return dumps(message_share_v1(token, og_message_id, message, channel_id, dm_id))
+
+@APP.route("/search/v1", methods=['GET'])
+def search():
+    token = request.args.get('token')
+    query_str = request.args.get('query_str')
+    
+    return dumps(search_v1(token, query_str))
 
 @APP.route("/notifications/get/v1", methods=['GET'])
 def notification_get():
