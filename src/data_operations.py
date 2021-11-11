@@ -1314,6 +1314,44 @@ def pin_message(message_id):
     else:
         data_source['message_data'][message_id]['is_pinned'] = False
 
+def add_sendlater_id(message_id):
+    '''
+    Adds a message to the database from a user
+
+    Arguments:
+        message_id   (int): id of message being added to the database
+
+    Return Value:
+        None
+    '''
+    data_source = data_store.get()
+
+    data_source['message_ids'].append(message_id)
+    data_source['message_data'][message_id] = {
+        'author': '',
+        'content': '',
+        'time_created': '',
+        'message_id': '',
+        'channel_created': '',
+        'is_channel': '',
+        'reacts': [],
+        'is_pinned': False
+    }
+
+def add_dm_sendlater_id(message_id):
+    data_source = data_store.get()
+
+    data_source['dm_ids'].append(message_id)
+    data_source['dm_data'][message_id] = {
+        'author': '',
+        'content': '',
+        'time_created': '',
+        'message_id': '',
+        'channel_created': '',
+        'is_channel': '',
+        'reacts': [],
+        'is_pinned': False
+    }
 
 def data_dump():
     while True:

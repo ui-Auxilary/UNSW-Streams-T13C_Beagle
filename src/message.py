@@ -1,3 +1,4 @@
+import threading
 from src.error import InputError, AccessError
 from src.other import decode_token, check_valid_tag
 from datetime import timezone, datetime
@@ -24,11 +25,13 @@ from src.data_operations import (
     pin_message,
     remove_message,
     get_user,
-    add_notification
+    add_notification,
+    add_sendlater_id,
+    add_dm_sendlater_id
 )
 
 
-def message_send_v1(token, channel_id, message):
+def message_send_v1(token, channel_id, message, message_sendlater = 0):
     '''
     Sends a message into the channel
 
@@ -62,7 +65,10 @@ def message_send_v1(token, channel_id, message):
     elif message_length > 1000:
         raise InputError(description="Message over 1000 characters")
 
-    message_id = len(get_message_ids()) + 1
+    if message_sendlater != 0:
+        message_id = message_sendlater
+    else:
+        message_id = len(get_message_ids()) + 1
 
     # time created
     dt = datetime.now()
@@ -478,7 +484,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     - og_message_id does not refer to a valid message within a channel/DM that the authorised user has joined
     - length of message is more than 1000 characters
       
-AccessError when:      
+    AccessError when:      
     - The pair of channel_id and dm_id are valid (i.e. one is -1, the other is valid) and the authorised 
       user has not joined the channel or DM they are trying to share the message to
 
@@ -541,3 +547,71 @@ AccessError when:
     return {
               'shared_message_id': int(shared_message_id)
             }
+
+def message_sendlater_v1(token, channel_id, message, time_sent):
+    auth_user_id = decode_token(token)
+
+    if channel_id not in get_channel_ids():
+        raise InputError(description="Invalid channel id")
+    elif auth_user_id not in get_channel(channel_id)['members']:
+        raise AccessError(description="User is not a member of the channel")
+
+    # get current time
+    dt = datetime.now(timezone.utc)
+    time_created = int(dt.timestamp())
+
+    # find how long in the future to send message
+    length = time_sent - time_created
+
+    if length < 0:
+        raise InputError(description="Cannot send message to past")
+
+    if len(message) > 1000:
+        raise InputError(description="Message is too long")
+
+    delayed_message_id = len(get_message_ids()) + 1
+    add_sendlater_id(delayed_message_id)
+
+    # set a timer, send the message when the standup ends
+    timer = threading.Timer(length, message_send_v1,
+                            (token, channel_id, message, delayed_message_id))
+    timer.daemon = True
+    timer.start()
+
+    return {
+        'message_id': delayed_message_id
+    }
+
+def message_sendlaterdm_v1(token, dm_id, message, time_sent):
+    auth_user_id = decode_token(token)
+
+    if dm_id not in get_dm_ids():
+        raise InputError(description="Invalid dm id")
+    elif auth_user_id not in get_dm(dm_id)['members']:
+        raise AccessError(description="User is not a member of the dm")
+
+    # get current time
+    dt = datetime.now(timezone.utc)
+    time_created = int(dt.timestamp())
+
+    # find how long in the future to send message
+    length = time_sent - time_created
+
+    if length < 0:
+        raise InputError(description="Cannot send message to past")
+
+    if len(message) > 1000:
+        raise InputError(description="Message is too long")
+
+    delayed_message_id = len(get_dm_ids()) + 1
+    add_dm_sendlater_id(delayed_message_id)
+
+    # set a timer, send the message when the standup ends
+    timer = threading.Timer(length, message_send_v1,
+                            (token, dm_id, message, delayed_message_id))
+    timer.daemon = True
+    timer.start()
+
+    return {
+        'message_id': delayed_message_id
+    }
