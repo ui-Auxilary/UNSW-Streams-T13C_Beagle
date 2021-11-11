@@ -11,7 +11,7 @@ from src.error import InputError
 from src.users import users_all, users_stats_v1
 from src.user import user_profile, user_profile_sethandle, user_profile_setname, user_profile_setemail, user_profile_uploadphoto_v1, user_stats_v1, notifications_get_v1
 from src.auth import auth_register_v1, auth_login_v1, auth_logout_v1, auth_passwordreset_request, auth_passwordreset_reset
-from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_react_v1, message_unreact_v1, message_pin_v1, message_unpin_v1, message_share_v1
+from src.message import message_send_v1, message_edit_v1, message_remove_v1, message_react_v1, message_unreact_v1, message_pin_v1, message_unpin_v1, message_sendlater_v1, message_share_v1
 from src.other import clear_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1, channel_addowner_v1, channel_removeowner_v1, channel_messages_v1, channel_leave_v1
@@ -346,7 +346,18 @@ def notification_get():
     token = request.args.get('token')
     
     return dumps(notifications_get_v1(token))
-    
+
+@APP.route("/message/sendlater/v1", methods=['POST'])
+def send_message_later():
+    data = request.get_json()
+    # get user's token and channel that the message will be sent to
+    user_token = data['token']
+    channel_id = data['channel_id']
+    message = data['message']
+    time_sent = data['time_sent']
+
+    return dumps(message_sendlater_v1(user_token, channel_id, message, time_sent))
+
 @APP.route("/standup/start/v1", methods=['POST'])
 def standup_start():
     data = request.get_json()
