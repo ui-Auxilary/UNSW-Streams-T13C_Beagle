@@ -16,6 +16,7 @@ Test:
     - multiple channels and dms [X]
 '''
 
+
 @pytest.fixture
 def clear_data():
     requests.delete(config.url + 'clear/v1')
@@ -23,65 +24,66 @@ def clear_data():
 
 @pytest.fixture
 def create_users():
-    register_user_1 = requests.post(config.url + 'auth/register/v2', json = { 'email': 'asd@gmail.com',
-                                                                                'password': 'qwertyuiop',
-                                                                                'name_first': 'lawrence',
-                                                                                'name_last': 'lee'
-                                                                              })
+    register_user_1 = requests.post(config.url + 'auth/register/v2', json={'email': 'asd@gmail.com',
+                                                                           'password': 'qwertyuiop',
+                                                                           'name_first': 'lawrence',
+                                                                           'name_last': 'lee'
+                                                                           })
 
     token_1 = json.loads(register_user_1.text)['token']
     user_id_1 = json.loads(register_user_1.text)['auth_user_id']
 
-    register_user_2 = requests.post(config.url + 'auth/register/v2', json = { 'email': 'email2@gmail.com',
-                                                                                'password': 'zxcvbnm',
-                                                                                'name_first': 'christian',
-                                                                                'name_last': 'lam'
-                                                                              })
+    register_user_2 = requests.post(config.url + 'auth/register/v2', json={'email': 'email2@gmail.com',
+                                                                           'password': 'zxcvbnm',
+                                                                           'name_first': 'christian',
+                                                                           'name_last': 'lam'
+                                                                           })
 
     token_2 = json.loads(register_user_2.text)['token']
     user_id_2 = json.loads(register_user_2.text)['auth_user_id']
 
-
-    register_user_3 = requests.post(config.url + 'auth/register/v2', json = { 'email': 'email3@gmail.com',
-                                                                                'password': 'something',
-                                                                                'name_first': 'john',
-                                                                                'name_last': 'doe'
-                                                                              })
+    register_user_3 = requests.post(config.url + 'auth/register/v2', json={'email': 'email3@gmail.com',
+                                                                           'password': 'something',
+                                                                           'name_first': 'john',
+                                                                           'name_last': 'doe'
+                                                                           })
 
     token_3 = json.loads(register_user_3.text)['token']
     user_id_3 = json.loads(register_user_3.text)['auth_user_id']
 
     return token_1, user_id_1, token_2, user_id_2, token_3, user_id_3
 
+
 @pytest.fixture
 def create_channels(create_users):
     token_1, _, _, user_2, _, user_3 = create_users
     create_channel_1 = requests.post(config.url + 'channels/create/v2', json={
-                                                                                'token': token_1,
-                                                                                'name': 'channel1',
-                                                                                'is_public': True
-                                                                              })
+        'token': token_1,
+        'name': 'channel1',
+        'is_public': True
+    })
     channel_id_1 = json.loads(create_channel_1.text)['channel_id']
 
     requests.post(config.url + 'channel/invite/v2', json={
-                                                              'token': token_1,
-                                                              'channel_id': channel_id_1,
-                                                              'u_id': user_2
-                                                            })
+        'token': token_1,
+        'channel_id': channel_id_1,
+        'u_id': user_2
+    })
 
     create_channel_2 = requests.post(config.url + 'channels/create/v2', json={
-                                                                                'token': token_1,
-                                                                                'name': 'channel2',
-                                                                                'is_public': True
-                                                                              })
+        'token': token_1,
+        'name': 'channel2',
+        'is_public': True
+    })
     channel_id_2 = json.loads(create_channel_2.text)['channel_id']
 
     requests.post(config.url + 'channel/invite/v2', json={
-                                                              'token': token_1,
-                                                              'channel_id': channel_id_2,
-                                                              'u_id': user_3
-                                                            })
+        'token': token_1,
+        'channel_id': channel_id_2,
+        'u_id': user_3
+    })
     return channel_id_1, channel_id_2
+
 
 @pytest.fixture
 def create_dms(create_users):
@@ -123,22 +125,22 @@ def test_single_message(clear_data, create_users, create_channels):
     })
 
     message_id = json.loads(send_message_data.text)['message_id']
-    
+
     query_str = 'imagine'
 
     search = requests.get(config.url + 'search/v1', params={
-                                                              'token': token,
-                                                              'query_str': query_str
-                                                            })
+        'token': token,
+        'query_str': query_str
+    })
 
-    get_search = json.loads(search.text)    
+    get_search = json.loads(search.text)['messages']
 
     assert get_search[0]['message_id'] == message_id
     assert get_search[0]['u_id'] == user
-    assert get_search[0]['content'] == message
+    assert get_search[0]['message'] == message
     assert get_search[0]['reacts'] == []
     assert get_search[0]['is_pinned'] == False
-    
+
 
 def test_no_messages_from_query(clear_data, create_users, create_channels):
     token, _, _, _, _, _, = create_users
@@ -146,13 +148,14 @@ def test_no_messages_from_query(clear_data, create_users, create_channels):
     query_str = 'imagine'
 
     search = requests.get(config.url + 'search/v1', params={
-                                                              'token': token,
-                                                              'query_str': query_str
-                                                            })
+        'token': token,
+        'query_str': query_str
+    })
 
-    get_search = json.loads(search.text)
+    get_search = json.loads(search.text)['messages']
 
     assert get_search == []
+
 
 def test_single_message_substring(clear_data, create_users, create_channels):
     token, user, _, _, _, _, = create_users
@@ -166,19 +169,19 @@ def test_single_message_substring(clear_data, create_users, create_channels):
     })
 
     message_id = json.loads(send_message_data.text)['message_id']
-    
+
     query_str = 'imag'
 
     search = requests.get(config.url + 'search/v1', params={
-                                                              'token': token,
-                                                              'query_str': query_str
-                                                            })
+        'token': token,
+        'query_str': query_str
+    })
 
-    get_search = json.loads(search.text)
-    
+    get_search = json.loads(search.text)['messages']
+
     assert get_search[0]['message_id'] == message_id
     assert get_search[0]['u_id'] == user
-    assert get_search[0]['content'] == message
+    assert get_search[0]['message'] == message
     assert get_search[0]['reacts'] == []
     assert get_search[0]['is_pinned'] == False
 
@@ -193,13 +196,12 @@ def test_channel_and_dm_query(clear_data, create_users, create_channels, create_
     message = "imagine"
 
     send_message_data = requests.post(config.url + 'message/send/v1', json={
-                                                                              'token': token,
-                                                                              'channel_id': channel_id,
-                                                                              'message': message
-                                                                            })
+        'token': token,
+        'channel_id': channel_id,
+        'message': message
+    })
 
     message_id = json.loads(send_message_data.text)['message_id']
-    
 
     message_data = requests.post(config.url + 'message/senddm/v1', json={'token': token,
                                                                          'dm_id': dm_id,
@@ -207,27 +209,28 @@ def test_channel_and_dm_query(clear_data, create_users, create_channels, create_
                                                                          })
 
     dm_message_id = json.loads(message_data.text)['message_id']
-    
+
     query_str = 'imag'
 
     search = requests.get(config.url + 'search/v1', params={
-                                                              'token': token,
-                                                              'query_str': query_str
-                                                            })
+        'token': token,
+        'query_str': query_str
+    })
 
-    get_search = json.loads(search.text)    
+    get_search = json.loads(search.text)['messages']
 
     assert get_search[0]['message_id'] == message_id
     assert get_search[0]['u_id'] == user
-    assert get_search[0]['content'] == message
+    assert get_search[0]['message'] == message
     assert get_search[0]['reacts'] == []
     assert get_search[0]['is_pinned'] == False
-    
+
     assert get_search[1]['message_id'] == dm_message_id
     assert get_search[1]['u_id'] == user
-    assert get_search[1]['content'] == message
+    assert get_search[1]['message'] == message
     assert get_search[1]['reacts'] == []
     assert get_search[1]['is_pinned'] == False
+
 
 def test_multiple_channels_and_dms(clear_data, create_users, create_channels, create_dms):
     token_1, user_1, token_2, user_2, token_3, _, = create_users
@@ -239,52 +242,49 @@ def test_multiple_channels_and_dms(clear_data, create_users, create_channels, cr
     message_4 = "not"
 
     send_message_data = requests.post(config.url + 'message/send/v1', json={
-                                                                              'token': token_1,
-                                                                              'channel_id': channel_id_1,
-                                                                              'message': message_1
-                                                                            })
+        'token': token_1,
+        'channel_id': channel_id_1,
+        'message': message_1
+    })
 
     message_id_1 = json.loads(send_message_data.text)['message_id']
-    
-    send_message_data = requests.post(config.url + 'message/send/v1', json={
-                                                                              'token': token_1,
-                                                                              'channel_id': channel_id_2,
-                                                                              'message': message_3
-                                                                            })
 
-    
-    
+    send_message_data = requests.post(config.url + 'message/send/v1', json={
+        'token': token_1,
+        'channel_id': channel_id_2,
+        'message': message_3
+    })
+
     message_data_1 = requests.post(config.url + 'message/senddm/v1', json={'token': token_2,
-                                                                         'dm_id': dm_id_1,
-                                                                         'message': message_2
-                                                                         })
+                                                                           'dm_id': dm_id_1,
+                                                                           'message': message_2
+                                                                           })
 
     dm_message_id_1 = json.loads(message_data_1.text)['message_id']
-    
-    message_data_1 = requests.post(config.url + 'message/senddm/v1', json={'token': token_3,
-                                                                         'dm_id': dm_id_2,
-                                                                         'message': message_4
-                                                                         })
 
-        
+    message_data_1 = requests.post(config.url + 'message/senddm/v1', json={'token': token_3,
+                                                                           'dm_id': dm_id_2,
+                                                                           'message': message_4
+                                                                           })
+
     query_str = 'in'
 
     search = requests.get(config.url + 'search/v1', params={
-                                                              'token': token_1,
-                                                              'query_str': query_str
-                                                            })
+        'token': token_1,
+        'query_str': query_str
+    })
 
-    get_search = json.loads(search.text)    
+    get_search = json.loads(search.text)['messages']
 
     assert get_search[0]['message_id'] == message_id_1
     assert get_search[0]['u_id'] == user_1
-    assert get_search[0]['content'] == message_1
+    assert get_search[0]['message'] == message_1
     assert get_search[0]['reacts'] == []
     assert get_search[0]['is_pinned'] == False
-    
+
     assert get_search[1]['message_id'] == dm_message_id_1
     assert get_search[1]['u_id'] == user_2
-    assert get_search[1]['content'] == message_2
+    assert get_search[1]['message'] == message_2
     assert get_search[1]['reacts'] == []
     assert get_search[1]['is_pinned'] == False
 
@@ -298,11 +298,12 @@ def test_query_too_short(clear_data, create_users, create_channels):
     query_str = ''
 
     search = requests.get(config.url + 'search/v1', params={
-                                                              'token': token,
-                                                              'query_str': query_str
-                                                            })
+        'token': token,
+        'query_str': query_str
+    })
 
     assert search.status_code == 400
+
 
 def test_query_too_long(clear_data, create_users, create_channels):
     token, _, _, _, _, _, = create_users
@@ -318,9 +319,9 @@ def test_query_too_long(clear_data, create_users, create_channels):
                 pretium lorem euismod sed. Duis vel'
 
     search = requests.get(config.url + 'search/v1', params={
-                                                              'token': token,
-                                                              'query_str': query_str
-                                                            })
+        'token': token,
+        'query_str': query_str
+    })
 
     assert search.status_code == 400
 
@@ -334,15 +335,15 @@ def test_invalid_token(clear_data, create_users, create_channels):
     message = "imagine"
 
     requests.post(config.url + 'message/send/v1', json={
-                                                          'token': token,
-                                                          'channel_id': channel_id,
-                                                          'message': message
-                                                      })
+        'token': token,
+        'channel_id': channel_id,
+        'message': message
+    })
 
     query_str = 'imagine'
 
     search = requests.get(config.url + 'search/v1', params={
-                                                              'token': 'token',
-                                                              'query_str': query_str
-                                                            })
+        'token': 'token',
+        'query_str': query_str
+    })
     assert search.status_code == 403
