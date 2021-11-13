@@ -48,7 +48,7 @@ def standup_start_v1(token, channel_id, length):
     # get the time now, and find when the standup ends
     dt = datetime.utcnow()
 
-    time_created = int(dt.timestamp())
+    time_created = int(dt.replace(tzinfo=timezone.utc).timestamp())
     time_finish = time_created + length
 
     set_active_standup(True, channel_id, time_finish)

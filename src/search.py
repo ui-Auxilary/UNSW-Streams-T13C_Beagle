@@ -9,6 +9,7 @@ from src.data_operations import (
     get_messages_by_dm
 )
 
+
 def search_v1(token, query_str):
     auth_user_id = decode_token(token)
 
@@ -29,13 +30,12 @@ def search_v1(token, query_str):
                 message = {
                     'message_id': message_id,
                     'u_id': get_message_by_id(message_id)['author'],
-                    'content': message_content,
+                    'message': message_content,
                     'time_created': get_message_by_id(message_id)['time_created'],
                     'reacts': get_message_by_id(message_id)['reacts'],
                     'is_pinned': get_message_by_id(message_id)['is_pinned']
                 }
                 message_list.append(message)
-
 
     # edit dm messages
     for dm_id in dm_list:
@@ -45,11 +45,13 @@ def search_v1(token, query_str):
                 message = {
                     'message_id': message_id,
                     'u_id': get_message_by_id(message_id)['author'],
-                    'content': message_content,
+                    'message': message_content,
                     'time_created': get_message_by_id(message_id)['time_created'],
                     'reacts': get_message_by_id(message_id)['reacts'],
                     'is_pinned': get_message_by_id(message_id)['is_pinned']
                 }
                 message_list.append(message)
-    
-    return message_list
+
+    return {
+        'messages': message_list
+    }

@@ -31,7 +31,7 @@ from src.data_operations import (
 )
 
 
-def message_send_v1(token, channel_id, message, message_sendlater = 0):
+def message_send_v1(token, channel_id, message, message_sendlater=0):
     '''
     Sends a message into the channel
 
@@ -386,7 +386,7 @@ def message_pin_v1(token, message_id):
     # check whether user has owner permissions in that channel
     channel_id = get_message_by_id(message_id)['channel_created']
     is_channel = get_message_by_id(message_id)['is_channel']
-    
+
     if is_channel:
         if auth_user_id not in get_channel(channel_id)['owner'] and not get_user(auth_user_id)['global_owner']:
             raise AccessError(
@@ -433,7 +433,6 @@ def message_unpin_v1(token, message_id):
     channel_ids = get_user_channels(auth_user_id)
     dm_ids = get_user_dms(auth_user_id)
     message_id_valid = False
-    
 
     if any(message_id in get_channel_messages(channel) for channel in channel_ids) == True:
         message_id_valid = True
@@ -483,7 +482,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     - neither channel_id nor dm_id are -1        
     - og_message_id does not refer to a valid message within a channel/DM that the authorised user has joined
     - length of message is more than 1000 characters
-      
+
     AccessError when:      
     - The pair of channel_id and dm_id are valid (i.e. one is -1, the other is valid) and the authorised 
       user has not joined the channel or DM they are trying to share the message to
@@ -492,15 +491,16 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         {shared_message_id}
     '''
     user_id = decode_token(token)
-       
+
     users_channels = get_user_channels(user_id)
-    users_dms = get_user_dms(user_id)    
-    
-    if channel_id is -1 and dm_id is -1:
+    users_dms = get_user_dms(user_id)
+
+    if channel_id == -1 and dm_id == -1:
         raise InputError(description="Must share to valid dm or channel")
-    
-    if channel_id is not -1 and dm_id is not -1:
-        raise InputError(description="User can only share to a channel or a dm")
+
+    if channel_id != -1 and dm_id != -1:
+        raise InputError(
+            description="User can only share to a channel or a dm")
 
     is_channel = False
 
@@ -510,43 +510,48 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         send_to = channel_id
 
         if user_id not in channel_members:
-            raise AccessError(description="User not in channel they are trying to share the message to")
-    
+            raise AccessError(
+                description="User not in channel they are trying to share the message to")
+
     if channel_id == -1:
         dm_members = get_dm(dm_id)['members']
         send_to = dm_id
-        
+
         if user_id not in dm_members:
-            raise AccessError(description="User not in dm they are trying to share the message to")
+            raise AccessError(
+                description="User not in dm they are trying to share the message to")
 
     valid_message_ids = []
     for channel_ids in users_channels:
         channel_messages = get_channel_messages(channel_ids)
         for ch_msg in channel_messages:
             valid_message_ids.append(ch_msg)
-    
+
     for dm_ids in users_dms:
         dm_messages = get_dm_messages(dm_ids)
         for dm_msg in dm_messages:
             valid_message_ids.append(dm_msg)
-        
+
     if og_message_id not in valid_message_ids:
         raise InputError(description="Cannot share invalid message")
-    
+
     if len(message) > 1000:
-        raise InputError(description="Message must be less than or equal to 1000 characters")
+        raise InputError(
+            description="Message must be less than or equal to 1000 characters")
 
     old_message = get_message_content(og_message_id)
-    
+
     shared_message_id = len(get_message_ids()) + 1
     content = old_message + message
     dt = datetime.now()
     time_created = int(dt.timestamp())
-    add_message(is_channel, user_id, send_to, shared_message_id, content, time_created)
-        
+    add_message(is_channel, user_id, send_to,
+                shared_message_id, content, time_created)
+
     return {
-              'shared_message_id': int(shared_message_id)
-            }
+        'shared_message_id': int(shared_message_id)
+    }
+
 
 def message_sendlater_v1(token, channel_id, message, time_sent):
     auth_user_id = decode_token(token)
@@ -581,6 +586,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     return {
         'message_id': delayed_message_id
     }
+
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     auth_user_id = decode_token(token)
