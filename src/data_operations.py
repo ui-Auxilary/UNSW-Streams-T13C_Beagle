@@ -54,7 +54,7 @@ from datetime import timezone, datetime
 from typing_extensions import TypedDict
 from typing import Dict, Tuple
 
-class get_user(TypedDict):
+class get_user_type(TypedDict):
     first_name: str
     last_name: str
     email_address: str
@@ -62,31 +62,31 @@ class get_user(TypedDict):
     user_handle: str
     global_owner: bool
 
-class get_channel(TypedDict):
+class get_channel_type(TypedDict):
     name: str
     owner: int
     is_public: bool
     members: list
     message_ids: list
     
-class get_dm(TypedDict):
+class get_dm_type(TypedDict):
     name: str
     owner: int
     members: list
     message_ids: list
 
-class get_message_by_id(TypedDict):
+class get_message_by_id_type(TypedDict):
     author: int
     content: str
     time_created: int
     
-class get_user_stats(TypedDict):
+class get_user_stats_type(TypedDict):
     channels_joined: int
     dms_joined: int
     messages_sent: int
     involvement_rate: float
     
-class get_workspace_stats(TypedDict):
+class get_workspace_stats_type(TypedDict):
     channels_exist: int
     dms_exist: int
     messages_exist: int
@@ -234,7 +234,7 @@ def get_user_dms(user_id: int) -> list:
     return data_source['user_data'][user_id]['in_dms']
 
 
-def get_user(user_id: int) -> get_user:
+def get_user(user_id: int) -> get_user_type:
     '''
     gets the user data from the database
 
@@ -473,7 +473,7 @@ def add_channel(channel_id: int, channel_name: str, user_id: int, is_public: boo
     update_workspace_stats(channel_data_2, False, False)
 
 
-def get_channel(channel_id: int) -> get_channel:
+def get_channel(channel_id: int) -> get_channel_type:
     '''
     Gets the channel data from the database from a specific channel_id
 
@@ -639,7 +639,7 @@ def add_dm(dm_id: int, dm_name: str, auth_user_id: int, time_created: int) -> No
     update_user_stats(auth_user_id, False, dm_data, False)
 
 
-def get_dm(dm_id: int) -> get_dm:
+def get_dm(dm_id: int) -> get_dm_type:
     '''
     Gets the dm data from the database for a specific dm_id
 
@@ -906,7 +906,7 @@ def get_message_content(message_id: int) -> Dict[str, str]:
     return data_source['message_data'][message_id]['content']
 
 
-def get_message_by_id(message_id: int) -> get_message_by_id:
+def get_message_by_id(message_id: int) -> get_message_by_id_type:
     '''
     Gets a specific message from its id
 
@@ -1373,7 +1373,7 @@ def update_workspace_stats(channel_data: dict, dm_data: dict, message_data: dict
     data_source['workspace_stats']['utilization_rate'] = rate
 
 
-def get_user_stats(user_id: int) -> get_user_stats:
+def get_user_stats(user_id: int) -> get_user_stats_type:
     '''
     gets the stats of a user
 
@@ -1388,7 +1388,7 @@ def get_user_stats(user_id: int) -> get_user_stats:
     return data_source['user_stats'][user_id]
 
 
-def get_workspace_stats() -> get_workspace_stats:
+def get_workspace_stats() -> get_workspace_stats_type:
     '''
     gets the stats of the workspace
 
