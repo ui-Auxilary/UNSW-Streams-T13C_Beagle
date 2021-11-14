@@ -21,14 +21,14 @@ def create_data(clear_data):
     auth_user_id = json.loads(user_id_data.text)['auth_user_id']
     token = json.loads(user_id_data.text)['token']
 
-    return auth_user_id, token
+    return auth_user_id
 
 def test_simple_register(create_data):
-    auth_user_id, token = create_data
+    auth_user_id= create_data
     assert type(auth_user_id) == int
 
 def test_simple_login(create_data):
-    original_id, _ = create_data
+    original_id = create_data
     user_id_data = requests.post(config.url + 'oauth/register/v1', json={'email': 'hello@mycompany.com'})
     auth_user_id = json.loads(user_id_data.text)['auth_user_id']
 
