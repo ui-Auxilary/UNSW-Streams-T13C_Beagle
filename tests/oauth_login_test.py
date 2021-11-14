@@ -19,7 +19,6 @@ def create_data(clear_data):
                                                          })
 
     auth_user_id = json.loads(user_id_data.text)['auth_user_id']
-    token = json.loads(user_id_data.text)['token']
 
     return auth_user_id
 
