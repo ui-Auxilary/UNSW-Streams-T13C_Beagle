@@ -2,7 +2,7 @@ import threading
 from src.error import InputError, AccessError
 from src.other import decode_token, check_valid_tag
 from datetime import timezone, datetime
-
+from typing import Optional
 from src.data_operations import (
     get_channel_ids,
     get_channel,
@@ -30,7 +30,7 @@ from src.data_operations import (
 )
 
 
-def message_send_v1(token, channel_id, message, message_sendlater=0):
+def message_send_v1(token: str, channel_id: int, message: str, message_sendlater: Optional[int] = 0) -> dict[str, int]:
     '''
     Sends a message into the channel
 
@@ -89,7 +89,7 @@ def message_send_v1(token, channel_id, message, message_sendlater=0):
     }
 
 
-def message_edit_v1(token, message_id, message):
+def message_edit_v1(token: str, message_id: int, message: str) -> dict:
     '''
     Edits a pre-existing message
 
@@ -160,7 +160,7 @@ def message_edit_v1(token, message_id, message):
     return {}
 
 
-def message_remove_v1(token, message_id):
+def message_remove_v1(token: str, message_id: int) -> dict:
     '''
     Removes message from the channel/DM it was sent from
 
@@ -214,7 +214,7 @@ def message_remove_v1(token, message_id):
     return {}
 
 
-def message_react_v1(token, message_id, react_id):
+def message_react_v1(token: str, message_id: int, react_id: int) -> dict:
     '''
     Reacts to a message in a channel/DM
 
@@ -282,7 +282,7 @@ def message_react_v1(token, message_id, react_id):
     return {}
 
 
-def message_unreact_v1(token, message_id, react_id):
+def message_unreact_v1(token: str, message_id: int, react_id: int) -> dict:
     '''
     Unreacts message in the channel/DM it was sent from
 
@@ -339,7 +339,7 @@ def message_unreact_v1(token, message_id, react_id):
     react_message(auth_user_id, message_id, react_id)
 
 
-def message_pin_v1(token, message_id):
+def message_pin_v1(token: str, message_id: int) -> dict:
     '''
     Pins message in the channel/DM it was sent from
 
@@ -400,7 +400,7 @@ def message_pin_v1(token, message_id):
     return {}
 
 
-def message_unpin_v1(token, message_id):
+def message_unpin_v1(token: str, message_id: int) -> dict:
     '''
     Unpins message in the channel/DM it was sent from
 
@@ -461,7 +461,7 @@ def message_unpin_v1(token, message_id):
     return {}
 
 
-def message_share_v1(token, og_message_id, message, channel_id, dm_id):
+def message_share_v1(token: str, og_message_id: int, message: str, channel_id: int, dm_id: int) -> dict[str, int]:
     '''
     Shares a message from a channel or dm to another channel or dm
 
@@ -559,7 +559,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     }
 
 
-def message_sendlater_v1(token, channel_id, message, time_sent):
+def message_sendlater_v1(token: str, channel_id: int, message: str, time_sent: int) -> dict[str, int]:
     auth_user_id = decode_token(token)
 
     if channel_id not in get_channel_ids():

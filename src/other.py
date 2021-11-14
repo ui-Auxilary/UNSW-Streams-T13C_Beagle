@@ -24,6 +24,7 @@ from src.data_operations import (
 from src.error import AccessError
 from datetime import datetime
 from random import randint
+from typing import Union
 
 
 def clear_v1():
@@ -39,7 +40,7 @@ def clear_v1():
     return {}
 
 
-def get_uid_by_email(email):
+def get_uid_by_email(email: str) -> dict[str, int]:
     '''
     Gets a user's id using their email address
 
@@ -57,7 +58,7 @@ def get_uid_by_email(email):
     return user_id
 
 
-def encode_token(user_id):
+def encode_token(user_id: int) -> dict[str, int]:
     '''
     Generates a unique user session token for a given user_id
 
@@ -83,7 +84,7 @@ def encode_token(user_id):
     return encoded_token
 
 
-def decode_token(token):
+def decode_token(token: str) -> dict[str, int]:
     '''
     Decodes a user token to give the user_id it is associated with
 
@@ -104,7 +105,7 @@ def decode_token(token):
     return user_id
 
 
-def check_valid_tag(is_channel, message, channel_id):
+def check_valid_tag(is_channel: bool, message: str, channel_id: int) -> Union[int, bool]:
     channel_members = []
     dm_members = []
     if is_channel:
@@ -126,7 +127,7 @@ def check_valid_tag(is_channel, message, channel_id):
     return False
 
 
-def get_user_from_handle(user_handle):
+def get_user_from_handle(user_handle: str) -> Union[int, bool]:
     for person in get_user_ids():
         if get_user(person)['user_handle'] == user_handle:
             user_id = person

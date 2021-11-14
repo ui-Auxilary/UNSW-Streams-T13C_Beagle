@@ -1,4 +1,5 @@
 import threading
+from typing import TypedDict
 from src.error import InputError, AccessError
 from src.other import decode_token
 from datetime import timezone, datetime
@@ -7,7 +8,12 @@ from src.data_operations import (
     get_channel_ids, get_channel, set_active_standup, add_standup_message, get_user, add_message, get_message_ids, clear_message_pack)
 
 
-def send_message_package(channel_id, auth_user_id, time_finish):
+class standup_start(TypedDict):
+    is_active: bool
+    time_finish: int
+
+
+def send_message_package(channel_id: int, auth_user_id: int, time_finish: int) -> None:
     # get message data for the channel
     message_pack = get_channel(channel_id)['standup_data']['message_package']
     message_content = '\n'.join(line for line in message_pack)
@@ -23,7 +29,7 @@ def send_message_package(channel_id, auth_user_id, time_finish):
     clear_message_pack(channel_id)
 
 
-def standup_start_v1(token, channel_id, length):
+def standup_start_v1(token: str, channel_id: int, length: int) -> int:
     # check for valid token
     auth_user_id = decode_token(token)
 
@@ -64,7 +70,7 @@ def standup_start_v1(token, channel_id, length):
     }
 
 
-def standup_active_v1(token, channel_id):
+def standup_active_v1(token: str, channel_id: int) -> standup_start:
     # check for valid token
     auth_user_id = decode_token(token)
 
@@ -86,7 +92,7 @@ def standup_active_v1(token, channel_id):
     }
 
 
-def standup_send_v1(token, channel_id, message):
+def standup_send_v1(token: str, channel_id: int, message: str) -> dict:
     # check for valid token
     auth_user_id = decode_token(token)
 

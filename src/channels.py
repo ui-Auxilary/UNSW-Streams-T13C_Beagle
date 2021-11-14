@@ -45,7 +45,7 @@ def channels_list_v1(token):
     }
 
 
-def channels_listall_v1(token):
+def channels_listall_v1(token: str) -> dict[str, list]:
     '''
     Provides a list of all channels including private channels, and their associated details
 
@@ -75,7 +75,7 @@ def channels_listall_v1(token):
     }
 
 
-def channels_create_v1(token, name, is_public):
+def channels_create_v1(token: str, name: str, is_public: bool) -> dict[str, int]:
     '''
     Creates a new channel with a given name that is public or private. The user that
     creates it automatically joins the channel as an owner member

@@ -8,6 +8,7 @@ Functions:
     channel_join_v1(auth_user_id: int, channel_id: int) -> dict
 '''
 
+from typing import Type, TypedDict
 from src.error import InputError, AccessError
 from src.other import decode_token
 from src.data_operations import (
@@ -26,8 +27,23 @@ from src.data_operations import (
 )
 from datetime import timezone, datetime
 
+# Type definitions
 
-def channel_invite_v1(token: str, channel_id: int, u_id: int):
+
+class channel_details(TypedDict):
+    name: str
+    owner_members: list
+    all_members: list
+    is_public: bool
+
+
+class channel_messages(TypedDict):
+    messages: list
+    start: int
+    end: int
+
+
+def channel_invite_v1(token: str, channel_id: int, u_id: int) -> dict:
     '''
     A user invites another user and gives access to a channel and adds them to the channel
 
@@ -83,7 +99,7 @@ def channel_invite_v1(token: str, channel_id: int, u_id: int):
     }
 
 
-def channel_details_v1(token, channel_id):
+def channel_details_v1(token: str, channel_id: int) -> channel_details:
     '''
     Generates all details of a selected channel such as channel name, the owners of the channel,
     all members of the channel, and whether the channel is public or private.
@@ -158,7 +174,7 @@ def channel_details_v1(token, channel_id):
     return return_dict
 
 
-def channel_messages_v1(token, channel_id, start):
+def channel_messages_v1(token: str, channel_id: int, start: int) -> channel_messages:
     '''
     Retrieves data of up to 50 sent messages for pagination
 
@@ -229,7 +245,7 @@ def channel_messages_v1(token, channel_id, start):
     }
 
 
-def channel_join_v1(token, channel_id):
+def channel_join_v1(token: str, channel_id: int) -> dict:
     '''
     Adds user to a channel
 
@@ -275,7 +291,7 @@ def channel_join_v1(token, channel_id):
     }
 
 
-def channel_leave_v1(token, channel_id):
+def channel_leave_v1(token: str, channel_id: int) -> dict:
     '''
     Removes a member from the channel
 
@@ -320,7 +336,7 @@ def channel_leave_v1(token, channel_id):
     return {}
 
 
-def channel_addowner_v1(token, channel_id, u_id):
+def channel_addowner_v1(token: str, channel_id: int, u_id: int) -> dict:
     '''
     Promotes a channel member to owner
 
@@ -373,7 +389,7 @@ def channel_addowner_v1(token, channel_id, u_id):
     return {}
 
 
-def channel_removeowner_v1(token, channel_id, u_id):
+def channel_removeowner_v1(token: str, channel_id: int, u_id: int) -> dict:
     '''
     Removes user as channel owner
 

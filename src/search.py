@@ -10,7 +10,7 @@ from src.data_operations import (
 )
 
 
-def search_v1(token, query_str):
+def search_v1(token: str, query_str: str) -> dict[str, list]:
     auth_user_id = decode_token(token)
 
     if not 0 < len(query_str) < 1000:
