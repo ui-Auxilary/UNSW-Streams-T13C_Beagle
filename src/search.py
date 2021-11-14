@@ -1,5 +1,6 @@
 from src.error import InputError
 from src.other import decode_token
+from typing import Dict
 
 from src.data_operations import (
     get_user_channels,
@@ -10,7 +11,7 @@ from src.data_operations import (
 )
 
 
-def search_v1(token, query_str):
+def search_v1(token: str, query_str: str) -> Dict[str, list]:
     auth_user_id = decode_token(token)
 
     if not 0 < len(query_str) < 1000:

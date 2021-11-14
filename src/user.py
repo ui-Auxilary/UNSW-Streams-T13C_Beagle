@@ -28,9 +28,10 @@ from src.data_operations import (
     get_user_stats
 )
 from src.other import decode_token
+from typing import Dict
 
 
-def user_profile(token, user_id):
+def user_profile(token: str, user_id: int) -> dict:
     '''
     Update a user's first and last name
 
@@ -71,7 +72,7 @@ def user_profile(token, user_id):
     }
 
 
-def user_profile_setname(token, first_name, last_name):
+def user_profile_setname(token: str, first_name: str, last_name: str) -> dict:
     '''
     Update a user's email address
 
@@ -105,7 +106,7 @@ def user_profile_setname(token, first_name, last_name):
     edit_user(user_id, 'last_name', last_name)
 
 
-def user_profile_setemail(token, email):
+def user_profile_setemail(token: str, email: str) -> dict:
     '''
     Update a user's handle
 
@@ -141,7 +142,7 @@ def user_profile_setemail(token, email):
     edit_user(user_id, 'email_address', email)
 
 
-def user_profile_sethandle(token, handle_str):
+def user_profile_sethandle(token: str, handle_str: str) -> None:
     # check if valid token and decode it
     user_id = decode_token(token)
 
@@ -161,14 +162,17 @@ def user_profile_sethandle(token, handle_str):
     edit_user(user_id, 'user_handle', handle_str)
 
 
-def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
+def user_profile_uploadphoto_v1(token: str, img_url: str, x_start: int, y_start: int, x_end: int, y_end: int) -> dict:
     # check if valid token and decode it
     user_id = decode_token(token)
 
     if not img_url:
         raise InputError(description='URL cannot be empty')
 
-    image_data = requests.get(img_url, stream=True)
+    try:
+        image_data = requests.get(img_url, stream=True)
+    except Exception as e:
+        raise InputError(description=e) from e
 
     if image_data.status_code != 200:
         raise InputError(description='Invalid url parsed')
@@ -200,7 +204,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     return {}
 
 
-def notifications_get_v1(token):
+def notifications_get_v1(token: str) -> Dict[str, list]:
     auth_user_id = decode_token(token)
 
     notifications_arr = []
@@ -227,7 +231,7 @@ def notifications_get_v1(token):
     }
 
 
-def user_stats_v1(token):
+def user_stats_v1(token: str) -> Dict[str, dict]:
     user_id = decode_token(token)
 
     update_user_stats(user_id, False, False, False)

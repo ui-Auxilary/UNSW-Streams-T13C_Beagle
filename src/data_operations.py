@@ -684,7 +684,7 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
         'message_id': message_id,
         'channel_created': channel_id,
         'is_channel': is_channel,
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }
 
@@ -836,6 +836,7 @@ def get_message_ids():
     data_source = data_store.get()
     return data_source['message_ids']
 
+
 def get_message_content(message_id):
     '''
     Gets a specific message from its id
@@ -848,6 +849,7 @@ def get_message_content(message_id):
     '''
     data_source = data_store.get()
     return data_source['message_data'][message_id]['content']
+
 
 def get_message_by_id(message_id):
     '''
@@ -1103,22 +1105,20 @@ def remove_owner_from_channel(user_id, channel_id):
     data_source['channel_data'][channel_id]['owner'].remove(user_id)
 
 
-def add_react(user_id, message_id, react_id):
-    '''
-    adds new react to the reacts list
+# def add_react(user_id, message_id, react_id):
+#     '''
+#     adds new react to the reacts list
 
-    Arguments:
-        user_id     (int): user_id of new owner member
-        message_id  (int): id of message being reacted
-        react_id    (int): id of the react
+#     Arguments:
+#         user_id     (int): user_id of new owner member
+#         message_id  (int): id of message being reacted
+#         react_id    (int): id of the react
 
-    Return Value:
-        None
-    '''
-    data_source = data_store.get()
-    react_data = {'react_id': react_id, 'u_ids': [
-        user_id], 'is_this_user_reacted': True}
-    data_source['message_data'][message_id]['reacts'].append(react_data)
+#     Return Value:
+#         None
+#     '''
+#     data_source = data_store.get()
+#     data_source['message_data'][message_id]['reacts']['is_this_user_reacted'] = True
 
 
 def react_message(user_id, message_id, react_id):
@@ -1140,6 +1140,7 @@ def react_message(user_id, message_id, react_id):
     in_user_id = data_source['message_data'][message_id]['reacts'][index]['u_ids']
 
     if user_id not in in_user_id:
+        data_source['message_data'][message_id]['reacts'][index]['is_this_user_reacted'] = True
         in_user_id.append(user_id)
     else:
         data_source['message_data'][message_id]['reacts'][index]['is_this_user_reacted'] = False
@@ -1314,6 +1315,7 @@ def pin_message(message_id):
     else:
         data_source['message_data'][message_id]['is_pinned'] = False
 
+
 def add_sendlater_id(message_id):
     '''
     Adds a message to the database from a user
@@ -1338,6 +1340,7 @@ def add_sendlater_id(message_id):
         'is_pinned': False
     }
 
+
 def add_dm_sendlater_id(message_id):
     data_source = data_store.get()
 
@@ -1352,6 +1355,7 @@ def add_dm_sendlater_id(message_id):
         'reacts': [],
         'is_pinned': False
     }
+
 
 def data_dump():
     while True:

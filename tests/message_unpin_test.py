@@ -1,4 +1,4 @@
-#message_unpin
+# message_unpin
 
 import pytest
 
@@ -6,7 +6,6 @@ import requests
 from src import config
 import json
 
-from src.server import dm_messages
 '''
 Parameters:{ token, message_id }
 Return Type:{}
@@ -20,9 +19,11 @@ AccessError when:
     - invalid_token
 '''
 
+
 @pytest.fixture
 def clear_data():
     requests.delete(config.url + 'clear/v1')
+
 
 @pytest.fixture
 def create_data():
@@ -95,16 +96,16 @@ def create_data():
 
     # stores a string
     dm_message = "That dough go uwu"
-    
+
     dm_messages = []
     # send random messages
     for message in range(0, 5):
         # user_2 sends a message
         message_send_data = requests.post(config.url + 'message/senddm/v1', json={
-        'token': token,
-        'dm_id': dm_id,
-        'message': dm_message[message]
-    })
+            'token': token,
+            'dm_id': dm_id,
+            'message': dm_message[message]
+        })
         message_id = json.loads(message_send_data.text)['message_id']
         dm_messages.append(message_id)
 
@@ -152,8 +153,9 @@ def create_data():
 
     return token, channel_messages, dm_messages, channel_id, dm_id, memberless_token, token2
 
+
 def test_simple_case_channel(clear_data, create_data):
-    token, channel_messages, _, channel_id, _, _ , _ = create_data
+    token, channel_messages, _, channel_id, _, _, _ = create_data
     requests.post(config.url + 'message/unpin/v1', json={
         'token': token,
         'message_id': channel_messages[1]
@@ -177,15 +179,19 @@ def test_simple_case_channel(clear_data, create_data):
     })
 
     length = len(channel_messages) - 1
-    channel_pin = json.loads(channel_message_data.text)['messages'][length - 1]['is_pinned']
+    channel_pin = json.loads(channel_message_data.text)[
+        'messages'][length - 1]['is_pinned']
     assert channel_pin == False
-    channel_pin = json.loads(channel_message_data.text)['messages'][length - 2]['is_pinned']
+    channel_pin = json.loads(channel_message_data.text)[
+        'messages'][length - 2]['is_pinned']
     assert channel_pin == False
-    channel_pin = json.loads(channel_message_data.text)['messages'][length - 5]['is_pinned']
+    channel_pin = json.loads(channel_message_data.text)[
+        'messages'][length - 5]['is_pinned']
     assert channel_pin == False
 
+
 def test_simple_case_dm(clear_data, create_data):
-    token, _, dm_messages, _, dm_id, _ , _ = create_data
+    token, _, dm_messages, _, dm_id, _, _ = create_data
     requests.post(config.url + 'message/unpin/v1', json={
         'token': token,
         'message_id': dm_messages[1]
@@ -209,12 +215,16 @@ def test_simple_case_dm(clear_data, create_data):
     })
 
     length = len(dm_messages)-1
-    dm_pin = json.loads(dm_message_data.text)['messages'][length - 1]['is_pinned']
+    dm_pin = json.loads(dm_message_data.text)[
+        'messages'][length - 1]['is_pinned']
     assert dm_pin == False
-    dm_pin = json.loads(dm_message_data.text)['messages'][length - 2]['is_pinned']
+    dm_pin = json.loads(dm_message_data.text)[
+        'messages'][length - 2]['is_pinned']
     assert dm_pin == False
-    dm_pin = json.loads(dm_message_data.text)['messages'][length - 4]['is_pinned']
+    dm_pin = json.loads(dm_message_data.text)[
+        'messages'][length - 4]['is_pinned']
     assert dm_pin == False
+
 
 def test_user_is_not_channel_member(clear_data, create_data):
     _, channel_messages, _, _, _, memberless_token, _ = create_data
@@ -224,6 +234,7 @@ def test_user_is_not_channel_member(clear_data, create_data):
     })
     assert unpin_data.status_code == 400
 
+
 def test_user_is_not_dm_member(clear_data, create_data):
     _, _, dm_messages, _, _, memberless_token, _ = create_data
     unpin_data = requests.post(config.url + 'message/unpin/v1', json={
@@ -231,6 +242,7 @@ def test_user_is_not_dm_member(clear_data, create_data):
         'message_id': dm_messages[1]
     })
     assert unpin_data.status_code == 400
+
 
 def test_invalid_message_id(clear_data, create_data):
     token, _, _, _, _, _, _ = create_data
@@ -240,6 +252,7 @@ def test_invalid_message_id(clear_data, create_data):
         'message_id': message_id
     })
     assert unpin_data.status_code == 400
+
 
 def test_double_unpin_channel(clear_data, create_data):
     token, channel_messages, _, _, _, _, _ = create_data
@@ -253,6 +266,7 @@ def test_double_unpin_channel(clear_data, create_data):
     })
     assert unpin_data.status_code == 400
 
+
 def test_double_unpin_dm(clear_data, create_data):
     token, _, dm_messages, _, _, _, _ = create_data
     requests.post(config.url + 'message/unpin/v1', json={
@@ -265,6 +279,7 @@ def test_double_unpin_dm(clear_data, create_data):
     })
     assert unpin_data.status_code == 400
 
+
 def test_user_is_not_owner_channel(clear_data, create_data):
     _, channel_messages, _, _, _, _, token2 = create_data
     unpin_data = requests.post(config.url + 'message/unpin/v1', json={
@@ -272,6 +287,7 @@ def test_user_is_not_owner_channel(clear_data, create_data):
         'message_id': channel_messages[1]
     })
     assert unpin_data.status_code == 403
+
 
 def test_user_is_not_owner_dm(clear_data, create_data):
     _, _, dm_messages, _, _, _, token2 = create_data
@@ -281,7 +297,8 @@ def test_user_is_not_owner_dm(clear_data, create_data):
     })
     assert unpin_data.status_code == 403
 
-def test_invalid_token_channel(clear_data,create_data):
+
+def test_invalid_token_channel(clear_data, create_data):
     _, channel_messages, _, _, _, _, _ = create_data
     unpin_data = requests.post(config.url + 'message/unpin/v1', json={
         'token': "random_string",
@@ -289,7 +306,8 @@ def test_invalid_token_channel(clear_data,create_data):
     })
     assert unpin_data.status_code == 403
 
-def test_invalid_token_dm(clear_data,create_data):
+
+def test_invalid_token_dm(clear_data, create_data):
     _, _, dm_messages, _, _, _, _ = create_data
     unpin_data = requests.post(config.url + 'message/unpin/v1', json={
         'token': "random_string",
@@ -297,21 +315,24 @@ def test_invalid_token_dm(clear_data,create_data):
     })
     assert unpin_data.status_code == 403
 
-def test_invalid_token_and_message_channel(clear_data,create_data):
+
+def test_invalid_token_and_message_channel(clear_data, create_data):
     unpin_data = requests.post(config.url + 'message/unpin/v1', json={
         'token': "random_string",
         'message_id': 4323
     })
     assert unpin_data.status_code == 403
 
-def test_invalid_token_and_message_dm(clear_data,create_data):
+
+def test_invalid_token_and_message_dm(clear_data, create_data):
     unpin_data = requests.post(config.url + 'message/unpin/v1', json={
         'token': "random_string",
         'message_id': "dasdas"
     })
     assert unpin_data.status_code == 403
 
-def test_invalid_token_and_unpinned_message_channel(clear_data,create_data):
+
+def test_invalid_token_and_unpinned_message_channel(clear_data, create_data):
     _, channel_messages, _, _, _, _, _ = create_data
     unpin_data = requests.post(config.url + 'message/unpin/v1', json={
         'token': "random_string",
@@ -319,7 +340,8 @@ def test_invalid_token_and_unpinned_message_channel(clear_data,create_data):
     })
     assert unpin_data.status_code == 403
 
-def test_invalid_token_and_unpinned_message_dm(clear_data,create_data):
+
+def test_invalid_token_and_unpinned_message_dm(clear_data, create_data):
     _, _, dm_messages, _, _, _, _ = create_data
     unpin_data = requests.post(config.url + 'message/unpin/v1', json={
         'token': "random_string",
