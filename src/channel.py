@@ -27,12 +27,12 @@ from src.data_operations import (
 from datetime import timezone, datetime
 
 
-def channel_invite_v1(token, channel_id, u_id):
+def channel_invite_v1(token: str, channel_id: int, u_id: int):
     '''
     A user invites another user and gives access to a channel and adds them to the channel
 
     Arguments:
-        auth_user_id (int): user id of the user that is inviting
+        token        (str): token of the user that is being invited
         channel_id   (int): id of the channel user has been invited to
         u_id         (int): user id of the user being invited
 

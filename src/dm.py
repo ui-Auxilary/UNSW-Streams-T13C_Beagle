@@ -379,7 +379,7 @@ def message_senddm_v1(token, dm_id, message):
     time_created = int(dt.timestamp())
 
     if "@" in message:
-        tagged_user = check_valid_tag(message)
+        tagged_user = check_valid_tag(False, message, dm_id)
         if tagged_user:
             auth_user_handle = get_user(auth_user_id)['user_handle']
             dm_name = get_dm(dm_id)['name']

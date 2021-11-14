@@ -168,7 +168,10 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     if not img_url:
         raise InputError(description='URL cannot be empty')
 
-    image_data = requests.get(img_url, stream=True)
+    try:
+        image_data = requests.get(img_url, stream=True)
+    except Exception as e:
+        raise InputError(description=e)
 
     if image_data.status_code != 200:
         raise InputError(description='Invalid url parsed')
