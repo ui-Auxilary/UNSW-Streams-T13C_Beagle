@@ -12,6 +12,19 @@ from src.data_operations import (
 
 
 def search_v1(token: str, query_str: str) -> Dict[str, list]:
+    '''
+    Given a query string, return a collection of messages in all of the channels/DMs \
+    that the user has joined that contain the query.
+    
+    InputError when:      
+        - length of query_str is less than 1 or over 1000 characters
+        
+    AccessError when:
+        - token is invalid
+        
+    Return Value:
+        {messages}
+    '''
     auth_user_id = decode_token(token)
 
     if not 0 < len(query_str) < 1000:

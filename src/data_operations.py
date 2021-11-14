@@ -51,9 +51,49 @@ import json
 import time
 import threading
 from datetime import timezone, datetime
+from typing_extensions import TypedDict
+from typing import Dict, Tuple
+
+class get_user(TypedDict):
+    first_name: str
+    last_name: str
+    email_address: str
+    password: str
+    user_handle: str
+    global_owner: bool
+
+class get_channel(TypedDict):
+    name: str
+    owner: int
+    is_public: bool
+    members: list
+    message_ids: list
+    
+class get_dm(TypedDict):
+    name: str
+    owner: int
+    members: list
+    message_ids: list
+
+class get_message_by_id(TypedDict):
+    author: int
+    content: str
+    time_created: int
+    
+class get_user_stats(TypedDict):
+    channels_joined: int
+    dms_joined: int
+    messages_sent: int
+    involvement_rate: float
+    
+class get_workspace_stats(TypedDict):
+    channels_exist: int
+    dms_exist: int
+    messages_exist: int
+    utilization_rate: float
 
 
-def reset_data_store_to_default():
+def reset_data_store_to_default() -> None:
     '''
     Clears the contents of data_store
 
@@ -86,7 +126,7 @@ def reset_data_store_to_default():
     data_store.set(store)
 
 
-def add_user(user_id, user_details, password, user_handle, is_owner):
+def add_user(user_id: int, user_details: tuple, password: str, user_handle: str, is_owner: bool) -> None:
     '''
     Adds user to the database
 
@@ -134,7 +174,7 @@ def add_user(user_id, user_details, password, user_handle, is_owner):
         data_source['global_owners'].append(user_id)
 
 
-def remove_user_details(user_id):
+def remove_user_details(user_id: int) -> None:
     '''
     Removes the specified user
 
@@ -162,7 +202,7 @@ def remove_user_details(user_id):
     data_source['user_ids'].remove(user_id)
 
 
-def get_user_channels(user_id):
+def get_user_channels(user_id: int) -> list:
     '''
     Gets the list of channels the user is currently in
 
@@ -178,7 +218,7 @@ def get_user_channels(user_id):
     return data_source['user_data'][user_id]['in_channels']
 
 
-def get_user_dms(user_id):
+def get_user_dms(user_id: int) -> list:
     '''
     Gets the list of channels the user is currently in
 
@@ -194,7 +234,7 @@ def get_user_dms(user_id):
     return data_source['user_data'][user_id]['in_dms']
 
 
-def get_user(user_id):
+def get_user(user_id: int) -> get_user:
     '''
     gets the user data from the database
 
@@ -214,7 +254,18 @@ def get_user(user_id):
     return data_source['user_data'][user_id]
 
 
-def edit_user(user_id, key, new_value):
+def edit_user(user_id: int, key: str, new_value: str) -> None:
+    '''
+    Edits the user's handle or email of the user
+
+    Arguments:
+        user_id          (int): id of user who's permissions will change
+        key              (str): the user's email or handle
+        new_value        (str): the user's new email or handle
+
+    Return Value:
+        None
+    '''
     # get the data store
     data_source = data_store.get()
 
@@ -232,7 +283,7 @@ def edit_user(user_id, key, new_value):
     data_source['user_data'][user_id][key] = new_value
 
 
-def edit_user_permissions(user_id, permission_id):
+def edit_user_permissions(user_id: int, permission_id: int) -> None:
     '''
     Edits the user permissions of the user_id
 
@@ -255,7 +306,7 @@ def edit_user_permissions(user_id, permission_id):
             data_source['global_owners'].remove(user_id)
 
 
-def get_user_handles():
+def get_user_handles() -> list:
     '''
     Gets the handles of all users from the database
 
@@ -270,7 +321,7 @@ def get_user_handles():
     return data_source['user_handles']
 
 
-def get_user_emails():
+def get_user_emails() -> list:
     '''
     gets the emails of all users from the database
 
@@ -285,7 +336,7 @@ def get_user_emails():
     return data_source['user_emails']
 
 
-def get_user_ids():
+def get_user_ids() -> list:
     '''
     Gets the id's of all users from the database
 
@@ -300,7 +351,7 @@ def get_user_ids():
     return data_source['user_ids']
 
 
-def get_complete_user_ids():
+def get_complete_user_ids() -> list:
     '''
     Gets the id's of all users from the database
 
@@ -315,14 +366,14 @@ def get_complete_user_ids():
     return data_source['user_data'].keys()
 
 
-def add_member_to_channel(channel_id, user_id, time_updated):
+def add_member_to_channel(channel_id: int, user_id: int, time_updated: int) -> None:
     '''
     Adds a user to a channel as a member
 
     Arguments:
         channel_id      (int): id of channel that user is being added to
         user_id         (int): id of user being added to channel
-        time_created    (int): time when user is added to channel
+        time_updated    (int): time when user is added to channel
 
     Return Value:
         None
@@ -342,13 +393,14 @@ def add_member_to_channel(channel_id, user_id, time_updated):
     update_user_stats(user_id, channel_data, False, False)
 
 
-def remove_member_from_channel(channel_id, user_id, time_updated):
+def remove_member_from_channel(channel_id: int, user_id: int, time_updated: int) -> None:
     '''
     Removes a user from a channel
 
     Arguments:
-        channel_id (int): id of channel that user is being removed from
-        user_id    (int): id of user being removed from channel
+        channel_id      (int): id of channel that user is being removed from
+        user_id         (int): id of user being removed from channel
+        time_updated    (int): time when member is removed from channel
 
     Return Value:
         None
@@ -369,7 +421,7 @@ def remove_member_from_channel(channel_id, user_id, time_updated):
     update_user_stats(user_id, channel_data, False, False)
 
 
-def add_channel(channel_id, channel_name, user_id, is_public, time_created):
+def add_channel(channel_id: int, channel_name: str, user_id: int, is_public: bool, time_created: int) -> None:
     '''
     adds channel data to the database
 
@@ -421,7 +473,7 @@ def add_channel(channel_id, channel_name, user_id, is_public, time_created):
     update_workspace_stats(channel_data_2, False, False)
 
 
-def get_channel(channel_id):
+def get_channel(channel_id: int) -> get_channel:
     '''
     Gets the channel data from the database from a specific channel_id
 
@@ -440,7 +492,7 @@ def get_channel(channel_id):
     return data_source['channel_data'][channel_id]
 
 
-def get_channel_messages(channel_id):
+def get_channel_messages(channel_id: int) -> list:
     '''
     Gets a list of all the channel messages from the channel
 
@@ -455,7 +507,7 @@ def get_channel_messages(channel_id):
     return data_source['channel_data'][channel_id]['message_ids']
 
 
-def get_dm_messages(dm_id):
+def get_dm_messages(dm_id: int) -> list:
     '''
     Gets a list of all the dm messages from the dm
 
@@ -470,7 +522,7 @@ def get_dm_messages(dm_id):
     return data_source['dm_data'][dm_id]['message_ids']
 
 
-def get_channel_ids():
+def get_channel_ids() -> list:
     '''
     Gets a list of all the channel ids from the database
 
@@ -485,13 +537,14 @@ def get_channel_ids():
     return data_source['channel_ids']
 
 
-def remove_member_from_dm(dm_id, user_id, time_updated):
+def remove_member_from_dm(dm_id: int, user_id: int, time_updated: int) -> None:
     '''
     Removes a user from a dm
 
     Arguments:
-        dm_id (int): id of dm that user is being removed from
-        user_id    (int): id of user being removed from dm
+        dm_id   (int): id of dm that user is being removed from
+        user_id     (int): id of user being removed from dm
+        time_updated    (int): time when member is removed from dm
 
     Return Value:
         None
@@ -512,7 +565,7 @@ def remove_member_from_dm(dm_id, user_id, time_updated):
     update_user_stats(user_id, False, dm_data, False)
 
 
-def add_user_to_dm(dm_id, user_id, time_updated):
+def add_user_to_dm(dm_id: int, user_id: int, time_updated: int) -> None:
     '''
     adds user to a dm
 
@@ -538,7 +591,7 @@ def add_user_to_dm(dm_id, user_id, time_updated):
     update_user_stats(user_id, False, dm_data, False)
 
 
-def add_dm(dm_id, dm_name, auth_user_id, time_created):
+def add_dm(dm_id: int, dm_name: str, auth_user_id: int, time_created: int) -> None:
     '''
     adds dm data to the database
 
@@ -586,7 +639,7 @@ def add_dm(dm_id, dm_name, auth_user_id, time_created):
     update_user_stats(auth_user_id, False, dm_data, False)
 
 
-def get_dm(dm_id):
+def get_dm(dm_id: int) -> get_dm:
     '''
     Gets the dm data from the database for a specific dm_id
 
@@ -603,7 +656,7 @@ def get_dm(dm_id):
     return data_source['dm_data'][dm_id]
 
 
-def get_dm_ids():
+def get_dm_ids() -> list:
     '''
     Gets a list of all the dm ids from the database
 
@@ -618,7 +671,7 @@ def get_dm_ids():
     return data_source['dm_ids']
 
 
-def remove_dm(dm_id, time_updated):
+def remove_dm(dm_id: int, time_updated: int) -> None:
     '''
     Removes a dm, from the database list of DMs
 
@@ -641,7 +694,7 @@ def remove_dm(dm_id, time_updated):
     update_workspace_stats(False, dm_data, False)
 
 
-def get_global_owners():
+def get_global_owners() -> list:
     '''
     Gets a list of all the global owners from the database
 
@@ -656,7 +709,7 @@ def get_global_owners():
     return data_source['global_owners']
 
 
-def add_message(is_channel, user_id, channel_id, message_id, content, time_created):
+def add_message(is_channel: bool, user_id: int, channel_id: int, message_id: int, content: str, time_created: int) -> None:
     '''
     Adds a message to the database from a user
 
@@ -717,12 +770,12 @@ def add_message(is_channel, user_id, channel_id, message_id, content, time_creat
     update_user_stats(user_id, False, False, message_data)
 
 
-def add_standup_message(channel_id, content):
+def add_standup_message(channel_id: int, content: str) -> None:
     '''
     Adds a message to the database from a user
 
     Arguments:
-        is_channel  (bool): bool of whether the message is from a channel
+        channel_id   (int): id of channel
         content      (str): contents of the message
 
     Return Value:
@@ -734,7 +787,7 @@ def add_standup_message(channel_id, content):
         content)
 
 
-def clear_message_pack(channel_id):
+def clear_message_pack(channel_id: int) -> None:
     '''
     Clears the message pack in a standup in a channel
 
@@ -756,7 +809,7 @@ def clear_active_threads():
             thread.cancel()
 
 
-def edit_message(is_channel, channel_id, message_id, message):
+def edit_message(is_channel: bool, channel_id: int, message_id: int, message: str) -> None:
     '''
     Edits a message in the datastore
 
@@ -784,13 +837,15 @@ def edit_message(is_channel, channel_id, message_id, message):
         data_source['message_data'][message_id]['content'] = message
 
 
-def remove_message(is_channel, channel_id, message_id, time_updated):
+def remove_message(is_channel: bool, channel_id: int, message_id: int, time_updated: int) -> None:
     '''
     Removes a message from the datastore and associated channels/dms
 
     Arguments:
         is_channel  (bool): bool of whether the message is from a channel
+        channel_id   (int): id of channel
         message_id   (int): id of message being added to the database
+        time_updated (int): time when the message is removed
 
     Return Value:
         None
@@ -822,7 +877,7 @@ def remove_message(is_channel, channel_id, message_id, time_updated):
     }
 
 
-def get_message_ids():
+def get_message_ids() -> list:
     '''
     Gets a list of all the message ids from the database
 
@@ -837,7 +892,7 @@ def get_message_ids():
     return data_source['message_ids']
 
 
-def get_message_content(message_id):
+def get_message_content(message_id: int) -> Dict[str, str]:
     '''
     Gets a specific message from its id
 
@@ -851,7 +906,7 @@ def get_message_content(message_id):
     return data_source['message_data'][message_id]['content']
 
 
-def get_message_by_id(message_id):
+def get_message_by_id(message_id: int) -> get_message_by_id:
     '''
     Gets a specific message from its id
 
@@ -868,7 +923,7 @@ def get_message_by_id(message_id):
     return data_source['message_data'][message_id]
 
 
-def get_messages_by_channel(channel_id):
+def get_messages_by_channel(channel_id: int) -> list:
     '''
     gets all the message ids from a specified channel id
 
@@ -883,7 +938,7 @@ def get_messages_by_channel(channel_id):
     return data_source['channel_data'][channel_id]['message_ids']
 
 
-def get_messages_by_dm(dm_id):
+def get_messages_by_dm(dm_id: int) -> list:
     '''
     gets all the message ids from a specified dm id
 
@@ -898,7 +953,7 @@ def get_messages_by_dm(dm_id):
     return data_source['dm_data'][dm_id]['message_ids']
 
 
-def add_notification(is_channel, channel_id, user_id, content):
+def add_notification(is_channel: bool, channel_id: int, user_id: int, content: str) -> None:
     '''
     adds a notifcation to the database
 
@@ -928,7 +983,7 @@ def add_notification(is_channel, channel_id, user_id, content):
         })
 
 
-def get_user_notifications(user_id):
+def get_user_notifications(user_id: int) -> list:
     '''
     Gets a list of a user's notifications
 
@@ -944,7 +999,7 @@ def get_user_notifications(user_id):
     return data_source['user_data'][user_id]['notifications']
 
 
-def set_active_standup(set_active, channel_id, time_finished):
+def set_active_standup(set_active: bool, channel_id: int, time_finished: int) -> None:
     '''
     Sets a channel's active_standup value to True
 
@@ -966,7 +1021,7 @@ def set_active_standup(set_active, channel_id, time_finished):
         data_source['channel_data'][channel_id]['standup_data']['is_active'] = False
 
 
-def add_user_profileimage(user_id, cropped_image):
+def add_user_profileimage(user_id: int, cropped_image) -> None:
     '''
     saves a copy of a cropped image to a user profilephotos folder and saves the url
 
@@ -991,7 +1046,7 @@ def add_user_profileimage(user_id, cropped_image):
         'static/imgurl/' + file_name
 
 
-def add_session_token(token, user_id):
+def add_session_token(token: str, user_id: int) -> None:
     '''
     adds a user token to the sessions storage
 
@@ -1007,7 +1062,7 @@ def add_session_token(token, user_id):
     data_source['token'][token] = user_id
 
 
-def remove_session_token(token):
+def remove_session_token(token: str) -> None:
     '''
     removes a user token to the sessions storage
 
@@ -1022,7 +1077,7 @@ def remove_session_token(token):
     del data_source['token'][token]
 
 
-def get_all_valid_tokens():
+def get_all_valid_tokens() -> set:
     '''
     retrieves a set of all currently valid tokens
 
@@ -1034,7 +1089,7 @@ def get_all_valid_tokens():
     return set(data_source['token'].keys())
 
 
-def add_passwordreset_key(user_id, reset_key):
+def add_passwordreset_key(user_id: int, reset_key: str) -> None:
     '''
     adds a unique password reset request key to
     the data store
@@ -1051,12 +1106,12 @@ def add_passwordreset_key(user_id, reset_key):
     data_source['password_reset_key'][reset_key] = user_id
 
 
-def get_passwordreset_key(reset_key):
+def get_passwordreset_key(reset_key: str) -> Tuple[bool, str]:
     '''
     gets reset code associated with a user
 
     Arguments:
-        user_id   (int): user_id for account requesting reset
+        reset_key (str): unique password reset request key
 
     Return Value:
         reset_tuple (tuple):
@@ -1071,7 +1126,7 @@ def get_passwordreset_key(reset_key):
         return (False, 0)
 
 
-def add_owner_to_channel(user_id, channel_id):
+def add_owner_to_channel(user_id: int, channel_id: int) -> None:
     '''
     adds given owner to channel
 
@@ -1088,7 +1143,7 @@ def add_owner_to_channel(user_id, channel_id):
     data_source['channel_data'][channel_id]['owner'].append(user_id)
 
 
-def remove_owner_from_channel(user_id, channel_id):
+def remove_owner_from_channel(user_id: int, channel_id: int) -> None:
     '''
     removes given owner from channel
 
@@ -1121,7 +1176,7 @@ def remove_owner_from_channel(user_id, channel_id):
 #     data_source['message_data'][message_id]['reacts']['is_this_user_reacted'] = True
 
 
-def react_message(user_id, message_id, react_id):
+def react_message(user_id: int, message_id: int, react_id: int) -> None:
     '''
     reacts to a message
 
@@ -1147,7 +1202,7 @@ def react_message(user_id, message_id, react_id):
         in_user_id.remove(user_id)
 
 
-def calculate_utilization_rate(users_in_channels_or_dms, total_users):
+def calculate_utilization_rate(users_in_channels_or_dms: int, total_users: int) -> float:
     '''
     calculates utilization rate
 
@@ -1163,7 +1218,7 @@ def calculate_utilization_rate(users_in_channels_or_dms, total_users):
     return rate
 
 
-def initialise_workspace_stats():
+def initialise_workspace_stats() -> None:
     '''
     adds workspace stats
 
@@ -1171,7 +1226,7 @@ def initialise_workspace_stats():
         None
 
     Return Value:
-        workspace_stats (dict): contains how many channels, dms and messages exist
+        None
     '''
     dt = datetime.now()
     time_intialised = int(dt.timestamp())
@@ -1192,15 +1247,15 @@ def initialise_workspace_stats():
     data_source['workspace_stats']['utilization_rate'] = 0.0
 
 
-def initialise_user_stats(user_id):
+def initialise_user_stats(user_id: int) -> None:
     '''
     initialises a user's stats
 
     Arguments:
-        None
+        user_id     (int): id of the user
 
     Return Value:
-        user_stats (dict): contains how many channels, dms and messages exist
+        None
     '''
     data_source = data_store.get()
 
@@ -1222,7 +1277,7 @@ def initialise_user_stats(user_id):
     data_source['user_stats'][user_id]['involvement_rate'] = 0.0
 
 
-def calculate_involvement_rate(numerator, denominator):
+def calculate_involvement_rate(numerator: int, denominator: int) -> float:
     '''
     calculates involvement rate
 
@@ -1231,7 +1286,7 @@ def calculate_involvement_rate(numerator, denominator):
         denominator     (int): sum(num_channels, num_dms, num_msgs)
 
     Return Value:
-        None
+        involvement_rate    (float): the rate of the user's involvement in the stream
     '''
 
     print(numerator, denominator)
@@ -1245,7 +1300,19 @@ def calculate_involvement_rate(numerator, denominator):
     return rate
 
 
-def update_user_stats(user_id, channel_data, dm_data, message_data):
+def update_user_stats(user_id: int, channel_data: dict, dm_data: dict, message_data: dict) -> None:
+    '''
+    updates a user's stats
+
+    Arguments:
+        user_id         (int): id of the user
+        channel_data    (dict): dictionary that contains channel data
+        dm_data         (dict): dictionary that contains dm data
+        message_data    (dict): dictionary that contains message data
+
+    Return Value:
+        None
+    '''
     data_source = data_store.get()
 
     if channel_data:
@@ -1273,7 +1340,18 @@ def update_user_stats(user_id, channel_data, dm_data, message_data):
     data_source['user_stats'][user_id]['involvement_rate'] = rate
 
 
-def update_workspace_stats(channel_data, dm_data, message_data):
+def update_workspace_stats(channel_data: dict, dm_data: dict, message_data: dict) -> None:
+    '''
+    updates the workspace stats
+
+    Arguments:        
+        channel_data    (dict): dictionary that contains channel data
+        dm_data         (dict): dictionary that contains dm data
+        message_data    (dict): dictionary that contains message data
+
+    Return Value:
+        None
+    '''
     data_source = data_store.get()
 
     if channel_data:
@@ -1295,19 +1373,45 @@ def update_workspace_stats(channel_data, dm_data, message_data):
     data_source['workspace_stats']['utilization_rate'] = rate
 
 
-def get_user_stats(user_id):
+def get_user_stats(user_id: int) -> get_user_stats:
+    '''
+    gets the stats of a user
+
+    Arguments:        
+        user_id         (int): id of the user
+
+    Return Value:
+        user_stats      (dict): contains the stats of a user
+    '''
     data_source = data_store.get()
 
     return data_source['user_stats'][user_id]
 
 
-def get_workspace_stats():
+def get_workspace_stats() -> get_workspace_stats:
+    '''
+    gets the stats of the workspace
+
+    Arguments:        
+        None
+
+    Return Value:
+        workspace_stats      (dict): contains the stats of the workspace
+    '''
     data_source = data_store.get()
 
     return data_source['workspace_stats']
 
 
-def pin_message(message_id):
+def pin_message(message_id: int) -> None:
+    '''
+    pins a message
+    Arguments:        
+        message_id  (int): id of the message
+
+    Return Value:
+        None
+    '''
     data_source = data_store.get()
     pinned = data_source['message_data'][message_id]['is_pinned']
     if pinned == False:
@@ -1316,7 +1420,7 @@ def pin_message(message_id):
         data_source['message_data'][message_id]['is_pinned'] = False
 
 
-def add_sendlater_id(message_id):
+def add_sendlater_id(message_id: int) -> None:
     '''
     Adds a message to the database from a user
 
@@ -1341,7 +1445,16 @@ def add_sendlater_id(message_id):
     }
 
 
-def add_dm_sendlater_id(message_id):
+def add_dm_sendlater_id(message_id: int) -> None:
+    '''
+    Adds a message to the database from a user
+
+    Arguments:
+        message_id   (int): id of message being added to the database
+
+    Return Value:
+        None
+    '''
     data_source = data_store.get()
 
     data_source['dm_ids'].append(message_id)
@@ -1357,7 +1470,7 @@ def add_dm_sendlater_id(message_id):
     }
 
 
-def data_dump():
+def data_dump() -> None:
     while True:
         data_source = data_store.get()
         with open('data_store.json', 'w') as data_file:
@@ -1366,7 +1479,7 @@ def data_dump():
         time.sleep(1)
 
 
-def data_restore():
+def data_restore() -> None:
     data_source = data_store.get()
 
     try:

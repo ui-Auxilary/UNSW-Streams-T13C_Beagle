@@ -31,6 +31,26 @@ def send_message_package(channel_id: int, auth_user_id: int, time_finish: int) -
 
 
 def standup_start_v1(token: str, channel_id: int, length: int) -> Dict[str, int]:
+    '''
+    starts a standup
+
+    Arguments:
+        token            (str): the token for the session
+        channel_id       (int): id of channel that message was created
+        length           (int): the number of seconds the standup lasts for
+        
+    InputError when any of:      
+        - channel_id does not refer to a valid channel
+        - length is a negative integer
+        - an active standup is currently running in the channel
+        
+    AccessError when:      
+        - channel_id is valid and the authorised user is not a member of the channel
+        - invalid token
+
+    Return Value:
+        {time_finish}
+    '''
     # check for valid token
     auth_user_id = decode_token(token)
 
@@ -72,6 +92,27 @@ def standup_start_v1(token: str, channel_id: int, length: int) -> Dict[str, int]
 
 
 def standup_active_v1(token: str, channel_id: int) -> standup_start:
+    '''
+    starts a standup
+
+    Arguments:
+        token            (str): the token for the session
+        channel_id       (int): id of channel that message was created        
+        
+    InputError when any of:      
+        - channel_id does not refer to a valid channel
+        - length is a negative integer
+        - an active standup is currently running in the channel
+        
+    AccessError when:      
+        - channel_id is valid and the authorised user is not a member of the channel
+        - invalid token
+
+    Return Value:
+        {   is_active   (bool): whether or not a standup is active
+            time_finish (int): time when standup finishes. If inactive then returns None
+            }
+    '''
     # check for valid token
     auth_user_id = decode_token(token)
 
@@ -94,6 +135,26 @@ def standup_active_v1(token: str, channel_id: int) -> standup_start:
 
 
 def standup_send_v1(token: str, channel_id: int, message: str) -> dict:
+    '''
+    Sends a message to an active standup
+
+    Arguments:
+        token            (str): the token for the session
+        channel_id       (int): id of channel that message was created
+        message          (str): the content to be sent to the standup
+        
+    InputError when any of:      
+        - channel_id does not refer to a valid channel
+        - length is a negative integer
+        - an active standup is not currently running in the channel
+        
+    AccessError when:      
+        - channel_id is valid and the authorised user is not a member of the channel
+        - invalid token
+
+    Return Value:
+        {}
+    '''
     # check for valid token
     auth_user_id = decode_token(token)
 

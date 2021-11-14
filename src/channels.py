@@ -14,7 +14,7 @@ from datetime import timezone, datetime
 from typing import Dict
 
 
-def channels_list_v1(token):
+def channels_list_v1(token: str) -> Dict[str, list]:
     '''
     Returns a list of all the channels with their channel id's and channel name that the user
     is a member of
