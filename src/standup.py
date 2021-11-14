@@ -29,7 +29,7 @@ def send_message_package(channel_id: int, auth_user_id: int, time_finish: int) -
     clear_message_pack(channel_id)
 
 
-def standup_start_v1(token: str, channel_id: int, length: int) -> int:
+def standup_start_v1(token: str, channel_id: int, length: int) -> dict[str, int]:
     # check for valid token
     auth_user_id = decode_token(token)
 
