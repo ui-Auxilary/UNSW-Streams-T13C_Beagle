@@ -108,24 +108,21 @@ def user_profile_setname(token: str, first_name: str, last_name: str) -> dict:
 
 def user_profile_setemail(token: str, email: str) -> dict:
     '''
-    Update a user's handle
+    Update a user's email
 
     Arguments:
         token        (str): an encoded token containing a users id
-        user_handle  (str): unique alphanumeric handle for user
+        email        (str): email address of user
 
     Exceptions:
         InputError: Occurs when:
-                        - length of user_handle is under 3 characters
-                        - length of user_handle is over 20 characters
-                        - user_handle contains non-alphanumeric characters
-                        - user_handle already in use
+                        - email is invalid
+                        - email is already taken
         AccessError: Occurs when:
                         - invalid auth_id
 
     Return Value:
         {}
-
     '''
     # check if valid token and decode it
     user_id = decode_token(token)
@@ -143,6 +140,25 @@ def user_profile_setemail(token: str, email: str) -> dict:
 
 
 def user_profile_sethandle(token: str, handle_str: str) -> None:
+    '''
+    Update a user's handle
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        user_handle  (str): unique alphanumeric handle for user
+
+    Exceptions:
+        InputError: Occurs when:
+                        - length of user_handle is under 3 characters
+                        - length of user_handle is over 20 characters
+                        - user_handle contains non-alphanumeric characters
+                        - user_handle already in use
+        AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {}
+    '''
     # check if valid token and decode it
     user_id = decode_token(token)
 
@@ -163,6 +179,30 @@ def user_profile_sethandle(token: str, handle_str: str) -> None:
 
 
 def user_profile_uploadphoto_v1(token: str, img_url: str, x_start: int, y_start: int, x_end: int, y_end: int) -> dict:
+    '''
+    Uploads a user's profile photo
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+        img_url      (str): unique alphanumeric handle for user
+        x_start      (int): start of the image
+        y_start      (int): start of the image
+        x_end        (int): end of the image
+        y_end        (int): end of the image
+
+    Exceptions:
+        InputError when any of:      
+                        - img_url returns an HTTP status other than 200
+                        - any of x_start, y_start, x_end, y_end are not within the dimensions of the image at the URL
+                        - x_end is less than x_start or y_end is less than y_start
+                        - image uploaded is not a JPG
+        AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {}
+
+    '''
     # check if valid token and decode it
     user_id = decode_token(token)
 
@@ -205,6 +245,19 @@ def user_profile_uploadphoto_v1(token: str, img_url: str, x_start: int, y_start:
 
 
 def notifications_get_v1(token: str) -> Dict[str, list]:
+    '''
+    Gets the user's most recent 20 notifications, ordered from most recent to least recent.
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+
+    Exceptions:
+        AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {notifications     (list): contains the stats of a user }
+    '''
     auth_user_id = decode_token(token)
 
     notifications_arr = []
@@ -232,6 +285,25 @@ def notifications_get_v1(token: str) -> Dict[str, list]:
 
 
 def user_stats_v1(token: str) -> Dict[str, dict]:
+    '''
+    Gets the user's stats
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+
+    Exceptions:
+        AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {user_stats      (dict): contains the stats of a user
+            {channels_joined     (int): number of channels user has joined
+            dms_joined          (int): number of dms user has joined
+            messages_sent       (int): number of messages user has sent
+            involvement_rate    (float): the rate the user is involved in the platform
+            }
+        }
+    '''
     user_id = decode_token(token)
 
     update_user_stats(user_id, False, False, False)

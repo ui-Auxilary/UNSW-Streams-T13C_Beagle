@@ -72,6 +72,25 @@ def users_all(token: str) -> users_all_dict:
 
 
 def users_stats_v1(token: str) -> Dict[str, dict]:
+    '''
+    Gets the workplace stats
+
+    Arguments:
+        token        (str): an encoded token containing a users id
+
+    Exceptions:
+        AccessError: Occurs when:
+                        - invalid auth_id
+
+    Return Value:
+        {workspace_stats        (dict): contains the stats of the workspace
+            {channels_exist     (int): number of channels user has joined
+            dms_exist           (int): number of dms user has joined
+            messages_exist      (int): number of messages user has sent
+            utilization_rate    (float): the rate the user is involved in the platform
+            }
+        }
+    '''
     decode_token(token)
 
     update_workspace_stats(False, False, False)

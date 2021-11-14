@@ -208,6 +208,19 @@ def auth_logout_v1(token: str) -> dict:
 
 
 def auth_passwordreset_request(email: str) -> dict:
+    '''
+    Given an email address, if the user is a registered user, sends them an email containing \
+    a specific secret code, that when entered in auth/passwordreset/reset, shows that the user \
+    trying to reset the password is the one who got sent this email. No error should be raised \
+    when passed an invalid email, as that would pose a security/privacy concern. \
+    When a user requests a password reset, they should be logged out of all current sessions.
+
+    Arguments:
+        email       (str): email of the user
+
+    Return Value:
+        {}
+    '''
     # do not raise any errors if invalid error (for privacy reasons)
     if email not in get_user_emails():
         return {}
@@ -245,6 +258,20 @@ def auth_passwordreset_request(email: str) -> dict:
 
 
 def auth_passwordreset_reset(reset_code: int, new_password: str) -> dict:
+    '''
+    Given an email address, if the user is a registered user, sends them an email containing \
+    a specific secret code, that when entered in auth/passwordreset/reset, shows that the user \
+    trying to reset the password is the one who got sent this email. No error should be raised \
+    when passed an invalid email, as that would pose a security/privacy concern. \
+    When a user requests a password reset, they should be logged out of all current sessions.
+
+    Arguments:
+        reset_code      (int): the code that is sent to the email to be able to reset password
+        new_password    (str): the new password of the user's account
+
+    Return Value:
+        {}
+    '''
     reset_key_exists, user_id = get_passwordreset_key(str(reset_code))
 
     if not reset_key_exists:

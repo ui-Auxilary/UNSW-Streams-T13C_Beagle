@@ -560,6 +560,28 @@ def message_share_v1(token: str, og_message_id: int, message: str, channel_id: i
 
 
 def message_sendlater_v1(token: str, channel_id: int, message: str, time_sent: int) -> Dict[str, int]:
+    '''
+    Send a message from the authorised user to the channel specified by channel_id automatically at a specified time in the future.
+
+    Arguments:
+        token           (str): an encoded token containing a users id
+        message         (str): optional message the user can add to the shared message
+        channel_id      (int): id of the channel the message is being shared to
+        time_sent       (int): time when message is to be sent
+
+    InputError when any of:      
+        - channel_id does not refer to a valid channel
+        - length of message is over 1000 characters
+        - time_sent is a time in the past
+      
+      AccessError when:
+      
+        - channel_id is valid and the authorised user is not a member of the channel they are trying to post to   
+        - token is invalid
+
+    Return Value:
+        {message_id}
+    '''
     auth_user_id = decode_token(token)
 
     if channel_id not in get_channel_ids():
@@ -595,6 +617,28 @@ def message_sendlater_v1(token: str, channel_id: int, message: str, time_sent: i
 
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
+    '''
+    Send a message from the authorised user to the channel specified by channel_id automatically at a specified time in the future.
+
+    Arguments:
+        token           (str): an encoded token containing a users id
+        message         (str): optional message the user can add to the shared message
+        dm_id           (int): id of the dm the message is being shared to
+        time_sent       (int): time when message is to be sent
+
+    InputError when any of:      
+        - dm_id does not refer to a valid DM
+        - length of message is over 1000 characters
+        - time_sent is a time in the past
+      
+      AccessError when:
+      
+        - dm_id is valid and the authorised user is not a member of the DM they are trying to post to
+        - token is invalid
+
+    Return Value:
+        {message_id}
+    '''
     auth_user_id = decode_token(token)
 
     if dm_id not in get_dm_ids():
