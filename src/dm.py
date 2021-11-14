@@ -1,7 +1,7 @@
 from src.error import InputError, AccessError
 from src.other import decode_token, check_valid_tag
 from datetime import timezone, datetime
-from typing import Dict
+from typing import Dict, List
 from typing_extensions import TypedDict
 
 from src.data_operations import (
@@ -32,7 +32,7 @@ class dm_messages(TypedDict):
     end: int
 
 
-def dm_create_v1(token: str, u_ids: list[int]) -> Dict[str, int]:
+def dm_create_v1(token: str, u_ids: List[int]) -> Dict[str, int]:
     '''
     Creates a new dm
 

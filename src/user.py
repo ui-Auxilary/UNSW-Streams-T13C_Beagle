@@ -172,7 +172,7 @@ def user_profile_uploadphoto_v1(token: str, img_url: str, x_start: int, y_start:
     try:
         image_data = requests.get(img_url, stream=True)
     except Exception as e:
-        raise InputError(description=e)
+        raise InputError(description=e) from e
 
     if image_data.status_code != 200:
         raise InputError(description='Invalid url parsed')

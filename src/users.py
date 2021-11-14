@@ -5,7 +5,7 @@ Functions:
     users_all(token: str) -> dict
 '''
 
-from typing import Dict
+from typing import Dict, List
 from typing_extensions import TypedDict
 from src.error import InputError
 from src.data_operations import (
@@ -25,11 +25,11 @@ from src.data_operations import (
 from src.other import decode_token
 
 
-class users_all(TypedDict):
-    user: list[dict]
+class users_all_dict(TypedDict):
+    user: List[dict]
 
 
-def users_all(token: str) -> users_all:
+def users_all(token: str) -> users_all_dict:
     '''
     Returns a list of all users, including user ids, emails, first name, 
     last name and user handle.
