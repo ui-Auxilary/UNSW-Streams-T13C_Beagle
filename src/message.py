@@ -2,9 +2,8 @@ import threading
 from src.error import InputError, AccessError
 from src.other import decode_token, check_valid_tag
 from datetime import timezone, datetime
-
+from typing import Optional, Dict
 from src.data_operations import (
-    add_react,
     get_channel_ids,
     get_channel,
     get_channel_messages,
@@ -31,7 +30,7 @@ from src.data_operations import (
 )
 
 
-def message_send_v1(token, channel_id, message, message_sendlater=0):
+def message_send_v1(token: str, channel_id: int, message: str, message_sendlater: Optional[int] = 0) -> Dict[str, int]:
     '''
     Sends a message into the channel
 
@@ -75,7 +74,7 @@ def message_send_v1(token, channel_id, message, message_sendlater=0):
     time_created = int(dt.timestamp())
 
     if "@" in message:
-        tagged_user = check_valid_tag(message)
+        tagged_user = check_valid_tag(True, message, channel_id)
         if tagged_user:
             auth_user_handle = get_user(auth_user_id)['user_handle']
             channel_name = get_channel(channel_id)['name']
@@ -90,7 +89,7 @@ def message_send_v1(token, channel_id, message, message_sendlater=0):
     }
 
 
-def message_edit_v1(token, message_id, message):
+def message_edit_v1(token: str, message_id: int, message: str) -> dict:
     '''
     Edits a pre-existing message
 
@@ -149,7 +148,7 @@ def message_edit_v1(token, message_id, message):
         channel_name = get_dm(channel_id)['name']
 
     if "@" in message:
-        tagged_user = check_valid_tag(message)
+        tagged_user = check_valid_tag(is_channel, message, channel_id)
         if tagged_user:
             auth_user_handle = get_user(auth_user_id)['user_handle']
 
@@ -161,7 +160,7 @@ def message_edit_v1(token, message_id, message):
     return {}
 
 
-def message_remove_v1(token, message_id):
+def message_remove_v1(token: str, message_id: int) -> dict:
     '''
     Removes message from the channel/DM it was sent from
 
@@ -215,7 +214,7 @@ def message_remove_v1(token, message_id):
     return {}
 
 
-def message_react_v1(token, message_id, react_id):
+def message_react_v1(token: str, message_id: int, react_id: int) -> dict:
     '''
     Reacts to a message in a channel/DM
 
@@ -259,16 +258,12 @@ def message_react_v1(token, message_id, react_id):
     if react_id not in valid_react_ids:
         raise InputError(description="Invalid react id")
 
-    # checks if react_id exists in the message
-    if len(get_message_by_id(message_id)['reacts']) < 1:
-        add_react(auth_user_id, message_id, react_id)
-    else:
-        # checks if message has already been reacted from auth_user
-        if auth_user_id in get_message_by_id(message_id)['reacts'][0]['u_ids']:
-            raise InputError(
-                description="User has already reacted with this react_id")
+    # checks if message has already been reacted from auth_user
+    if auth_user_id in get_message_by_id(message_id)['reacts'][0]['u_ids']:
+        raise InputError(
+            description="User has already reacted with this react_id")
 
-        react_message(auth_user_id, message_id, react_id)
+    react_message(auth_user_id, message_id, react_id)
 
     # send notification
     is_channel = get_message_by_id(message_id)['is_channel']
@@ -287,7 +282,7 @@ def message_react_v1(token, message_id, react_id):
     return {}
 
 
-def message_unreact_v1(token, message_id, react_id):
+def message_unreact_v1(token: str, message_id: int, react_id: int) -> dict:
     '''
     Unreacts message in the channel/DM it was sent from
 
@@ -344,7 +339,7 @@ def message_unreact_v1(token, message_id, react_id):
     react_message(auth_user_id, message_id, react_id)
 
 
-def message_pin_v1(token, message_id):
+def message_pin_v1(token: str, message_id: int) -> dict:
     '''
     Pins message in the channel/DM it was sent from
 
@@ -405,7 +400,7 @@ def message_pin_v1(token, message_id):
     return {}
 
 
-def message_unpin_v1(token, message_id):
+def message_unpin_v1(token: str, message_id: int) -> dict:
     '''
     Unpins message in the channel/DM it was sent from
 
@@ -466,7 +461,7 @@ def message_unpin_v1(token, message_id):
     return {}
 
 
-def message_share_v1(token, og_message_id, message, channel_id, dm_id):
+def message_share_v1(token: str, og_message_id: int, message: str, channel_id: int, dm_id: int) -> Dict[str, int]:
     '''
     Shares a message from a channel or dm to another channel or dm
 
@@ -503,10 +498,12 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
             description="User can only share to a channel or a dm")
 
     is_channel = False
+    channel_name = ''
 
     if dm_id == -1:
         channel_members = get_channel(channel_id)['members']
         is_channel = True
+        channel_name = get_channel(channel_id)['name']
         send_to = channel_id
 
         if user_id not in channel_members:
@@ -515,6 +512,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
     if channel_id == -1:
         dm_members = get_dm(dm_id)['members']
+        channel_name = get_dm(dm_id)['name']
         send_to = dm_id
 
         if user_id not in dm_members:
@@ -545,6 +543,14 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     content = old_message + message
     dt = datetime.now()
     time_created = int(dt.timestamp())
+
+    if "@" in message:
+        tagged_user = check_valid_tag(is_channel, message, send_to)
+        if tagged_user:
+            auth_user_handle = get_user(user_id)['user_handle']
+            add_notification(is_channel, send_to, tagged_user,
+                             f"{auth_user_handle} tagged you in {channel_name}: {message[:20]}")
+
     add_message(is_channel, user_id, send_to,
                 shared_message_id, content, time_created)
 
@@ -553,7 +559,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     }
 
 
-def message_sendlater_v1(token, channel_id, message, time_sent):
+def message_sendlater_v1(token: str, channel_id: int, message: str, time_sent: int) -> Dict[str, int]:
     auth_user_id = decode_token(token)
 
     if channel_id not in get_channel_ids():

@@ -1,6 +1,8 @@
 from src.error import InputError, AccessError
 from src.other import decode_token, check_valid_tag
 from datetime import timezone, datetime
+from typing import Dict, List
+from typing_extensions import TypedDict
 
 from src.data_operations import (
     add_dm,
@@ -19,7 +21,18 @@ from src.data_operations import (
 )
 
 
-def dm_create_v1(token, u_ids):
+class dm_details(TypedDict):
+    name: str
+    members: list
+
+
+class dm_messages(TypedDict):
+    messages: list
+    start: int
+    end: int
+
+
+def dm_create_v1(token: str, u_ids: List[int]) -> Dict[str, int]:
     '''
     Creates a new dm
 
@@ -80,7 +93,7 @@ def dm_create_v1(token, u_ids):
     }
 
 
-def dm_list_v1(token):
+def dm_list_v1(token: str) -> Dict[str, list]:
     '''
     Returns the list of DMs that the user is part of.
 
@@ -112,7 +125,7 @@ def dm_list_v1(token):
     }
 
 
-def dm_remove_v1(token, dm_id):
+def dm_remove_v1(token: str, dm_id: int) -> dict:
     '''
     Removes an existing dm and its members
 
@@ -159,7 +172,7 @@ def dm_remove_v1(token, dm_id):
     return {}
 
 
-def dm_details_v1(token, dm_id):
+def dm_details_v1(token: str, dm_id: int) -> dm_details:
     '''
     Returns the details dm such as the creator's name, each of the member's user ids, emails,
     first name, last name and user handle.
@@ -219,7 +232,7 @@ def dm_details_v1(token, dm_id):
     }
 
 
-def dm_leave_v1(token, dm_id):
+def dm_leave_v1(token: str, dm_id: int) -> dict:
     '''
     Removes a user from a dm
 
@@ -264,7 +277,7 @@ def dm_leave_v1(token, dm_id):
     return {}
 
 
-def dm_messages_v1(token, dm_id, start):
+def dm_messages_v1(token: str, dm_id: int, start: int) -> dm_messages:
     '''
     Retrieves data of up to 50 sent messages for pagination
 
@@ -335,7 +348,7 @@ def dm_messages_v1(token, dm_id, start):
     }
 
 
-def message_senddm_v1(token, dm_id, message):
+def message_senddm_v1(token: str, dm_id: int, message: str) -> Dict[str, int]:
     '''
     Sends a message into a dm
 
@@ -379,7 +392,7 @@ def message_senddm_v1(token, dm_id, message):
     time_created = int(dt.timestamp())
 
     if "@" in message:
-        tagged_user = check_valid_tag(message)
+        tagged_user = check_valid_tag(False, message, dm_id)
         if tagged_user:
             auth_user_handle = get_user(auth_user_id)['user_handle']
             dm_name = get_dm(dm_id)['name']

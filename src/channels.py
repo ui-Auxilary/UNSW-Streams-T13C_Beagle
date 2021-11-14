@@ -11,6 +11,7 @@ from src.data_operations import get_channel_ids, get_channel, add_channel
 from src.other import decode_token
 from src.error import InputError
 from datetime import timezone, datetime
+from typing import Dict
 
 
 def channels_list_v1(token):
@@ -45,7 +46,7 @@ def channels_list_v1(token):
     }
 
 
-def channels_listall_v1(token):
+def channels_listall_v1(token: str) -> Dict[str, list]:
     '''
     Provides a list of all channels including private channels, and their associated details
 
@@ -75,7 +76,7 @@ def channels_listall_v1(token):
     }
 
 
-def channels_create_v1(token, name, is_public):
+def channels_create_v1(token: str, name: str, is_public: bool) -> Dict[str, int]:
     '''
     Creates a new channel with a given name that is public or private. The user that
     creates it automatically joins the channel as an owner member

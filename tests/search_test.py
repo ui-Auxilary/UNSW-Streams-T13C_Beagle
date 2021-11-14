@@ -138,7 +138,7 @@ def test_single_message(clear_data, create_users, create_channels):
     assert get_search[0]['message_id'] == message_id
     assert get_search[0]['u_id'] == user
     assert get_search[0]['message'] == message
-    assert get_search[0]['reacts'] == []
+    assert get_search[0]['reacts'] == [{'is_this_user_reacted': False, 'react_id': 1, 'u_ids': []}]
     assert get_search[0]['is_pinned'] == False
 
 
@@ -182,7 +182,7 @@ def test_single_message_substring(clear_data, create_users, create_channels):
     assert get_search[0]['message_id'] == message_id
     assert get_search[0]['u_id'] == user
     assert get_search[0]['message'] == message
-    assert get_search[0]['reacts'] == []
+    assert get_search[0]['reacts'] == [{'is_this_user_reacted': False, 'react_id': 1, 'u_ids': []}]
     assert get_search[0]['is_pinned'] == False
 
 
@@ -222,13 +222,13 @@ def test_channel_and_dm_query(clear_data, create_users, create_channels, create_
     assert get_search[0]['message_id'] == message_id
     assert get_search[0]['u_id'] == user
     assert get_search[0]['message'] == message
-    assert get_search[0]['reacts'] == []
+    assert get_search[0]['reacts'] == [{'is_this_user_reacted': False, 'react_id': 1, 'u_ids': []}]
     assert get_search[0]['is_pinned'] == False
 
     assert get_search[1]['message_id'] == dm_message_id
     assert get_search[1]['u_id'] == user
     assert get_search[1]['message'] == message
-    assert get_search[1]['reacts'] == []
+    assert get_search[1]['reacts'] == [{'is_this_user_reacted': False, 'react_id': 1, 'u_ids': []}]
     assert get_search[1]['is_pinned'] == False
 
 
@@ -279,13 +279,13 @@ def test_multiple_channels_and_dms(clear_data, create_users, create_channels, cr
     assert get_search[0]['message_id'] == message_id_1
     assert get_search[0]['u_id'] == user_1
     assert get_search[0]['message'] == message_1
-    assert get_search[0]['reacts'] == []
+    assert get_search[0]['reacts'] == [{'is_this_user_reacted': False, 'react_id': 1, 'u_ids': []}]
     assert get_search[0]['is_pinned'] == False
 
     assert get_search[1]['message_id'] == dm_message_id_1
     assert get_search[1]['u_id'] == user_2
     assert get_search[1]['message'] == message_2
-    assert get_search[1]['reacts'] == []
+    assert get_search[1]['reacts'] == [{'is_this_user_reacted': False, 'react_id': 1, 'u_ids': []}]
     assert get_search[1]['is_pinned'] == False
 
 

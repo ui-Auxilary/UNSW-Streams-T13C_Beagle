@@ -23,7 +23,7 @@ from src.other import decode_token
 from datetime import timezone, datetime
 
 
-def admin_user_remove_v1(token, u_id):
+def admin_user_remove_v1(token: str, u_id: int) -> dict:
     '''
     Removes a user from Streams, including all channels and dms. Their messages
     are replaced with 'Removed user'
@@ -99,7 +99,7 @@ def admin_user_remove_v1(token, u_id):
     return {}
 
 
-def admin_userpermission_change_v1(token, u_id, permission_id):
+def admin_userpermission_change_v1(token: str, u_id: int, permission_id: int) -> dict:
     '''
     Removes a user from Streams, including all channels and dms. Their messages
     are replaced with 'Removed user'

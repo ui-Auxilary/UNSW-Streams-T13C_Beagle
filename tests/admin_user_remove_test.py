@@ -110,6 +110,12 @@ def create_dms(create_users):
         'message': 'wee woo haha'
     })
 
+    requests.post(config.url + 'message/senddm/v1', json={
+        'token': token_2,
+        'dm_id': dm_id,
+        'message': 'wee woo haha'
+    })
+
     message_id = json.loads(create_message.text)['message_id']
 
     return dm_id, message_id
@@ -204,7 +210,7 @@ def test_removed_user_in_private_channel(clear_data, create_users, create_privat
         'u_id': user_id_1,
         'message': 'first message',
         'time_created': time_created,
-        'reacts': [],
+        'reacts': [{'is_this_user_reacted': False, 'react_id': 1, 'u_ids': []}],
         'is_pinned': False
     }
 
@@ -213,7 +219,7 @@ def test_removed_user_in_private_channel(clear_data, create_users, create_privat
         'u_id': user_id_2,
         'message': 'Removed user',
         'time_created': time_created_2,
-        'reacts': [],
+        'reacts': [{'is_this_user_reacted': False, 'react_id': 1, 'u_ids': []}],
         'is_pinned': False
     }
 
@@ -303,7 +309,7 @@ def test_member_of_dm(clear_data, create_users, create_dms):
         'u_id': user_id_2,
         'message': 'Removed user',
         'time_created': time_created,
-        'reacts': [],
+        'reacts': [{'is_this_user_reacted': False, 'react_id': 1, 'u_ids': []}],
         'is_pinned': False
     }
 
@@ -312,7 +318,7 @@ def test_member_of_dm(clear_data, create_users, create_dms):
         'u_id': user_id_2,
         'message': 'Removed user',
         'time_created': time_created_2,
-        'reacts': [],
+        'reacts': [{'is_this_user_reacted': False, 'react_id': 1, 'u_ids': []}],
         'is_pinned': False
     }
 
@@ -375,7 +381,7 @@ def test_member_of_channel(clear_data, create_users, create_channel):
         'u_id': user_id_1,
         'message': 'first message',
         'time_created': time_created,
-        'reacts': [],
+        'reacts': [{'is_this_user_reacted': False, 'react_id': 1, 'u_ids': []}],
         'is_pinned': False
     }
 
@@ -384,7 +390,7 @@ def test_member_of_channel(clear_data, create_users, create_channel):
         'u_id': user_id_2,
         'message': 'Removed user',
         'time_created': time_created_2,
-        'reacts': [],
+        'reacts': [{'is_this_user_reacted': False, 'react_id': 1, 'u_ids': []}],
         'is_pinned': False
     }
 
