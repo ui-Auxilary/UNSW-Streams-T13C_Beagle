@@ -540,7 +540,7 @@ def message_share_v1(token: str, og_message_id: int, message: str, channel_id: i
     old_message = get_message_content(og_message_id)
 
     shared_message_id = len(get_message_ids()) + 1
-    content = old_message + " " + message
+    content = old_message + message
     dt = datetime.now()
     time_created = int(dt.timestamp())
 
