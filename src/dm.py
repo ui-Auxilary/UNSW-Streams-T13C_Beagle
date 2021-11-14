@@ -1,7 +1,8 @@
 from src.error import InputError, AccessError
 from src.other import decode_token, check_valid_tag
 from datetime import timezone, datetime
-from typing import TypedDict, Dict
+from typing import Dict
+from typing_extensions import TypedDict
 
 from src.data_operations import (
     add_dm,

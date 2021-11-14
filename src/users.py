@@ -5,7 +5,8 @@ Functions:
     users_all(token: str) -> dict
 '''
 
-from typing import TypedDict, Dict
+from typing import Dict
+from typing_extensions import TypedDict
 from src.error import InputError
 from src.data_operations import (
     get_user_handles,

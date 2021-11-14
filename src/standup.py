@@ -1,5 +1,6 @@
 import threading
-from typing import TypedDict, Dict
+from typing import Dict
+from typing_extensions import TypedDict
 from src.error import InputError, AccessError
 from src.other import decode_token
 from datetime import timezone, datetime

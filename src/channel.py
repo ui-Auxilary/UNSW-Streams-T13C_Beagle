@@ -8,7 +8,7 @@ Functions:
     channel_join_v1(auth_user_id: int, channel_id: int) -> dict
 '''
 
-from typing import Type, TypedDict
+from typing_extensions import TypedDict
 from src.error import InputError, AccessError
 from src.other import decode_token
 from src.data_operations import (
