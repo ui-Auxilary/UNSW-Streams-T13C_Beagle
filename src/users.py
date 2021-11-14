@@ -5,7 +5,7 @@ Functions:
     users_all(token: str) -> dict
 '''
 
-from typing import TypedDict
+from typing import TypedDict, Dict
 from src.error import InputError
 from src.data_operations import (
     get_user_handles,
@@ -70,7 +70,7 @@ def users_all(token: str) -> users_all:
     return users
 
 
-def users_stats_v1(token: str) -> dict[str, dict]:
+def users_stats_v1(token: str) -> Dict[str, dict]:
     decode_token(token)
 
     update_workspace_stats(False, False, False)

@@ -24,7 +24,7 @@ from src.data_operations import (
 from src.error import AccessError
 from datetime import datetime
 from random import randint
-from typing import Union
+from typing import Union, Dict
 
 
 def clear_v1():
@@ -40,7 +40,7 @@ def clear_v1():
     return {}
 
 
-def get_uid_by_email(email: str) -> dict[str, int]:
+def get_uid_by_email(email: str) -> Dict[str, int]:
     '''
     Gets a user's id using their email address
 
@@ -58,7 +58,7 @@ def get_uid_by_email(email: str) -> dict[str, int]:
     return user_id
 
 
-def encode_token(user_id: int) -> dict[str, int]:
+def encode_token(user_id: int) -> Dict[str, int]:
     '''
     Generates a unique user session token for a given user_id
 
@@ -84,7 +84,7 @@ def encode_token(user_id: int) -> dict[str, int]:
     return encoded_token
 
 
-def decode_token(token: str) -> dict[str, int]:
+def decode_token(token: str) -> Dict[str, int]:
     '''
     Decodes a user token to give the user_id it is associated with
 

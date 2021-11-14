@@ -1,7 +1,7 @@
 from src.error import InputError, AccessError
 from src.other import decode_token, check_valid_tag
 from datetime import timezone, datetime
-from typing import TypedDict
+from typing import TypedDict, Dict
 
 from src.data_operations import (
     add_dm,
@@ -31,7 +31,7 @@ class dm_messages(TypedDict):
     end: int
 
 
-def dm_create_v1(token: str, u_ids: list[int]) -> dict[str, int]:
+def dm_create_v1(token: str, u_ids: list[int]) -> Dict[str, int]:
     '''
     Creates a new dm
 
@@ -92,7 +92,7 @@ def dm_create_v1(token: str, u_ids: list[int]) -> dict[str, int]:
     }
 
 
-def dm_list_v1(token: str) -> dict[str, list]:
+def dm_list_v1(token: str) -> Dict[str, list]:
     '''
     Returns the list of DMs that the user is part of.
 
@@ -347,7 +347,7 @@ def dm_messages_v1(token: str, dm_id: int, start: int) -> dm_messages:
     }
 
 
-def message_senddm_v1(token: str, dm_id: int, message: str) -> dict[str, int]:
+def message_senddm_v1(token: str, dm_id: int, message: str) -> Dict[str, int]:
     '''
     Sends a message into a dm
 

@@ -28,6 +28,7 @@ from src.data_operations import (
     get_user_stats
 )
 from src.other import decode_token
+from typing import Dict
 
 
 def user_profile(token: str, user_id: int) -> dict:
@@ -203,7 +204,7 @@ def user_profile_uploadphoto_v1(token: str, img_url: str, x_start: int, y_start:
     return {}
 
 
-def notifications_get_v1(token: str) -> dict[str, list]:
+def notifications_get_v1(token: str) -> Dict[str, list]:
     auth_user_id = decode_token(token)
 
     notifications_arr = []
@@ -230,7 +231,7 @@ def notifications_get_v1(token: str) -> dict[str, list]:
     }
 
 
-def user_stats_v1(token: str) -> dict[str, dict]:
+def user_stats_v1(token: str) -> Dict[str, dict]:
     user_id = decode_token(token)
 
     update_user_stats(user_id, False, False, False)

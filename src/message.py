@@ -2,7 +2,7 @@ import threading
 from src.error import InputError, AccessError
 from src.other import decode_token, check_valid_tag
 from datetime import timezone, datetime
-from typing import Optional
+from typing import Optional, Dict
 from src.data_operations import (
     get_channel_ids,
     get_channel,
@@ -30,7 +30,7 @@ from src.data_operations import (
 )
 
 
-def message_send_v1(token: str, channel_id: int, message: str, message_sendlater: Optional[int] = 0) -> dict[str, int]:
+def message_send_v1(token: str, channel_id: int, message: str, message_sendlater: Optional[int] = 0) -> Dict[str, int]:
     '''
     Sends a message into the channel
 
@@ -461,7 +461,7 @@ def message_unpin_v1(token: str, message_id: int) -> dict:
     return {}
 
 
-def message_share_v1(token: str, og_message_id: int, message: str, channel_id: int, dm_id: int) -> dict[str, int]:
+def message_share_v1(token: str, og_message_id: int, message: str, channel_id: int, dm_id: int) -> Dict[str, int]:
     '''
     Shares a message from a channel or dm to another channel or dm
 
@@ -559,7 +559,7 @@ def message_share_v1(token: str, og_message_id: int, message: str, channel_id: i
     }
 
 
-def message_sendlater_v1(token: str, channel_id: int, message: str, time_sent: int) -> dict[str, int]:
+def message_sendlater_v1(token: str, channel_id: int, message: str, time_sent: int) -> Dict[str, int]:
     auth_user_id = decode_token(token)
 
     if channel_id not in get_channel_ids():
