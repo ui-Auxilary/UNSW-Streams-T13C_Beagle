@@ -110,6 +110,12 @@ def create_dms(create_users):
         'message': 'wee woo haha'
     })
 
+    requests.post(config.url + 'message/senddm/v1', json={
+        'token': token_2,
+        'dm_id': dm_id,
+        'message': 'wee woo haha'
+    })
+
     message_id = json.loads(create_message.text)['message_id']
 
     return dm_id, message_id

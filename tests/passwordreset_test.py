@@ -32,6 +32,14 @@ def test_simple_case(clear_data, create_data):
 
     assert login_request.status_code == 200
 
+    requests.post(config.url + 'auth/register/v2', json={
+        'email': 'newuser@gmail.com',
+        'password': 'mypassword',
+        'name_first': 'Firstname',
+        'name_last': 'Lastname'
+    })
+
+
     requests.post(config.url + 'auth/passwordreset/request/v1', json={
         'email': 'dhruv.gravity@gmail.com'
     })
