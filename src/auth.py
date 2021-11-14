@@ -215,7 +215,7 @@ def auth_passwordreset_request(email: str) -> dict:
     # Get user ID from email in data
     user_id = get_uid_by_email(email)
 
-    init_reset_key = secrets.randbits(32)
+    init_reset_key = secrets.randbits(20)
     add_passwordreset_key(user_id, str(init_reset_key))
 
     smtp_server = 'smtp.gmail.com'
