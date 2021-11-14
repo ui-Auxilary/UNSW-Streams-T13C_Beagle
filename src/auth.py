@@ -78,7 +78,7 @@ def generate_user_handle(name_first: str, name_last: str) -> str:
     return user_handle
 
 
-def auth_login_v1(email: str, password: str) -> int:
+def auth_login_v1(email: str, password: str) -> dict[str, int]:
     '''
     Logs in user given a valid email and password
 
@@ -115,7 +115,7 @@ def auth_login_v1(email: str, password: str) -> int:
     }
 
 
-def auth_register_v1(email: Optional[str] = '', password: Optional[str] = '', name_first: Optional[str] = '', name_last: Optional[str] = '') -> int:
+def auth_register_v1(email: Optional[str] = '', password: Optional[str] = '', name_first: Optional[str] = '', name_last: Optional[str] = '') -> dict[str, int]:
     '''
     Registers user using an email, password, first name and last name.
     Adds the user's data into the database with a user handle and
@@ -260,7 +260,7 @@ def auth_passwordreset_reset(reset_code: int, new_password: str) -> dict:
     return {}
 
 
-def oauth_register_v1(email: str = '', name_first: str = '', name_last: str = '', image_url: str = '') -> int:
+def oauth_register_v1(email: str = '', name_first: str = '', name_last: str = '', image_url: str = '') -> dict[str, int]:
     '''
     Registers user using an email, first name and last name via Oauth.
     Adds the user's data into the database with a user handle and
